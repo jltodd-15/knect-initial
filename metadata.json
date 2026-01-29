@@ -1,0 +1,7 @@
+{
+  "name": "Knect",
+  "description": "A social logistics web app for effortless event planning and spontaneous connection. Features smart scheduling, a privacy-first social dashboard, and a discovery feed for local activities.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
