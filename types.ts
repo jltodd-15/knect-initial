@@ -1,4 +1,3 @@
-
 export interface User {
   id: string;
   name: string;
@@ -6,6 +5,8 @@ export interface User {
   status?: string;
   isAvailable: boolean;
   interests?: string[];
+  location?: string;
+  bio?: string;
 }
 
 export interface Message {
@@ -13,6 +14,21 @@ export interface Message {
   senderId: string;
   text: string;
   timestamp: Date;
+  type?: 'text' | 'invite';
+  eventId?: string;
+  eventDetails?: {
+    title: string;
+    location: string;
+    time: string;
+    color: string;
+  };
+}
+
+export interface Attendee {
+  userId: string;
+  name: string;
+  avatar: string;
+  status: 'confirmed' | 'declined' | 'pending';
 }
 
 export interface Conversation {
@@ -27,10 +43,15 @@ export interface Conversation {
 export interface CalendarEvent {
   id: string;
   title: string;
-  date: number;
+  timestamp: number; // MS timestamp of the start time
+  endTime?: number; // MS timestamp of the end time
   type: string;
   location?: string;
   participants: string[];
+  color?: string;
+  attendees?: Attendee[];
+  status?: 'proposed' | 'confirmed';
+  isAllDay?: boolean;
 }
 
 export interface TimeWindow {

@@ -1,4 +1,3 @@
-
 import { GoogleGenAI, Type } from "@google/genai";
 import { TimeWindow, DiscoveryItem } from "../types";
 
@@ -42,15 +41,13 @@ export const getSmartSchedulingSuggestions = async (
 
 export const getDiscoveryFeed = async (location?: string): Promise<DiscoveryItem[]> => {
   const prompt = `Generate a personalized activity feed for someone in ${location || 'San Francisco'}. 
-  Include 5 activity ideas (restaurants, parks, venues) using Google Search/Maps knowledge. 
-  Include 1 "Sponsored" content item clearly labeled. 
+  Include 5 activity ideas (restaurants, parks, venues). 
   Output as a JSON array.`;
 
   const response = await ai.models.generateContent({
     model: "gemini-3-flash-preview",
     contents: prompt,
     config: {
-      tools: [{ googleSearch: {} }],
       responseMimeType: "application/json",
       responseSchema: {
         type: Type.ARRAY,
@@ -74,7 +71,6 @@ export const getDiscoveryFeed = async (location?: string): Promise<DiscoveryItem
 
   try {
     const data = JSON.parse(response.text);
-    // Inject real placeholder images since AI might give generic strings
     return data.map((item: DiscoveryItem, idx: number) => ({
       ...item,
       image: `https://picsum.photos/seed/${item.id || idx}/600/800`
