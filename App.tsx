@@ -6,7 +6,10 @@ import DiscoveryFeed from './components/DiscoveryFeed';
 import EventPlanner from './components/EventPlanner';
 import SocialDashboard from './components/SocialDashboard';
 import ProfilePage from './components/ProfilePage';
-import { GoogleGenAI } from '@google/genai'; // Keeping logic imports
+//import { GoogleGenAI } from '@google/genai'; // Keeping logic imports
+
+import { createAsyncStorage } from "@react-native-async-storage/async-storage";
+
 
 // Auth Component
 import { TouchableOpacity, TextInput, Image } from 'react-native';
@@ -17,13 +20,17 @@ const App: React.FC = () => {
   const [isAuth, setIsAuth] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false); // Default logic handled in useEffect
 
+  const localStorage = createAsyncStorage("appDB");
+
   // Theme State Initialization
   useEffect(() => {
-    const savedTheme = localStorage.getItem('knect_theme');
-    if (savedTheme) {
-      setIsDarkMode(savedTheme === 'dark');
-    } else {
-      setIsDarkMode(systemColorScheme === 'dark');
+    async () => { 
+      const savedTheme = await localStorage.getItem('knect_theme'); 
+      if (savedTheme) {
+        setIsDarkMode(savedTheme === 'dark');
+      } else {
+        setIsDarkMode(systemColorScheme === 'dark');
+      }
     }
   }, [systemColorScheme]);
 
@@ -34,7 +41,7 @@ const App: React.FC = () => {
 
   useEffect(() => {
     const savedUser = localStorage.getItem('knect_session');
-    if (savedUser) setIsAuth(true);
+    if (savedUser != null) setIsAuth(true);
   }, []);
 
   const toggleDarkMode = () => {
@@ -48,6 +55,7 @@ const App: React.FC = () => {
     // Simulate API call
     setTimeout(() => {
       const mockUser = { id: 'user_123', email: email || 'alex@knect.app' };
+      // TODO: add session handling here, data retrieval, etc.
       localStorage.setItem('knect_session', JSON.stringify(mockUser));
       setIsAuth(true);
       setLoading(false);
