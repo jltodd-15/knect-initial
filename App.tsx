@@ -10,7 +10,6 @@ import ProfilePage from './components/ProfilePage';
 
 import { createAsyncStorage } from "@react-native-async-storage/async-storage";
 
-
 // Auth Component
 import { TouchableOpacity, TextInput, Image } from 'react-native';
 
