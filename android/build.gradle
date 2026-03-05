@@ -1,4 +1,4 @@
-println "$rootDir"
+// println "$rootDir"
 allprojects {
     repositories{
         mavenCentral()

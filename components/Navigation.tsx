@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Platform, Dimensions } from 'react-native';
+import Svg, { Rect, Line, Circle, Path } from 'react-native-svg';
 import { AppTab } from '../types';
 
 interface NavigationProps {
@@ -11,11 +12,48 @@ interface NavigationProps {
 const Navigation: React.FC<NavigationProps> = ({ activeTab, setActiveTab, isDarkMode }) => {
   const styles = getStyles(isDarkMode);
 
+  const renderIcon = (id: AppTab, color: string) => {
+    switch (id) {
+      case AppTab.PLANNER:
+        return (
+          <Svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5">
+            <Rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+            <Line x1="16" y1="2" x2="16" y2="6" />
+            <Line x1="8" y1="2" x2="8" y2="6" />
+            <Line x1="3" y1="10" x2="21" y2="10" />
+          </Svg>
+        );
+      case AppTab.FEED:
+        return (
+          <Svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5">
+            <Circle cx="11" cy="11" r="8" />
+            <Line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </Svg>
+        );
+      case AppTab.SOCIAL:
+        return (
+          <Svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5">
+            <Path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+            <Circle cx="9" cy="7" r="4" />
+            <Path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+            <Path d="M16 3.13a4 4 0 0 1 0 7.75" />
+          </Svg>
+        );
+      case AppTab.PROFILE:
+        return (
+          <Svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5">
+            <Path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+            <Circle cx="12" cy="7" r="4" />
+          </Svg>
+        );
+    }
+  };
+
   const tabs = [
-    { id: AppTab.PLANNER, label: 'Planner', icon: '📅' },
-    { id: AppTab.FEED, label: 'Discover', icon: '🔍' },
-    { id: AppTab.SOCIAL, label: 'Circle', icon: '💬' },
-    { id: AppTab.PROFILE, label: 'Profile', icon: '👤' },
+    { id: AppTab.PLANNER, label: 'Planner' },
+    { id: AppTab.FEED, label: 'Discover' },
+    { id: AppTab.SOCIAL, label: 'Circle' },
+    { id: AppTab.PROFILE, label: 'Profile' },
   ];
 
   return (
@@ -23,6 +61,7 @@ const Navigation: React.FC<NavigationProps> = ({ activeTab, setActiveTab, isDark
       <View style={styles.tabBar}>
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
+          const color = isActive ? '#10b981' : (isDarkMode ? '#52525b' : '#a1a1aa');
           return (
             <TouchableOpacity
               key={tab.id}
@@ -31,9 +70,9 @@ const Navigation: React.FC<NavigationProps> = ({ activeTab, setActiveTab, isDark
               activeOpacity={0.7}
             >
               <View style={[styles.iconContainer, isActive && styles.activeIconContainer]}>
-                <Text style={[styles.icon, isActive && styles.activeIcon]}>{tab.icon}</Text>
+                {renderIcon(tab.id, color)}
               </View>
-              <Text style={[styles.label, isActive && styles.activeLabel]}>
+              <Text style={[styles.label, { color }]}>
                 {tab.label}
               </Text>
             </TouchableOpacity>
@@ -53,13 +92,14 @@ const getStyles = (isDark: boolean) => StyleSheet.create({
     backgroundColor: isDark ? 'rgba(18, 18, 18, 0.95)' : 'rgba(255, 255, 255, 0.95)',
     borderTopWidth: 1,
     borderTopColor: isDark ? '#27272a' : '#f4f4f5',
-    paddingBottom: Platform.OS === 'ios' ? 20 : 0, // Safe area padding
+    paddingBottom: Platform.OS === 'ios' ? 20 : 0,
   },
   tabBar: {
     flexDirection: 'row',
-    height: 60,
+    height: 70,
     justifyContent: 'space-around',
     alignItems: 'center',
+    paddingBottom: 10,
   },
   tab: {
     flex: 1,
@@ -74,23 +114,11 @@ const getStyles = (isDark: boolean) => StyleSheet.create({
   activeIconContainer: {
     transform: [{ scale: 1.1 }],
   },
-  icon: {
-    fontSize: 20,
-    opacity: 0.5,
-    filter: isDark ? 'grayscale(100%)' : 'none', // Web support
-  },
-  activeIcon: {
-    opacity: 1,
-  },
   label: {
     fontSize: 9,
     fontWeight: '900',
     textTransform: 'uppercase',
     letterSpacing: 1,
-    color: isDark ? '#71717a' : '#a1a1aa',
-  },
-  activeLabel: {
-    color: '#10b981',
   }
 });
 

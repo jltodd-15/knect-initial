@@ -1,64 +1,62 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, StatusBar, useColorScheme, Platform } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, StatusBar, Platform } from 'react-native';
 import { AppTab } from './types';
 import Navigation from './components/Navigation';
 import DiscoveryFeed from './components/DiscoveryFeed';
 import EventPlanner from './components/EventPlanner';
 import SocialDashboard from './components/SocialDashboard';
 import ProfilePage from './components/ProfilePage';
-//import { GoogleGenAI } from '@google/genai'; // Keeping logic imports
+import CreateProfilePage from './components/CreateProfilePage';
+import { localStorage } from './utils/storage';
 
-import { createAsyncStorage } from "@react-native-async-storage/async-storage";
-
-// Auth Component
-import { TouchableOpacity, TextInput, Image } from 'react-native';
+import { DiscoveryItem } from './types';
 
 const App: React.FC = () => {
-  const systemColorScheme = useColorScheme();
+  const [isDarkMode, setIsDarkMode] = useState(false);
   const [activeTab, setActiveTab] = useState<AppTab>(AppTab.PLANNER);
   const [isAuth, setIsAuth] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(false); // Default logic handled in useEffect
+  const [showCreateProfile, setShowCreateProfile] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [pendingDiscoveryItem, setPendingDiscoveryItem] = useState<DiscoveryItem | null>(null);
+  const [pendingParticipants, setPendingParticipants] = useState<string[]>([]);
 
-  const localStorage = createAsyncStorage("appDB");
-
-  // Theme State Initialization
-  useEffect(() => {
-    async () => { 
-      const savedTheme = await localStorage.getItem('knect_theme'); 
-      if (savedTheme) {
-        setIsDarkMode(savedTheme === 'dark');
-      } else {
-        setIsDarkMode(systemColorScheme === 'dark');
-      }
-    }
-  }, [systemColorScheme]);
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
   // Auth State
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const savedUser = localStorage.getItem('knect_session');
-    if (savedUser != null) setIsAuth(true);
+    const savedTheme = localStorage.getItem('knect_theme');
+    if (savedTheme) setIsDarkMode(savedTheme === 'dark');
+    
+    const session = localStorage.getItem('knect_session');
+    if (session) setIsAuth(true);
   }, []);
 
-  const toggleDarkMode = () => {
-    const newMode = !isDarkMode;
-    setIsDarkMode(newMode);
-    localStorage.setItem('knect_theme', newMode ? 'dark' : 'light');
-  };
-
-  const handleAuth = async () => {
+  const handleAuth = () => {
     setLoading(true);
-    // Simulate API call
     setTimeout(() => {
-      const mockUser = { id: 'user_123', email: email || 'alex@knect.app' };
-      // TODO: add session handling here, data retrieval, etc.
-      localStorage.setItem('knect_session', JSON.stringify(mockUser));
+      localStorage.setItem('knect_session', 'true');
       setIsAuth(true);
       setLoading(false);
     }, 1000);
+  };
+
+  const handleSignUp = () => {
+      setLoading(true);
+      setTimeout(() => {
+          setLoading(false);
+          setShowCreateProfile(true);
+      }, 800);
+  };
+
+  const handleProfileComplete = (profileData: any) => {
+      // Save profile data to localStorage (mock)
+      localStorage.setItem('knect_profile', JSON.stringify(profileData));
+      localStorage.setItem('knect_session', 'true');
+      setShowCreateProfile(false);
+      setIsAuth(true);
   };
 
   const handleLogout = () => {
@@ -66,140 +64,157 @@ const App: React.FC = () => {
     setIsAuth(false);
   };
 
+  const toggleDarkMode = () => {
+    const newVal = !isDarkMode;
+    setIsDarkMode(newVal);
+    localStorage.setItem('knect_theme', newVal ? 'dark' : 'light');
+  };
+
+  const handlePlanActivity = (item: DiscoveryItem | null, participants?: string[]) => {
+      if (item) setPendingDiscoveryItem(item);
+      if (participants) setPendingParticipants(participants);
+      setIsChatOpen(false); // Close chat to show nav bar
+      setActiveTab(AppTab.PLANNER);
+  };
+
   const styles = getStyles(isDarkMode);
+
+  if (showCreateProfile) {
+      return (
+          <SafeAreaView style={styles.container}>
+              <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
+              <CreateProfilePage isDarkMode={isDarkMode} onComplete={handleProfileComplete} />
+          </SafeAreaView>
+      );
+  }
 
   if (!isAuth) {
     return (
-      <SafeAreaView style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+      <View style={styles.container}>
         <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
         <View style={styles.authContainer}>
-          <View style={styles.logoContainer}>
-             <Text style={styles.logoText}>K</Text>
+          <View style={{ alignItems: 'center', marginBottom: 40 }}>
+             <View style={styles.logoBox}>
+                <Text style={styles.logoText}>Kn</Text>
+             </View>
+             <Text style={styles.appTitle}>Knect</Text>
+             <Text style={styles.appSubtitle}>Plan smarter. Connect deeper.</Text>
           </View>
-          <Text style={styles.title}>Knect</Text>
-          <Text style={styles.subtitle}>PLAN SMARTER. CONNECT DEEPER.</Text>
 
-          <View style={styles.formContainer}>
-            <TextInput 
-              style={styles.input} 
-              placeholder="EMAIL" 
-              placeholderTextColor={isDarkMode ? '#666' : '#999'}
-              value={email}
-              onChangeText={setEmail}
-              autoCapitalize="none"
-            />
-            <TextInput 
-              style={styles.input} 
-              placeholder="PASSWORD" 
-              placeholderTextColor={isDarkMode ? '#666' : '#999'}
-              secureTextEntry
-              value={password}
-              onChangeText={setPassword}
-            />
-            <TouchableOpacity style={styles.button} onPress={handleAuth} disabled={loading}>
-              <Text style={styles.buttonText}>{loading ? 'CONNECTING...' : 'SIGN IN'}</Text>
-            </TouchableOpacity>
+          <View style={styles.formCard}>
+             <TextInput 
+                style={styles.input} 
+                placeholder="EMAIL ADDRESS" 
+                placeholderTextColor={isDarkMode ? '#666' : '#999'}
+                value={email}
+                onChangeText={setEmail}
+                autoCapitalize="none"
+             />
+             <TextInput 
+                style={styles.input} 
+                placeholder="PASSWORD" 
+                placeholderTextColor={isDarkMode ? '#666' : '#999'}
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry
+             />
+             <TouchableOpacity style={styles.signInBtn} onPress={handleAuth} disabled={loading}>
+                <Text style={styles.signInText}>{loading ? 'PROCESSING...' : 'SIGN IN'}</Text>
+             </TouchableOpacity>
+             
+             <TouchableOpacity style={[styles.signInBtn, {backgroundColor: 'transparent', borderWidth: 1, borderColor: isDarkMode ? '#333' : '#ddd', marginTop: 12}]} onPress={handleSignUp} disabled={loading}>
+                <Text style={[styles.signInText, {color: isDarkMode ? 'white' : 'black'}]}>CREATE ACCOUNT</Text>
+             </TouchableOpacity>
+
+             <View style={styles.divider}>
+               <View style={styles.line} />
+               <Text style={styles.orText}>OR</Text>
+               <View style={styles.line} />
+             </View>
+
+             <View style={styles.socialRow}>
+                <TouchableOpacity style={styles.socialBtn} onPress={handleAuth}>
+                   <Text style={styles.socialText}>Google</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.socialBtn} onPress={handleAuth}>
+                   <Text style={styles.socialText}>Apple</Text>
+                </TouchableOpacity>
+             </View>
           </View>
         </View>
-      </SafeAreaView>
+      </View>
     );
   }
 
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      
-      <View style={styles.contentContainer}>
-        {activeTab === AppTab.PLANNER && <EventPlanner isDarkMode={isDarkMode} />}
-        {activeTab === AppTab.FEED && <DiscoveryFeed isDarkMode={isDarkMode} />}
-        {activeTab === AppTab.SOCIAL && <SocialDashboard isDarkMode={isDarkMode} />}
+      <View style={styles.content}>
+        {activeTab === AppTab.PLANNER && (
+            <EventPlanner 
+                isDarkMode={isDarkMode} 
+                initialProposal={pendingDiscoveryItem} 
+                initialParticipants={pendingParticipants}
+            />
+        )}
+        {activeTab === AppTab.FEED && (
+            <DiscoveryFeed 
+                isDarkMode={isDarkMode} 
+                onPlanActivity={(item) => handlePlanActivity(item)} 
+            />
+        )}
+        {activeTab === AppTab.SOCIAL && (
+            <SocialDashboard 
+                isDarkMode={isDarkMode} 
+                onChatOpen={() => setIsChatOpen(true)}
+                onChatClose={() => setIsChatOpen(false)}
+                onPlanActivity={(item, participants) => handlePlanActivity(item, participants)}
+            />
+        )}
         {activeTab === AppTab.PROFILE && <ProfilePage isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} onLogout={handleLogout} />}
       </View>
-
-      <Navigation activeTab={activeTab} setActiveTab={setActiveTab} isDarkMode={isDarkMode} />
+      {!isChatOpen && <Navigation activeTab={activeTab} setActiveTab={setActiveTab} isDarkMode={isDarkMode} />}
     </SafeAreaView>
   );
 };
 
 const getStyles = (isDark: boolean) => StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: isDark ? '#121212' : '#FDFCFB',
-  },
-  contentContainer: {
-    flex: 1,
-    paddingBottom: 80, // Space for tab bar
-  },
-  authContainer: {
-    width: '100%',
-    padding: 30,
-    alignItems: 'center',
-  },
-  logoContainer: {
-    width: 80,
-    height: 80,
-    backgroundColor: '#10b981',
-    borderRadius: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 20,
-    transform: [{ rotate: '3deg' }]
+  container: { flex: 1, backgroundColor: isDark ? '#121212' : '#FDFCFB' },
+  content: { flex: 1 },
+  authContainer: { flex: 1, justifyContent: 'center', padding: 24 },
+  
+  // Updated Logo Styles (Matte, Static, Anonymous Pro)
+  logoBox: { 
+    width: 80, 
+    height: 80, 
+    borderRadius: 24, 
+    backgroundColor: '#10b981', 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    marginBottom: 24,
+    // Removed shadow props for matte look
   },
   logoText: {
+    fontFamily: 'Anonymous Pro',
+    fontSize: 42,
+    fontWeight: '700',
     color: 'white',
-    fontSize: 40,
-    fontWeight: '900',
+    letterSpacing: -2
   },
-  title: {
-    fontSize: 40,
-    fontWeight: '900',
-    color: isDark ? 'white' : '#18181b',
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 10,
-    fontWeight: 'bold',
-    letterSpacing: 2,
-    color: '#71717a',
-    marginBottom: 40,
-  },
-  formContainer: {
-    width: '100%',
-    backgroundColor: isDark ? '#1E1E1E' : 'white',
-    padding: 24,
-    borderRadius: 32,
-    borderWidth: 1,
-    borderColor: isDark ? '#27272a' : '#f4f4f5',
-    gap: 16,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-  },
-  input: {
-    width: '100%',
-    padding: 20,
-    backgroundColor: isDark ? '#27272a' : '#f4f4f5',
-    borderRadius: 20,
-    color: isDark ? 'white' : 'black',
-    fontWeight: 'bold',
-    fontSize: 12,
-    letterSpacing: 1,
-  },
-  button: {
-    width: '100%',
-    padding: 20,
-    backgroundColor: '#10b981',
-    borderRadius: 20,
-    alignItems: 'center',
-    marginTop: 8,
-  },
-  buttonText: {
-    color: 'white',
-    fontWeight: '900',
-    fontSize: 12,
-    letterSpacing: 2,
-  }
+  
+  appTitle: { fontSize: 40, fontWeight: '700', color: isDark ? 'white' : 'black', marginBottom: 8, fontFamily: 'Anonymous Pro' },
+  appSubtitle: { fontSize: 10, fontWeight: '900', color: '#71717a', textTransform: 'uppercase', letterSpacing: 2, fontFamily: 'Inter' },
+  
+  formCard: { backgroundColor: isDark ? '#1E1E1E' : 'white', padding: 32, borderRadius: 40, gap: 16, borderWidth: 1, borderColor: isDark ? '#333' : '#f0f0f0' },
+  input: { backgroundColor: isDark ? '#2C2C2C' : '#f4f4f5', padding: 20, borderRadius: 24, fontSize: 12, fontWeight: 'bold', color: isDark ? 'white' : 'black', fontFamily: 'Inter' },
+  signInBtn: { backgroundColor: '#10b981', padding: 20, borderRadius: 24, alignItems: 'center' },
+  signInText: { color: 'white', fontWeight: '900', fontSize: 12, letterSpacing: 2, fontFamily: 'Inter' },
+  divider: { flexDirection: 'row', alignItems: 'center', marginVertical: 8 },
+  line: { flex: 1, height: 1, backgroundColor: isDark ? '#333' : '#eee' },
+  orText: { marginHorizontal: 16, fontSize: 10, fontWeight: '900', color: '#71717a', fontFamily: 'Inter' },
+  socialRow: { flexDirection: 'row', gap: 16 },
+  socialBtn: { flex: 1, padding: 16, borderRadius: 24, borderWidth: 1, borderColor: isDark ? '#333' : '#eee', alignItems: 'center' },
+  socialText: { fontWeight: 'bold', color: '#71717a', fontSize: 10, textTransform: 'uppercase', fontFamily: 'Inter' }
 });
 
 export default App;
