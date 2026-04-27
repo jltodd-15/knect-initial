@@ -6,7 +6,6 @@ import CreateEventModal from './CreateEventModal';
 import { calculateEventLayouts } from '../utils/calendarLayout';
 import DraggableEvent from './DraggableEvent';
 import { ChatService } from '../services/ChatService';
-import { storage } from '../utils/storage';
 import { statusService } from '../services/StatusService';
 import { MOCK_FRIENDS } from '../constants';
 
@@ -74,28 +73,21 @@ const EventPlanner: React.FC<Props> = ({ isDarkMode, initialProposal, initialPar
   }, [initialProposal, initialParticipants]);
 
   useEffect(() => {
-    // Load events from storage
-    const savedEvents = storage.getItem('knect_events');
-    if (savedEvents) {
-        setMyEvents(JSON.parse(savedEvents));
-    } else {
-        // Mock initial data matching screenshot
-        const mockDate = new Date(INITIAL_NOW.getFullYear(), INITIAL_NOW.getMonth(), INITIAL_NOW.getDate(), 18, 30).getTime();
-        const initialEvents: CalendarEvent[] = [{
-            id: '1', 
-            title: 'MOVIE NIGHT', 
-            timestamp: mockDate,
-            endTime: mockDate + 10800000, // 3 hr
-            type: 'personal', // Changed to personal since no participants
-            location: 'TBD', 
-            participants: [], 
-            color: '#10b981',
-            status: 'confirmed', // Changed to confirmed
-            isAllDay: false
-        }];
-        setMyEvents(initialEvents);
-        storage.setItem('knect_events', JSON.stringify(initialEvents));
-    }
+    // Mock initial data matching screenshot
+    const mockDate = new Date(INITIAL_NOW.getFullYear(), INITIAL_NOW.getMonth(), INITIAL_NOW.getDate(), 18, 30).getTime();
+    const initialEvents: CalendarEvent[] = [{
+        id: '1', 
+        title: 'MOVIE NIGHT', 
+        timestamp: mockDate,
+        endTime: mockDate + 10800000, // 3 hr
+        type: 'personal', // Changed to personal since no participants
+        location: 'TBD', 
+        participants: [], 
+        color: '#10b981',
+        status: 'confirmed', // Changed to confirmed
+        isAllDay: false
+    }];
+    setMyEvents(initialEvents);
     
     const interval = setInterval(() => setCurrentTime(new Date()), 60000);
     return () => clearInterval(interval);
@@ -103,9 +95,7 @@ const EventPlanner: React.FC<Props> = ({ isDarkMode, initialProposal, initialPar
 
   // Save events whenever they change
   useEffect(() => {
-      if (myEvents.length > 0) {
-          storage.setItem('knect_events', JSON.stringify(myEvents));
-      }
+    // TODO: Create listener for new events
   }, [myEvents]);
 
   const handleDeleteEvent = (eventId: string) => {

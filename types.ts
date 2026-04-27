@@ -2,7 +2,7 @@ export interface UserStatus {
   isAvailable: boolean;
   activity: string;
   privacy: 'all' | 'close-friends' | 'specific-groups';
-  timestamp: number; // MS timestamp of last update
+  //timestamp: number; // MS timestamp of last update
 }
 
 export interface User {
@@ -21,6 +21,8 @@ export interface Friend {
   name: string;
   avatar: string;
   busyHours: number[];
+  isCloseFriend?: Boolean;
+  status?: Boolean;
 }
 
 export interface Message {

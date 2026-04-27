@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, Image, TouchableOpacity, StyleSheet, Switch, Modal, FlatList, TextInput, Alert } from 'react-native';
 import Svg, { Path, Line } from 'react-native-svg';
 import { MOCK_FRIENDS } from '../constants';
-import { storage } from '../utils/storage';
+import { localStorage } from '../utils/storage';
 
 interface Props {
   isDarkMode: boolean;
@@ -24,7 +24,7 @@ const ProfilePage: React.FC<Props> = ({ isDarkMode, toggleDarkMode, onLogout }) 
   const [avatar, setAvatar] = useState('https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=400&h=400&fit=crop');
 
   useEffect(() => {
-      const savedProfile = storage.getItem('knect_profile');
+      const savedProfile = localStorage.getItem('knect_profile');
       if (savedProfile) {
           const data = JSON.parse(savedProfile);
           if (data.name) setName(data.name);
@@ -70,7 +70,7 @@ const ProfilePage: React.FC<Props> = ({ isDarkMode, toggleDarkMode, onLogout }) 
   const handleSaveProfile = () => {
       setIsEditing(false);
       const profileData = { name, role, interests, avatar };
-      storage.setItem('knect_profile', JSON.stringify(profileData));
+      localStorage.setItem('knect_profile', JSON.stringify(profileData));
   };
 
   return (
@@ -233,7 +233,7 @@ const ProfilePage: React.FC<Props> = ({ isDarkMode, toggleDarkMode, onLogout }) 
                            <Image source={{uri: item.avatar}} style={styles.friendAvatar} />
                            <View style={{flex: 1, marginLeft: 16}}>
                                <Text style={styles.friendName}>{item.name}</Text>
-                               <Text style={styles.friendStatus}>{item.status}</Text>
+                               <Text style={styles.friendStatus}>{item.status ? "Available" : "Away"}</Text>
                            </View>
                            <TouchableOpacity onPress={() => toggleCloseFriend(item.id)}>
                                <Svg width="24" height="24" viewBox="0 0 24 24" fill={item.isCloseFriend ? "#fbbf24" : "none"} stroke={item.isCloseFriend ? "#fbbf24" : (isDarkMode ? "#555" : "#ccc")} strokeWidth="2">

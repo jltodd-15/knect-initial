@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, StatusBar, Platform } from 'react-native';
+import { NativeModules, View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, StatusBar, Platform } from 'react-native';
 import { AppTab } from './types';
 import Navigation from './components/Navigation';
 import DiscoveryFeed from './components/DiscoveryFeed';
@@ -7,9 +7,10 @@ import EventPlanner from './components/EventPlanner';
 import SocialDashboard from './components/SocialDashboard';
 import ProfilePage from './components/ProfilePage';
 import CreateProfilePage from './components/CreateProfilePage';
-import { localStorage } from './utils/storage';
 
 import { DiscoveryItem } from './types';
+
+import { localStorage, keyChain } from './utils/storage';
 
 const App: React.FC = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -22,25 +23,24 @@ const App: React.FC = () => {
 
   const [isChatOpen, setIsChatOpen] = useState(false);
 
-  // Auth State
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
+  const {FirebaseModule} = NativeModules;
+
   useEffect(() => {
-    const savedTheme = localStorage.getItem('knect_theme');
-    if (savedTheme) setIsDarkMode(savedTheme === 'dark');
-    
-    const session = localStorage.getItem('knect_session');
-    if (session) setIsAuth(true);
+    setIsDarkMode(false);
   }, []);
 
   const handleAuth = () => {
     setLoading(true);
     setTimeout(() => {
-      localStorage.setItem('knect_session', 'true');
-      setIsAuth(true);
-      setLoading(false);
-    }, 1000);
+      if (!FirebaseModule.authenticateUser()) {
+        localStorage.setItem('knect_session', 'true');
+        setIsAuth(true);
+        setLoading(false);
+      }
+    }, 5000);
   };
 
   const handleSignUp = () => {
@@ -52,22 +52,18 @@ const App: React.FC = () => {
   };
 
   const handleProfileComplete = (profileData: any) => {
-      // Save profile data to localStorage (mock)
-      localStorage.setItem('knect_profile', JSON.stringify(profileData));
-      localStorage.setItem('knect_session', 'true');
+      FirebaseModule.createUserData(email, password);
       setShowCreateProfile(false);
       setIsAuth(true);
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('knect_session');
     setIsAuth(false);
   };
 
   const toggleDarkMode = () => {
     const newVal = !isDarkMode;
     setIsDarkMode(newVal);
-    localStorage.setItem('knect_theme', newVal ? 'dark' : 'light');
   };
 
   const handlePlanActivity = (item: DiscoveryItem | null, participants?: string[]) => {
@@ -89,6 +85,7 @@ const App: React.FC = () => {
   }
 
   if (!isAuth) {
+    console.log(isAuth);
     return (
       <View style={styles.container}>
         <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
@@ -183,7 +180,6 @@ const getStyles = (isDark: boolean) => StyleSheet.create({
   content: { flex: 1 },
   authContainer: { flex: 1, justifyContent: 'center', padding: 24 },
   
-  // Updated Logo Styles (Matte, Static, Anonymous Pro)
   logoBox: { 
     width: 80, 
     height: 80, 
@@ -192,7 +188,6 @@ const getStyles = (isDark: boolean) => StyleSheet.create({
     justifyContent: 'center', 
     alignItems: 'center', 
     marginBottom: 24,
-    // Removed shadow props for matte look
   },
   logoText: {
     fontFamily: 'Anonymous Pro',
