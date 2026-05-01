@@ -26,6 +26,9 @@ const App: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
+  //errors
+  const [loginError, setLoginError] = useState(false);
+
   const {FirebaseModule} = NativeModules;
 
   useEffect(() => {
@@ -35,10 +38,13 @@ const App: React.FC = () => {
   const handleAuth = () => {
     setLoading(true);
     setTimeout(() => {
-      if (!FirebaseModule.authenticateUser()) {
+      if (FirebaseModule.authenticateUser() == true) {
         localStorage.setItem('knect_session', 'true');
         setIsAuth(true);
         setLoading(false);
+      } else {
+        setLoading(false);
+        setLoginError(true);
       }
     }, 5000);
   };
@@ -51,9 +57,10 @@ const App: React.FC = () => {
       }, 800);
   };
 
-  const handleProfileComplete = (profileData: any) => {
+  const handleProfileComplete = async (profileData: any) => {
       FirebaseModule.createUserData(email, password);
       setShowCreateProfile(false);
+      await localStorage.setItem('knect_profile', JSON.stringify(profileData))
       setIsAuth(true);
   };
 
@@ -85,7 +92,6 @@ const App: React.FC = () => {
   }
 
   if (!isAuth) {
-    console.log(isAuth);
     return (
       <View style={styles.container}>
         <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
@@ -115,6 +121,11 @@ const App: React.FC = () => {
                 onChangeText={setPassword}
                 secureTextEntry
              />
+
+            {loginError && (
+              <Text style={styles.errorText}>{'Unable to sign in'}</Text>
+            )}
+             
              <TouchableOpacity style={styles.signInBtn} onPress={handleAuth} disabled={loading}>
                 <Text style={styles.signInText}>{loading ? 'PROCESSING...' : 'SIGN IN'}</Text>
              </TouchableOpacity>
@@ -209,7 +220,9 @@ const getStyles = (isDark: boolean) => StyleSheet.create({
   orText: { marginHorizontal: 16, fontSize: 10, fontWeight: '900', color: '#71717a', fontFamily: 'Inter' },
   socialRow: { flexDirection: 'row', gap: 16 },
   socialBtn: { flex: 1, padding: 16, borderRadius: 24, borderWidth: 1, borderColor: isDark ? '#333' : '#eee', alignItems: 'center' },
-  socialText: { fontWeight: 'bold', color: '#71717a', fontSize: 10, textTransform: 'uppercase', fontFamily: 'Inter' }
+  socialText: { fontWeight: 'bold', color: '#71717a', fontSize: 10, textTransform: 'uppercase', fontFamily: 'Inter' },
+
+  errorText: { color: '#ff8080', textAlign: 'center', fontFamily: 'Anonymous Pro' }
 });
 
 export default App;

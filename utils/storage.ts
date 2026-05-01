@@ -1,31 +1,7 @@
-import { createAsyncStorage } from "@react-native-async-storage/async-storage";
+import { createAsyncStorage,  } from "@react-native-async-storage/async-storage";
 import * as Keychain from 'react-native-keychain';
 
-export const localStorage =
-{
-  userData: (name: string) => createAsyncStorage(name),
-  getItem: (key: string): string | null => {
-    try {
-      return localStorage.getItem(key);
-    } catch (e) {
-      return null;
-    }
-  },
-  setItem: (key: string, value: string) => {
-    try {
-      localStorage.setItem(key, value);
-    } catch (e) {
-      console.error(e);
-    }
-  },
-  removeItem: (key: string) => {
-    try {
-      localStorage.removeItem(key);
-    } catch (e) {
-      console.error(e);
-    }
-  }
-};
+export const localStorage = createAsyncStorage("user_data");
 
 // Keychain exports
 const options: Keychain.SetOptions = {

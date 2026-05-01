@@ -76,11 +76,11 @@ class FirebaseModule(reactContext: ReactApplicationContext) : ReactContextBaseJa
     // last parameter has to be a Promise, so that JavaScript side will return expect a Promise
     fun authenticateUser(promise: Promise) {
         try {
-            val user = auth.currentUser ?: throw NullUserException();
+            val user = auth.currentUser
             //this.ActiveUser = dbConnection.getUserData(user!!.uid);
-            promise.resolve(true);
+            promise.resolve(true)
         } catch (e: Exception) {
-            promise.resolve(false);
+            promise.resolve(e)
         }
     }
 }

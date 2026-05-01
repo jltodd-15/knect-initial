@@ -24,7 +24,8 @@ const ProfilePage: React.FC<Props> = ({ isDarkMode, toggleDarkMode, onLogout }) 
   const [avatar, setAvatar] = useState('https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=400&h=400&fit=crop');
 
   useEffect(() => {
-      const savedProfile = localStorage.getItem('knect_profile');
+    (async () => {
+      const savedProfile = await localStorage.getItem('knect_profile');
       if (savedProfile) {
           const data = JSON.parse(savedProfile);
           if (data.name) setName(data.name);
@@ -32,6 +33,7 @@ const ProfilePage: React.FC<Props> = ({ isDarkMode, toggleDarkMode, onLogout }) 
           if (data.interests) setInterests(data.interests);
           if (data.avatar) setAvatar(data.avatar);
       }
+    })
   }, []);
 
   const toggleCloseFriend = (id: string) => {
@@ -55,6 +57,7 @@ const ProfilePage: React.FC<Props> = ({ isDarkMode, toggleDarkMode, onLogout }) 
   const handleImageChange = () => {
       if (!isEditing) return;
       
+      // TODO: remove this in lieu of actual image selection
       // Mock image cycling
       const mockImages = [
         'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=400&h=400&fit=crop',
