@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { NativeModules, View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, StatusBar, Platform } from 'react-native';
+import { NativeModules, View, Text, TextInput, TouchableOpacity, StyleSheet, StatusBar, Platform } from 'react-native';
+import {  SafeAreaProvider, SafeAreaView, SafeAreaInsetsContext, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppTab } from './types';
 import Navigation from './components/Navigation';
 import DiscoveryFeed from './components/DiscoveryFeed';
@@ -27,7 +28,8 @@ const App: React.FC = () => {
   const [password, setPassword] = useState('');
 
   //errors
-  const [loginError, setLoginError] = useState(false);
+  const [stateError, setStateError] = useState(false);
+  const [errorText, setErrorText ] = useState('');
 
   const {FirebaseModule} = NativeModules;
 
@@ -44,23 +46,20 @@ const App: React.FC = () => {
         setLoading(false);
       } else {
         setLoading(false);
-        setLoginError(true);
+        setErrorText(FirebaseModule.authenticateUser());
+        setStateError(true);
       }
     }, 5000);
   };
 
   const handleSignUp = () => {
-      setLoading(true);
-      setTimeout(() => {
-          setLoading(false);
-          setShowCreateProfile(true);
-      }, 800);
+    setLoading(false);
+    setShowCreateProfile(true);
   };
 
-  const handleProfileComplete = async (profileData: any) => {
+  const handleProfileComplete = () => {
       FirebaseModule.createUserData(email, password);
       setShowCreateProfile(false);
-      await localStorage.setItem('knect_profile', JSON.stringify(profileData))
       setIsAuth(true);
   };
 
@@ -84,10 +83,12 @@ const App: React.FC = () => {
 
   if (showCreateProfile) {
       return (
+        <SafeAreaProvider>
           <SafeAreaView style={styles.container}>
               <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
               <CreateProfilePage isDarkMode={isDarkMode} onComplete={handleProfileComplete} />
           </SafeAreaView>
+        </SafeAreaProvider>
       );
   }
 
@@ -122,8 +123,8 @@ const App: React.FC = () => {
                 secureTextEntry
              />
 
-            {loginError && (
-              <Text style={styles.errorText}>{'Unable to sign in'}</Text>
+            {stateError && (
+              <Text style={styles.errorText}>{`Unable to sign in: ${errorText}`}</Text>
             )}
              
              <TouchableOpacity style={styles.signInBtn} onPress={handleAuth} disabled={loading}>

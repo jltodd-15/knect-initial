@@ -2,6 +2,7 @@ export interface UserStatus {
   isAvailable: boolean;
   activity: string;
   privacy: 'all' | 'close-friends' | 'specific-groups';
+  // TODO: reenable this
   //timestamp: number; // MS timestamp of last update
 }
 
