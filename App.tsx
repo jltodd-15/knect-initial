@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { NativeModules, View, Text, TextInput, TouchableOpacity, StyleSheet, StatusBar, Platform } from 'react-native';
-import {  SafeAreaProvider, SafeAreaView, SafeAreaInsetsContext, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { NativeModules, View, Text, TextInput, TouchableOpacity, StyleSheet, StatusBar } from 'react-native';
+import {  SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { AppTab } from './types';
 import Navigation from './components/Navigation';
 import DiscoveryFeed from './components/DiscoveryFeed';
@@ -161,7 +161,7 @@ const App: React.FC = () => {
       <View style={styles.content}>
         {activeTab === AppTab.PLANNER && (
             <EventPlanner 
-                isDarkMode={isDarkMode} 
+                isDarkMode={isDarkMode}
                 initialProposal={pendingDiscoveryItem} 
                 initialParticipants={pendingParticipants}
             />

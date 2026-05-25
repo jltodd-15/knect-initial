@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ScrollView, Platform } from 'react-native';
-import * from 'react-native-image';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Platform } from 'react-native';
+import FastImage from '@d11/react-native-fast-image';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path, Circle, } from 'react-native-svg';
+
+import { keyChain } from '../utils/storage.ts'
 
 interface Props {
   isDarkMode: boolean;
@@ -138,7 +140,7 @@ const CreateProfilePage: React.FC<Props> = ({ isDarkMode, onComplete }) => {
 
         <View style={styles.avatarSection}>
           <TouchableOpacity onPress={handleImageUpload} style={styles.avatarWrapper}>
-              <Image source={{ uri: avatar }} style={styles.avatar} />
+              <FastImage source={{ uri: avatar }} style={styles.avatar} />
               <View style={styles.cameraIcon}>
                   <Svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
                       <Path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
