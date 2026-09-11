@@ -1,5 +1,5 @@
 import { Conversation, Message, CalendarEvent } from '../types';
-import { localStorage} from '../utils/storage';
+import { userStore } from '../utils/storage';
 
 const CONVOS_KEY = 'knect_conversations';
 const MSGS_KEY = 'knect_messages';
@@ -10,15 +10,15 @@ const CURRENT_USER_ID = 'me';
 const generateId = () => Date.now().toString() + '-' + Math.random().toString(36).substr(2, 9);
 
 export const ChatService = {
-  getConversations: (): Conversation[] => {
-    const data = localStorage.getItem(CONVOS_KEY);
+  getConversations: async (): Promise<Conversation[]> => {
+    const data = await userStore.getItem(CONVOS_KEY);
     const convos: Conversation[] = data ? JSON.parse(data) : [];
     // Deduplicate
     return Array.from(new Map(convos.map(c => [c.id, c])).values());
   },
 
-  getMessages: (conversationId: string): Message[] => {
-    const data = localStorage.getItem(MSGS_KEY);
+  getMessages: async (conversationId: string): Promise<Message[]> => {
+    const data = await userStore.getItem(MSGS_KEY);
     const allMessages: Record<string, Message[]> = data ? JSON.parse(data) : {};
     const msgs = allMessages[conversationId] || [];
     // Deduplicate
@@ -26,8 +26,8 @@ export const ChatService = {
   },
 
   // Find a chat that matches the EXACT set of participants (excluding current user)
-  findConversation: (participantIds: string[]): Conversation | null => {
-    const convos = ChatService.getConversations();
+  findConversation: async (participantIds: string[]): Promise<Conversation | null> => {
+    const convos = await ChatService.getConversations();
     // Filter out current user from the input list just in case
     const targetIds = participantIds.filter(id => id !== CURRENT_USER_ID).sort();
 
@@ -37,12 +37,12 @@ export const ChatService = {
     }) || null;
   },
 
-  createConversation: (participantIds: string[], title?: string, isGroup: boolean = false): Conversation => {
-    const convos = ChatService.getConversations();
-    
+  createConversation: async (participantIds: string[], title?: string, isGroup: boolean = false): Promise<Conversation> => {
+    const convos = await ChatService.getConversations();
+
     // Ensure current user is in participants
     const allParticipants = Array.from(new Set([...participantIds, CURRENT_USER_ID]));
-    
+
     const newConvo: Conversation = {
       id: generateId(),
       title: title || (isGroup ? 'New Group' : 'Chat'), // In real app, resolve names
@@ -55,80 +55,82 @@ export const ChatService = {
     };
 
     convos.unshift(newConvo);
-    localStorage.setItem(CONVOS_KEY, JSON.stringify(convos));
+    await userStore.setItem(CONVOS_KEY, JSON.stringify(convos));
     return newConvo;
   },
 
-  findOrCreateConversation: (participantIds: string[], title?: string): Conversation => {
-    const existing = ChatService.findConversation(participantIds);
+  findOrCreateConversation: async (participantIds: string[], title?: string): Promise<Conversation> => {
+    const existing = await ChatService.findConversation(participantIds);
     if (existing) return existing;
-    
+
     // Determine if group based on participant count (excluding self)
     const others = participantIds.filter(id => id !== CURRENT_USER_ID);
     const isGroup = others.length > 1;
-    
+
     return ChatService.createConversation(participantIds, title, isGroup);
   },
 
-  updateConversationTitle: (conversationId: string, newTitle: string): void => {
-    const convos = ChatService.getConversations();
+  updateConversationTitle: async (conversationId: string, newTitle: string): Promise<void> => {
+    const convos = await ChatService.getConversations();
     const index = convos.findIndex(c => c.id === conversationId);
     if (index !== -1) {
       convos[index].title = newTitle;
-      localStorage.setItem(CONVOS_KEY, JSON.stringify(convos));
+      await userStore.setItem(CONVOS_KEY, JSON.stringify(convos));
     }
   },
 
-  updateMessageRSVP: (conversationId: string, messageId: string, userId: string, status: 'going' | 'not_going'): Message | null => {
-    const allMessagesStr = localStorage.getItem(MSGS_KEY);
+  updateMessageRSVP: async (conversationId: string, messageId: string, userId: string, status: 'going' | 'not_going'): Promise<Message | null> => {
+    const allMessagesStr = await userStore.getItem(MSGS_KEY);
     const allMessages: Record<string, Message[]> = allMessagesStr ? JSON.parse(allMessagesStr) : {};
     const chatMsgs = allMessages[conversationId] || [];
-    
+
     const msgIndex = chatMsgs.findIndex(m => m.id === messageId);
     if (msgIndex !== -1) {
       const msg = chatMsgs[msgIndex];
       if (msg.eventDetails) {
         const updatedRsvps = { ...msg.eventDetails.rsvps, [userId]: status };
-        const updatedMsg = { 
-          ...msg, 
-          eventDetails: { ...msg.eventDetails, rsvps: updatedRsvps } 
+        const updatedMsg = {
+          ...msg,
+          eventDetails: { ...msg.eventDetails, rsvps: updatedRsvps }
         };
         chatMsgs[msgIndex] = updatedMsg;
         allMessages[conversationId] = chatMsgs;
-        localStorage.setItem(MSGS_KEY, JSON.stringify(allMessages));
+        await userStore.setItem(MSGS_KEY, JSON.stringify(allMessages));
         return updatedMsg;
       }
     }
     return null;
   },
 
-  deleteMessage: (conversationId: string, messageId: string): void => {
-    const allMessagesStr = localStorage.getItem(MSGS_KEY);
+  deleteMessage: async (conversationId: string, messageId: string): Promise<void> => {
+    const allMessagesStr = await userStore.getItem(MSGS_KEY);
     const allMessages: Record<string, Message[]> = allMessagesStr ? JSON.parse(allMessagesStr) : {};
     const chatMsgs = allMessages[conversationId] || [];
-    
+
     const newMsgs = chatMsgs.filter(m => m.id !== messageId);
     allMessages[conversationId] = newMsgs;
-    localStorage.setItem(MSGS_KEY, JSON.stringify(allMessages));
+    await userStore.setItem(MSGS_KEY, JSON.stringify(allMessages));
   },
 
-  deleteConversation: (conversationId: string): void => {
-    // Remove conversation
-    const convos = ChatService.getConversations();
-    const newConvos = convos.filter(c => c.id !== conversationId);
-    localStorage.setItem(CONVOS_KEY, JSON.stringify(newConvos));
-
-    // Remove messages
-    const allMessagesStr = localStorage.getItem(MSGS_KEY);
+  deleteConversation: async (conversationId: string): Promise<void> => {
+    // Remove messages first: if this write lands and the conversation write below
+    // doesn't, the conversation stays visible and re-deletable. The reverse order
+    // would orphan the message blob permanently on an interruption between the two.
+    const allMessagesStr = await userStore.getItem(MSGS_KEY);
     const allMessages: Record<string, Message[]> = allMessagesStr ? JSON.parse(allMessagesStr) : {};
     delete allMessages[conversationId];
-    localStorage.setItem(MSGS_KEY, JSON.stringify(allMessages));
+    await userStore.setItem(MSGS_KEY, JSON.stringify(allMessages));
+
+    // Remove conversation
+    const convos = await ChatService.getConversations();
+    const newConvos = convos.filter(c => c.id !== conversationId);
+    await userStore.setItem(CONVOS_KEY, JSON.stringify(newConvos));
   },
 
-  sendMessage: (conversationId: string, text: string, type: 'text' | 'event-proposal' = 'text', event?: CalendarEvent): Message => {
-    const allMessagesStr = localStorage.getItem(MSGS_KEY);
+  sendMessage: async (conversationId: string, text: string, type: 'text' | 'event-proposal' = 'text', event?: CalendarEvent): Promise<Message> => {
+    const allMessagesStr = await userStore.getItem(MSGS_KEY);
     const allMessages: Record<string, Message[]> = allMessagesStr ? JSON.parse(allMessagesStr) : {};
-    
+
     const newMessage: Message = {
       id: generateId(),
       senderId: CURRENT_USER_ID,
@@ -152,10 +154,10 @@ export const ChatService = {
     // Update messages
     const chatMsgs = allMessages[conversationId] || [];
     allMessages[conversationId] = [...chatMsgs, newMessage];
-    localStorage.setItem(MSGS_KEY, JSON.stringify(allMessages));
+    await userStore.setItem(MSGS_KEY, JSON.stringify(allMessages));
 
     // Update conversation last message
-    const convos = ChatService.getConversations();
+    const convos = await ChatService.getConversations();
     const convoIndex = convos.findIndex(c => c.id === conversationId);
     if (convoIndex >= 0) {
       convos[convoIndex].lastMessage = type === 'event-proposal' ? `📅 Event Proposed: ${event?.title}` : text;
@@ -163,7 +165,7 @@ export const ChatService = {
       // Move to top
       const updatedConvo = convos.splice(convoIndex, 1)[0];
       convos.unshift(updatedConvo);
-      localStorage.setItem(CONVOS_KEY, JSON.stringify(convos));
+      await userStore.setItem(CONVOS_KEY, JSON.stringify(convos));
     }
 
     return newMessage;

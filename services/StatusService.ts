@@ -1,4 +1,4 @@
-import { localStorage } from '../utils/storage';
+import { userStore } from '../utils/storage';
 import { UserStatus } from '../types';
 
 const STORAGE_KEY = 'knect_user_status';
@@ -18,17 +18,17 @@ class StatusService {
     this.loadStatus();
   }
 
-  private loadStatus() {
-    const saved = localStorage.getItem(STORAGE_KEY);
+  private async loadStatus() {
+    const saved = await userStore.getItem(STORAGE_KEY);
     if (saved) {
       try {
         const parsed: UserStatus = JSON.parse(saved);
         // Check if it's a new day
         const savedDate = new Date(parsed.timestamp);
         const now = new Date();
-        
-        if (savedDate.getDate() !== now.getDate() || 
-            savedDate.getMonth() !== now.getMonth() || 
+
+        if (savedDate.getDate() !== now.getDate() ||
+            savedDate.getMonth() !== now.getMonth() ||
             savedDate.getFullYear() !== now.getFullYear()) {
           // It's a new day, reset
           this.currentStatus = {
@@ -43,8 +43,12 @@ class StatusService {
       } catch (e) {
         console.error('Failed to parse status', e);
         this.clearStatus();
+        return;
       }
     }
+    // Loading resolves after the constructor already handed back the hardcoded
+    // default, so subscribers need a notify() here to pick up the loaded value.
+    this.notify();
   }
 
   getStatus(): UserStatus {
@@ -80,8 +84,12 @@ class StatusService {
     this.notify();
   }
 
-  private save() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(this.currentStatus));
+  private async save() {
+    try {
+      await userStore.setItem(STORAGE_KEY, JSON.stringify(this.currentStatus));
+    } catch (e) {
+      console.error('Failed to save status', e);
+    }
   }
 
   subscribe(listener: Listener) {
