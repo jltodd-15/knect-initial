@@ -11,7 +11,7 @@ import CreateProfilePage from './components/CreateProfilePage';
 
 import { DiscoveryItem } from './types';
 
-import { localStorage, keyChain } from './utils/storage';
+import { userStore, keyChain } from './utils/storage';
 
 const App: React.FC = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -41,7 +41,7 @@ const App: React.FC = () => {
     setLoading(true);
     setTimeout(() => {
       if (FirebaseModule.authenticateUser() == true) {
-        localStorage.setItem('knect_session', 'true');
+        userStore.setItem('knect_session', 'true');
         setIsAuth(true);
         setLoading(false);
       } else {

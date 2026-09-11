@@ -2,6 +2,14 @@
 
 React Native app. Firebase Auth + Firestore via `react-native-firebase`. Pre-launch, no users.
 
+## Repo identity
+
+`origin` must be `https://github.com/jltodd-15/knect-initial.git`. Check with `git remote -v`
+before doing anything else. If `origin` points anywhere else (a fork, e.g.
+`kysonallstar-stack/knect-initial`), stop and ask — do not fetch, branch, or commit against it.
+This repo has been mixed up with a fork before, causing a session to work from stale code and miss
+this file entirely.
+
 ## Read this first: most of this repo is a generated guess
 
 One commit — `71a7c07`, "adding latest changes from AI studios" — produced almost everything in

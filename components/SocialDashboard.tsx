@@ -266,25 +266,25 @@ const SocialDashboard: React.FC<Props> = ({ isDarkMode, onChatOpen, onChatClose,
     }
   }, [selectedConvo]);
 
-  const loadConversations = () => {
-    const data = ChatService.getConversations();
+  const loadConversations = async () => {
+    const data = await ChatService.getConversations();
     setConversations(data);
   };
 
-  const loadMessages = (chatId: string) => {
-    const msgs = ChatService.getMessages(chatId);
+  const loadMessages = async (chatId: string) => {
+    const msgs = await ChatService.getMessages(chatId);
     // Reverse messages so newest is at index 0 (bottom of inverted list)
     setMessages(msgs.reverse());
   };
 
-  const sendMessage = () => {
+  const sendMessage = async () => {
     if (!input.trim() || !selectedConvo) return;
-    
-    ChatService.sendMessage(selectedConvo.id, input);
-    
+
+    await ChatService.sendMessage(selectedConvo.id, input);
+
     // Refresh UI
-    loadMessages(selectedConvo.id);
-    loadConversations();
+    await loadMessages(selectedConvo.id);
+    await loadConversations();
     setInput('');
   };
 
@@ -294,13 +294,13 @@ const SocialDashboard: React.FC<Props> = ({ isDarkMode, onChatOpen, onChatClose,
           'Are you sure you want to delete this message?',
           [
               { text: 'Cancel', style: 'cancel' },
-              { 
-                  text: 'Delete', 
-                  style: 'destructive', 
-                  onPress: () => {
+              {
+                  text: 'Delete',
+                  style: 'destructive',
+                  onPress: async () => {
                       if (selectedConvo) {
-                          ChatService.deleteMessage(selectedConvo.id, msgId);
-                          loadMessages(selectedConvo.id);
+                          await ChatService.deleteMessage(selectedConvo.id, msgId);
+                          await loadMessages(selectedConvo.id);
                       }
                   }
               }
@@ -314,14 +314,14 @@ const SocialDashboard: React.FC<Props> = ({ isDarkMode, onChatOpen, onChatClose,
           'Are you sure you want to delete this conversation? This cannot be undone.',
           [
               { text: 'Cancel', style: 'cancel' },
-              { 
-                  text: 'Delete', 
-                  style: 'destructive', 
-                  onPress: () => {
+              {
+                  text: 'Delete',
+                  style: 'destructive',
+                  onPress: async () => {
                       if (selectedConvo) {
-                          ChatService.deleteConversation(selectedConvo.id);
+                          await ChatService.deleteConversation(selectedConvo.id);
                           setSelectedConvo(null);
-                          loadConversations();
+                          await loadConversations();
                           setShowChatDetails(false);
                       }
                   }
@@ -430,9 +430,9 @@ const SocialDashboard: React.FC<Props> = ({ isDarkMode, onChatOpen, onChatClose,
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [newTitle, setNewTitle] = useState('');
 
-  const handleSaveTitle = () => {
+  const handleSaveTitle = async () => {
       if (selectedConvo && newTitle.trim()) {
-          ChatService.updateConversationTitle(selectedConvo.id, newTitle);
+          await ChatService.updateConversationTitle(selectedConvo.id, newTitle);
           const updatedConvo = {...selectedConvo, title: newTitle};
           setSelectedConvo(updatedConvo);
           setConversations(prev => prev.map(c => c.id === selectedConvo.id ? updatedConvo : c));
@@ -440,9 +440,9 @@ const SocialDashboard: React.FC<Props> = ({ isDarkMode, onChatOpen, onChatClose,
       }
   };
 
-  const handleVote = (msgId: string, status: 'going' | 'not_going') => {
+  const handleVote = async (msgId: string, status: 'going' | 'not_going') => {
       if (!selectedConvo) return;
-      const updatedMsg = ChatService.updateMessageRSVP(selectedConvo.id, msgId, CURRENT_USER.id, status);
+      const updatedMsg = await ChatService.updateMessageRSVP(selectedConvo.id, msgId, CURRENT_USER.id, status);
       if (updatedMsg) {
           setMessages(prev => prev.map(m => m.id === msgId ? updatedMsg : m));
       }
