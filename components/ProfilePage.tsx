@@ -33,7 +33,7 @@ const ProfilePage: React.FC<Props> = ({ isDarkMode, toggleDarkMode, onLogout }) 
           if (data.interests) setInterests(data.interests);
           if (data.avatar) setAvatar(data.avatar);
       }
-    })
+    })();
   }, []);
 
   const toggleCloseFriend = (id: string) => {

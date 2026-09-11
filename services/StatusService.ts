@@ -11,7 +11,7 @@ class StatusService {
     isAvailable: false,
     activity: '',
     privacy: 'all',
-    //timestamp: Date.now()
+    timestamp: Date.now()
   };
 
   constructor() {
@@ -81,7 +81,7 @@ class StatusService {
   }
 
   private save() {
-    storage.setItem(STORAGE_KEY, JSON.stringify(this.currentStatus));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(this.currentStatus));
   }
 
   subscribe(listener: Listener) {

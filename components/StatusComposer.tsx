@@ -9,7 +9,7 @@ interface Props {
 
 const StatusComposer: React.FC<Props> = ({ isDarkMode }) => {
   const styles = getStyles(isDarkMode);
-  const [status, setStatus] = useState<UserStatus>({ isAvailable: false, activity: '', privacy: 'all' });
+  const [status, setStatus] = useState<UserStatus>({ isAvailable: false, activity: '', privacy: 'all', timestamp: Date.now() });
 
   useEffect(() => {
     const unsubscribe = statusService.subscribe(setStatus);
