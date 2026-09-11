@@ -1,4 +1,4 @@
-import { storage } from '../utils/storage';
+import { localStorage } from '../utils/storage';
 import { UserStatus } from '../types';
 
 const STORAGE_KEY = 'knect_user_status';
@@ -19,7 +19,7 @@ class StatusService {
   }
 
   private loadStatus() {
-    const saved = storage.getItem(STORAGE_KEY);
+    const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
       try {
         const parsed: UserStatus = JSON.parse(saved);
@@ -81,7 +81,7 @@ class StatusService {
   }
 
   private save() {
-    storage.setItem(STORAGE_KEY, JSON.stringify(this.currentStatus));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(this.currentStatus));
   }
 
   subscribe(listener: Listener) {

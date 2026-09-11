@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "529929722200",
+    "firebase_url": "https://knect-db-default-rtdb.firebaseio.com",
+    "project_id": "knect-db",
+    "storage_bucket": "knect-db.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:529929722200:android:01675c679f29875669ad2d",
+        "android_client_info": {
+          "package_name": "com.knect"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA_XctYjgsly_PhkuR15aKKzun6rC_7VMo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

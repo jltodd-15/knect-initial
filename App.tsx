@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, StatusBar, Platform } from 'react-native';
+import { NativeModules, View, Text, TextInput, TouchableOpacity, StyleSheet, StatusBar } from 'react-native';
+import {  SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { AppTab } from './types';
 import Navigation from './components/Navigation';
 import DiscoveryFeed from './components/DiscoveryFeed';
@@ -7,9 +8,10 @@ import EventPlanner from './components/EventPlanner';
 import SocialDashboard from './components/SocialDashboard';
 import ProfilePage from './components/ProfilePage';
 import CreateProfilePage from './components/CreateProfilePage';
-import { localStorage } from './utils/storage';
 
 import { DiscoveryItem } from './types';
+
+import { localStorage, keyChain } from './utils/storage';
 
 const App: React.FC = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -22,52 +24,52 @@ const App: React.FC = () => {
 
   const [isChatOpen, setIsChatOpen] = useState(false);
 
-  // Auth State
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
+  //errors
+  const [stateError, setStateError] = useState(false);
+  const [errorText, setErrorText ] = useState('');
+
+  const {FirebaseModule} = NativeModules;
+
   useEffect(() => {
-    const savedTheme = localStorage.getItem('knect_theme');
-    if (savedTheme) setIsDarkMode(savedTheme === 'dark');
-    
-    const session = localStorage.getItem('knect_session');
-    if (session) setIsAuth(true);
+    setIsDarkMode(false);
   }, []);
 
   const handleAuth = () => {
     setLoading(true);
     setTimeout(() => {
-      localStorage.setItem('knect_session', 'true');
-      setIsAuth(true);
-      setLoading(false);
-    }, 1000);
+      if (FirebaseModule.authenticateUser() == true) {
+        localStorage.setItem('knect_session', 'true');
+        setIsAuth(true);
+        setLoading(false);
+      } else {
+        setLoading(false);
+        setErrorText(FirebaseModule.authenticateUser());
+        setStateError(true);
+      }
+    }, 5000);
   };
 
   const handleSignUp = () => {
-      setLoading(true);
-      setTimeout(() => {
-          setLoading(false);
-          setShowCreateProfile(true);
-      }, 800);
+    setLoading(false);
+    setShowCreateProfile(true);
   };
 
-  const handleProfileComplete = (profileData: any) => {
-      // Save profile data to localStorage (mock)
-      localStorage.setItem('knect_profile', JSON.stringify(profileData));
-      localStorage.setItem('knect_session', 'true');
+  const handleProfileComplete = () => {
+      FirebaseModule.createUserData(email, password);
       setShowCreateProfile(false);
       setIsAuth(true);
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('knect_session');
     setIsAuth(false);
   };
 
   const toggleDarkMode = () => {
     const newVal = !isDarkMode;
     setIsDarkMode(newVal);
-    localStorage.setItem('knect_theme', newVal ? 'dark' : 'light');
   };
 
   const handlePlanActivity = (item: DiscoveryItem | null, participants?: string[]) => {
@@ -81,10 +83,12 @@ const App: React.FC = () => {
 
   if (showCreateProfile) {
       return (
+        <SafeAreaProvider>
           <SafeAreaView style={styles.container}>
               <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
               <CreateProfilePage isDarkMode={isDarkMode} onComplete={handleProfileComplete} />
           </SafeAreaView>
+        </SafeAreaProvider>
       );
   }
 
@@ -118,6 +122,11 @@ const App: React.FC = () => {
                 onChangeText={setPassword}
                 secureTextEntry
              />
+
+            {stateError && (
+              <Text style={styles.errorText}>{`Unable to sign in: ${errorText}`}</Text>
+            )}
+             
              <TouchableOpacity style={styles.signInBtn} onPress={handleAuth} disabled={loading}>
                 <Text style={styles.signInText}>{loading ? 'PROCESSING...' : 'SIGN IN'}</Text>
              </TouchableOpacity>
@@ -152,7 +161,7 @@ const App: React.FC = () => {
       <View style={styles.content}>
         {activeTab === AppTab.PLANNER && (
             <EventPlanner 
-                isDarkMode={isDarkMode} 
+                isDarkMode={isDarkMode}
                 initialProposal={pendingDiscoveryItem} 
                 initialParticipants={pendingParticipants}
             />
@@ -183,7 +192,6 @@ const getStyles = (isDark: boolean) => StyleSheet.create({
   content: { flex: 1 },
   authContainer: { flex: 1, justifyContent: 'center', padding: 24 },
   
-  // Updated Logo Styles (Matte, Static, Anonymous Pro)
   logoBox: { 
     width: 80, 
     height: 80, 
@@ -192,7 +200,6 @@ const getStyles = (isDark: boolean) => StyleSheet.create({
     justifyContent: 'center', 
     alignItems: 'center', 
     marginBottom: 24,
-    // Removed shadow props for matte look
   },
   logoText: {
     fontFamily: 'Anonymous Pro',
@@ -214,7 +221,9 @@ const getStyles = (isDark: boolean) => StyleSheet.create({
   orText: { marginHorizontal: 16, fontSize: 10, fontWeight: '900', color: '#71717a', fontFamily: 'Inter' },
   socialRow: { flexDirection: 'row', gap: 16 },
   socialBtn: { flex: 1, padding: 16, borderRadius: 24, borderWidth: 1, borderColor: isDark ? '#333' : '#eee', alignItems: 'center' },
-  socialText: { fontWeight: 'bold', color: '#71717a', fontSize: 10, textTransform: 'uppercase', fontFamily: 'Inter' }
+  socialText: { fontWeight: 'bold', color: '#71717a', fontSize: 10, textTransform: 'uppercase', fontFamily: 'Inter' },
+
+  errorText: { color: '#ff8080', textAlign: 'center', fontFamily: 'Anonymous Pro' }
 });
 
 export default App;

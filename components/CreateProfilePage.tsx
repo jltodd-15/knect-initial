@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ScrollView, Platform } from 'react-native';
-import Svg, { Path } from 'react-native-svg';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Platform } from 'react-native';
+import FastImage from '@d11/react-native-fast-image';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import Svg, { Path, Circle, } from 'react-native-svg';
+
+import { keyChain } from '../utils/storage.ts'
 
 interface Props {
   isDarkMode: boolean;
@@ -14,11 +18,29 @@ const CreateProfilePage: React.FC<Props> = ({ isDarkMode, onComplete }) => {
   const [interests, setInterests] = useState<string[]>([]);
   const [newInterest, setNewInterest] = useState('');
   const [avatar, setAvatar] = useState('https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=400&h=400&fit=crop');
+  const [hideText, setHideText] = useState(true);
+
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const [nextStep, setNextStep] = useState(false);
+  
+  const [badEmail, setBadEmail] = useState(false);
+  const [badPass, setBadPass] = useState(false);
+
+  var hideButton = false;
 
   const handleAddInterest = () => {
     if (newInterest.trim()) {
       setInterests([...interests, newInterest.trim().toUpperCase()]);
       setNewInterest('');
+    }
+  };
+
+  const handleNextStep = (goAhead: boolean) => {
+    if (goAhead) {
+      hideButton = true;
+      setNextStep(true);
     }
   };
 
@@ -40,88 +62,158 @@ const CreateProfilePage: React.FC<Props> = ({ isDarkMode, onComplete }) => {
     setAvatar(mockImages[nextIdx]);
   };
 
+  function _formatVerify() {
+    const emailRegex = new RegExp(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)
+    const passRegex = new RegExp(/^[a-zA-Z0-9!@#$%^&*()<>?{}\[\];',.\/\\`~]{2,24}$/);
+    setBadEmail(!emailRegex.test(email));
+    setBadPass(!passRegex.test(password));
+    if (emailRegex.test(email) == false || passRegex.test(password) == false) {
+      return false;
+    }
+    else {
+      return true;
+    }; 
+  };
+
   return (
     <ScrollView style={styles.container} contentContainerStyle={{ padding: 24 }}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Create Profile</Text>
-        <Text style={styles.subtitle}>Tell us a bit about yourself</Text>
-      </View>
+      { true && (
+      <SafeAreaView>
+        <View style={styles.header}>
+          <Text style={styles.title}>Create Account</Text>
+        </View>
 
-      <View style={styles.avatarSection}>
-        <TouchableOpacity onPress={handleImageUpload} style={styles.avatarWrapper}>
-            <Image source={{ uri: avatar }} style={styles.avatar} />
-            <View style={styles.cameraIcon}>
-                <Svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-                    <Path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
-                    <Path d="M12 13a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" />
+        <View style={styles.form}>
+          <View style={styles.inputGroup}>
+              <Text style={styles.label}>EMAIL</Text>
+              <TextInput 
+                  style={styles.input} 
+                  value={email}
+                  onChangeText={setEmail}
+                  placeholder="username@example.com"
+                  placeholderTextColor={isDarkMode ? '#666' : '#999'}
+              />
+              { badEmail && (
+              <Text style={styles.errorText}>Your email address is invalid (e.g, mark@example.com)</Text>
+              )}
+          </View>
+
+          <View style={styles.inputGroup}>
+              <Text style={styles.label}>PASSWORD</Text>
+              <TextInput 
+                  style={styles.input} 
+                  value={password}
+                  onChangeText={setPassword}
+                  placeholder="correcthorsebatterystaple"
+                  placeholderTextColor={isDarkMode ? '#666' : '#999'}
+                  secureTextEntry={hideText}
+              />
+              { badPass && (
+              <Text style={styles.errorText}>Your password must be 12-24 characters long</Text>
+              )}
+              <TouchableOpacity style={styles.hideText} onPress={() => {setHideText(!hideText ? true : false); console.log(hideText)}}>
+                <Svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={'#c1c1c1'} strokeWidth="2.5">
+                  <Circle cx="12" cy="12" r="10" />
+                  <Circle cx="8" cy="8" r="10" />
                 </Svg>
-            </View>
-        </TouchableOpacity>
-        <Text style={styles.photoHint}>Tap to change photo</Text>
-      </View>
+              </TouchableOpacity>
+          </View>
 
-      <View style={styles.form}>
-        <View style={styles.inputGroup}>
-            <Text style={styles.label}>FULL NAME</Text>
-            <TextInput 
-                style={styles.input} 
-                value={name} 
-                onChangeText={setName}
-                placeholder="e.g. Alex Rivera"
-                placeholderTextColor={isDarkMode ? '#666' : '#999'}
-            />
+          { !hideButton && (
+          <TouchableOpacity 
+              style={[styles.submitBtn, (!email || !password) && styles.submitBtnDisabled]} 
+              onPress={() => { handleNextStep(_formatVerify()); }}
+              disabled={!email || !password}
+          >
+              <Text style={styles.submitBtnText}>NEXT</Text>
+          </TouchableOpacity>
+          )}
+        </View>
+      </SafeAreaView>
+      )}
+      { nextStep && (
+      <SafeAreaView>
+        <View style={styles.header}>
+          <Text style={styles.title}>Create Profile</Text>
+          <Text style={styles.subtitle}>Tell us a bit about yourself</Text>
         </View>
 
-        <View style={styles.inputGroup}>
-            <Text style={styles.label}>ROLE / LOCATION</Text>
-            <TextInput 
-                style={styles.input} 
-                value={role} 
-                onChangeText={setRole}
-                placeholder="e.g. Digital Nomad • SF"
-                placeholderTextColor={isDarkMode ? '#666' : '#999'}
-            />
+        <View style={styles.avatarSection}>
+          <TouchableOpacity onPress={handleImageUpload} style={styles.avatarWrapper}>
+              <FastImage source={{ uri: avatar }} style={styles.avatar} />
+              <View style={styles.cameraIcon}>
+                  <Svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                      <Path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                      <Path d="M12 13a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" />
+                  </Svg>
+              </View>
+          </TouchableOpacity>
+          <Text style={styles.photoHint}>Tap to change photo</Text>
         </View>
 
-        <View style={styles.inputGroup}>
-            <Text style={styles.label}>INTERESTS</Text>
-            <View style={styles.addInterestRow}>
+          <View style={styles.form}>
+            <View style={styles.inputGroup}>
+                <Text style={styles.label}>FULL NAME</Text>
                 <TextInput 
-                    style={[styles.input, {flex: 1}]} 
-                    value={newInterest} 
-                    onChangeText={setNewInterest}
-                    placeholder="Add an interest..."
+                    style={styles.input} 
+                    value={name} 
+                    onChangeText={setName}
+                    placeholder="e.g. Alex Rivera"
                     placeholderTextColor={isDarkMode ? '#666' : '#999'}
-                    onSubmitEditing={handleAddInterest}
                 />
-                <TouchableOpacity style={styles.addBtn} onPress={handleAddInterest}>
-                    <Svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><Path d="M12 5v14M5 12h14"/></Svg>
-                </TouchableOpacity>
             </View>
-            <View style={styles.tagCloud}>
-                {interests.map((tag, idx) => (
-                    <TouchableOpacity key={idx} style={styles.tag} onPress={() => handleRemoveInterest(idx)}>
-                        <Text style={styles.tagText}>{tag}</Text>
-                        <Svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={isDarkMode ? "white" : "black"} strokeWidth="2" style={{marginLeft: 6}}>
-                            <Path d="M18 6L6 18M6 6l12 12"/>
-                        </Svg>
-                    </TouchableOpacity>
-                ))}
-            </View>
-        </View>
 
-        <TouchableOpacity 
-            style={[styles.submitBtn, (!name || !role) && styles.submitBtnDisabled]} 
-            onPress={() => onComplete({ name, role, interests, avatar })}
-            disabled={!name || !role}
-        >
-            <Text style={styles.submitBtnText}>COMPLETE PROFILE</Text>
-        </TouchableOpacity>
-      </View>
+            <View style={styles.inputGroup}>
+                <Text style={styles.label}>ROLE / LOCATION</Text>
+                <TextInput 
+                    style={styles.input} 
+                    value={role} 
+                    onChangeText={setRole}
+                    placeholder="e.g. Digital Nomad • SF"
+                    placeholderTextColor={isDarkMode ? '#666' : '#999'}
+                />
+            </View>
+
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>INTERESTS</Text>
+              <View style={styles.addInterestRow}>
+                  <TextInput 
+                      style={[styles.input, {flex: 1}]} 
+                      value={newInterest} 
+                      onChangeText={setNewInterest}
+                      placeholder="Add an interest..."
+                      placeholderTextColor={isDarkMode ? '#666' : '#999'}
+                      onSubmitEditing={handleAddInterest}
+                  />
+                  <TouchableOpacity style={styles.addBtn} onPress={handleAddInterest}>
+                      <Svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><Path d="M12 5v14M5 12h14"/></Svg>
+                  </TouchableOpacity>
+              </View>
+              <View style={styles.tagCloud}>
+                  {interests.map((tag, idx) => (
+                      <TouchableOpacity key={idx} style={styles.tag} onPress={() => handleRemoveInterest(idx)}>
+                          <Text style={styles.tagText}>{tag}</Text>
+                          <Svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={isDarkMode ? "white" : "black"} strokeWidth="2" style={{marginLeft: 6}}>
+                              <Path d="M18 6L6 18M6 6l12 12"/>
+                          </Svg>
+                      </TouchableOpacity>
+                  ))}
+              </View>
+          </View>
+
+          <TouchableOpacity 
+              style={[styles.submitBtn, (!name || !role) && styles.submitBtnDisabled]} 
+              onPress={() => onComplete({ name, role, interests, avatar })}
+              disabled={!name || !role}
+          >
+              <Text style={styles.submitBtnText}>COMPLETE PROFILE</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+      )}
     </ScrollView>
   );
 };
-
 const getStyles = (isDark: boolean) => StyleSheet.create({
   container: { flex: 1, backgroundColor: isDark ? '#121212' : '#FDFCFB' },
   header: { alignItems: 'center', marginTop: 40, marginBottom: 32 },
@@ -149,6 +241,9 @@ const getStyles = (isDark: boolean) => StyleSheet.create({
   submitBtn: { backgroundColor: '#10b981', padding: 20, borderRadius: 24, alignItems: 'center', marginTop: 24 },
   submitBtnDisabled: { opacity: 0.5 },
   submitBtnText: { color: 'white', fontWeight: '900', fontSize: 14, letterSpacing: 1 },
+
+  hideText: { backgroundColor: '#8f8f8f', borderRadius: 36, padding: 5, width: '9%' },
+  errorText: { color: '#ff8080', textAlign: 'center', fontFamily: 'Anonymous Pro' }
 });
 
 export default CreateProfilePage;

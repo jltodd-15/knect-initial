@@ -1,5 +1,5 @@
 import { Conversation, Message, CalendarEvent } from '../types';
-import { storage } from '../utils/storage';
+import { localStorage} from '../utils/storage';
 
 const CONVOS_KEY = 'knect_conversations';
 const MSGS_KEY = 'knect_messages';
@@ -11,14 +11,14 @@ const generateId = () => Date.now().toString() + '-' + Math.random().toString(36
 
 export const ChatService = {
   getConversations: (): Conversation[] => {
-    const data = storage.getItem(CONVOS_KEY);
+    const data = localStorage.getItem(CONVOS_KEY);
     const convos: Conversation[] = data ? JSON.parse(data) : [];
     // Deduplicate
     return Array.from(new Map(convos.map(c => [c.id, c])).values());
   },
 
   getMessages: (conversationId: string): Message[] => {
-    const data = storage.getItem(MSGS_KEY);
+    const data = localStorage.getItem(MSGS_KEY);
     const allMessages: Record<string, Message[]> = data ? JSON.parse(data) : {};
     const msgs = allMessages[conversationId] || [];
     // Deduplicate
@@ -55,7 +55,7 @@ export const ChatService = {
     };
 
     convos.unshift(newConvo);
-    storage.setItem(CONVOS_KEY, JSON.stringify(convos));
+    localStorage.setItem(CONVOS_KEY, JSON.stringify(convos));
     return newConvo;
   },
 
@@ -75,12 +75,12 @@ export const ChatService = {
     const index = convos.findIndex(c => c.id === conversationId);
     if (index !== -1) {
       convos[index].title = newTitle;
-      storage.setItem(CONVOS_KEY, JSON.stringify(convos));
+      localStorage.setItem(CONVOS_KEY, JSON.stringify(convos));
     }
   },
 
   updateMessageRSVP: (conversationId: string, messageId: string, userId: string, status: 'going' | 'not_going'): Message | null => {
-    const allMessagesStr = storage.getItem(MSGS_KEY);
+    const allMessagesStr = localStorage.getItem(MSGS_KEY);
     const allMessages: Record<string, Message[]> = allMessagesStr ? JSON.parse(allMessagesStr) : {};
     const chatMsgs = allMessages[conversationId] || [];
     
@@ -95,7 +95,7 @@ export const ChatService = {
         };
         chatMsgs[msgIndex] = updatedMsg;
         allMessages[conversationId] = chatMsgs;
-        storage.setItem(MSGS_KEY, JSON.stringify(allMessages));
+        localStorage.setItem(MSGS_KEY, JSON.stringify(allMessages));
         return updatedMsg;
       }
     }
@@ -103,30 +103,30 @@ export const ChatService = {
   },
 
   deleteMessage: (conversationId: string, messageId: string): void => {
-    const allMessagesStr = storage.getItem(MSGS_KEY);
+    const allMessagesStr = localStorage.getItem(MSGS_KEY);
     const allMessages: Record<string, Message[]> = allMessagesStr ? JSON.parse(allMessagesStr) : {};
     const chatMsgs = allMessages[conversationId] || [];
     
     const newMsgs = chatMsgs.filter(m => m.id !== messageId);
     allMessages[conversationId] = newMsgs;
-    storage.setItem(MSGS_KEY, JSON.stringify(allMessages));
+    localStorage.setItem(MSGS_KEY, JSON.stringify(allMessages));
   },
 
   deleteConversation: (conversationId: string): void => {
     // Remove conversation
     const convos = ChatService.getConversations();
     const newConvos = convos.filter(c => c.id !== conversationId);
-    storage.setItem(CONVOS_KEY, JSON.stringify(newConvos));
+    localStorage.setItem(CONVOS_KEY, JSON.stringify(newConvos));
 
     // Remove messages
-    const allMessagesStr = storage.getItem(MSGS_KEY);
+    const allMessagesStr = localStorage.getItem(MSGS_KEY);
     const allMessages: Record<string, Message[]> = allMessagesStr ? JSON.parse(allMessagesStr) : {};
     delete allMessages[conversationId];
-    storage.setItem(MSGS_KEY, JSON.stringify(allMessages));
+    localStorage.setItem(MSGS_KEY, JSON.stringify(allMessages));
   },
 
   sendMessage: (conversationId: string, text: string, type: 'text' | 'event-proposal' = 'text', event?: CalendarEvent): Message => {
-    const allMessagesStr = storage.getItem(MSGS_KEY);
+    const allMessagesStr = localStorage.getItem(MSGS_KEY);
     const allMessages: Record<string, Message[]> = allMessagesStr ? JSON.parse(allMessagesStr) : {};
     
     const newMessage: Message = {
@@ -152,7 +152,7 @@ export const ChatService = {
     // Update messages
     const chatMsgs = allMessages[conversationId] || [];
     allMessages[conversationId] = [...chatMsgs, newMessage];
-    storage.setItem(MSGS_KEY, JSON.stringify(allMessages));
+    localStorage.setItem(MSGS_KEY, JSON.stringify(allMessages));
 
     // Update conversation last message
     const convos = ChatService.getConversations();
@@ -163,7 +163,7 @@ export const ChatService = {
       // Move to top
       const updatedConvo = convos.splice(convoIndex, 1)[0];
       convos.unshift(updatedConvo);
-      storage.setItem(CONVOS_KEY, JSON.stringify(convos));
+      localStorage.setItem(CONVOS_KEY, JSON.stringify(convos));
     }
 
     return newMessage;

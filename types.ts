@@ -21,6 +21,8 @@ export interface Friend {
   name: string;
   avatar: string;
   busyHours: number[];
+  isCloseFriend?: Boolean;
+  status?: Boolean;
 }
 
 export interface Message {
