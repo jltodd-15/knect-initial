@@ -1,7 +1,7 @@
 import { createAsyncStorage,  } from "@react-native-async-storage/async-storage";
 import * as Keychain from 'react-native-keychain';
 
-export const localStorage = createAsyncStorage("user_data");
+export const userStore = createAsyncStorage("user_data");
 
 // Keychain exports
 const options: Keychain.SetOptions = {
@@ -10,11 +10,11 @@ const options: Keychain.SetOptions = {
   storage: Keychain.STORAGE_TYPE.AES_GCM_NO_AUTH
 }
 
-export const keyChain = 
+export const keyChain =
 {
-  userLogin: (username: string, password: string) => {
+  userLogin: async (username: string, password: string) => {
     try {
-      Keychain.setGenericPassword(username, password, options);
+      await Keychain.setGenericPassword(username, password, options);
     } catch (e) {
       console.error(e);
     }
