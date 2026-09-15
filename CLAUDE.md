@@ -58,14 +58,17 @@ confidently into a spec-driven codebase is more expensive than a question.
 **Don't fix adjacent things.** This repo has many known bugs and each one belongs to a ticket. An
 unrelated bug found in passing gets reported, not fixed.
 
+**Keep `README.md` and this file in sync with what has actually landed.** When a ticket's changes
+make a line here stale (a "known bug" gets fixed, a convention changes), update it as part of that
+ticket. Never get ahead of it — don't describe a decision, a data shape, or a capability for a
+ticket that hasn't been built yet, even if you know it's coming.
+
 ## Known bugs that are somebody else's ticket
 
 - Three of four tabs crash on load — `index.js` registers `App` instead of the `ErrorBoundary`-wrapped
   `Root`. (Ticket 0.1)
 - `components/ChatEventWidget.tsx` and `utils/votingLogic.ts` are dead — nothing imports either.
   Don't build on them. The live vote UI is inside `SocialDashboard.tsx`.
-- `android/app/build.gradle` already declares the Firestore and Analytics artifacts under the BOM. A
-  Gradle edit to add one is a stop-and-ask.
 
 ## Verification
 

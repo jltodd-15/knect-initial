@@ -40,13 +40,13 @@ const App: React.FC = () => {
   const handleAuth = () => {
     setLoading(true);
     setTimeout(() => {
-      if (FirebaseModule.authenticateUser() == true) {
+      if (FirebaseModule && FirebaseModule.authenticateUser() == true) {
         userStore.setItem('knect_session', 'true');
         setIsAuth(true);
         setLoading(false);
       } else {
         setLoading(false);
-        setErrorText(FirebaseModule.authenticateUser());
+        setErrorText(FirebaseModule ? FirebaseModule.authenticateUser() : 'Sign-in is not yet implemented');
         setStateError(true);
       }
     }, 5000);
@@ -58,7 +58,7 @@ const App: React.FC = () => {
   };
 
   const handleProfileComplete = () => {
-      FirebaseModule.createUserData(email, password);
+      if (FirebaseModule) { FirebaseModule.createUserData(email, password); }
       setShowCreateProfile(false);
       setIsAuth(true);
   };
