@@ -1,14 +1,21 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Platform } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import FastImage from '@d11/react-native-fast-image';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path, Circle, } from 'react-native-svg';
 
-import { keyChain } from '../utils/storage.ts'
+export interface CreateProfileData {
+  name: string;
+  role: string;
+  interests: string[];
+  avatar: string;
+  email: string;
+  password: string;
+}
 
 interface Props {
   isDarkMode: boolean;
-  onComplete: (profileData: any) => void;
+  onComplete: (profileData: CreateProfileData) => void;
 }
 
 const CreateProfilePage: React.FC<Props> = ({ isDarkMode, onComplete }) => {
@@ -203,7 +210,7 @@ const CreateProfilePage: React.FC<Props> = ({ isDarkMode, onComplete }) => {
 
           <TouchableOpacity 
               style={[styles.submitBtn, (!name || !role) && styles.submitBtnDisabled]} 
-              onPress={() => onComplete({ name, role, interests, avatar })}
+              onPress={() => onComplete({ name, role, interests, avatar, email, password })}
               disabled={!name || !role}
           >
               <Text style={styles.submitBtnText}>COMPLETE PROFILE</Text>
