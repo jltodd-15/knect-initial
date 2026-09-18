@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, Image, TouchableOpacity, StyleSheet, Switch, Modal, FlatList, TextInput, Alert } from 'react-native';
 import Svg, { Path, Line } from 'react-native-svg';
 import { MOCK_FRIENDS } from '../constants';
-import { localStorage } from '../utils/storage';
+import { userStore } from '../utils/storage';
 
 interface Props {
   isDarkMode: boolean;
@@ -25,7 +25,7 @@ const ProfilePage: React.FC<Props> = ({ isDarkMode, toggleDarkMode, onLogout }) 
 
   useEffect(() => {
     (async () => {
-      const savedProfile = await localStorage.getItem('knect_profile');
+      const savedProfile = await userStore.getItem('knect_profile');
       if (savedProfile) {
           const data = JSON.parse(savedProfile);
           if (data.name) setName(data.name);
@@ -70,10 +70,10 @@ const ProfilePage: React.FC<Props> = ({ isDarkMode, toggleDarkMode, onLogout }) 
       setAvatar(mockImages[nextIdx]);
   };
 
-  const handleSaveProfile = () => {
+  const handleSaveProfile = async () => {
       setIsEditing(false);
       const profileData = { name, role, interests, avatar };
-      localStorage.setItem('knect_profile', JSON.stringify(profileData));
+      await userStore.setItem('knect_profile', JSON.stringify(profileData));
   };
 
   return (

@@ -2,7 +2,20 @@ import React, { useEffect, useState, useRef } from 'react';
 import { View, Text, Image, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator, ScrollView, Animated, Dimensions, Modal } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import { DiscoveryItem, CalendarEvent } from '../types';
-import { getDiscoveryFeed } from '../services/geminiService';
+import { MOCK_ACTIVITIES } from '../services/mockActivities';
+
+// Maps the schema-shaped Activity mock to the DiscoveryItem contract this component
+// (and onPlanActivity's callers, App.tsx / EventPlanner.tsx) already expect.
+const getDiscoveryFeed = async (): Promise<DiscoveryItem[]> => {
+  return MOCK_ACTIVITIES.map(activity => ({
+    id: activity.id,
+    title: activity.name,
+    description: activity.description,
+    image: activity.pictures[0],
+    isAd: false,
+    category: activity.tags[0] ?? '',
+  }));
+};
 
 interface Props { 
   isDarkMode: boolean;

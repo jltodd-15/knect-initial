@@ -137,8 +137,8 @@ const EventPlanner: React.FC<Props> = ({ isDarkMode, initialProposal, initialPar
 
     // Send to chat only if it's a group proposal
     if (finalEvent.status === 'proposed' && !editingEvent) {
-        const convo = ChatService.findOrCreateConversation(finalEvent.participants, finalEvent.title);
-        ChatService.sendMessage(convo.id, '', 'event-proposal', finalEvent);
+        const convo = await ChatService.findOrCreateConversation(finalEvent.participants, finalEvent.title);
+        await ChatService.sendMessage(convo.id, '', 'event-proposal', finalEvent);
     }
   };
 

@@ -2,6 +2,14 @@
 
 React Native app. Firebase Auth + Firestore via `react-native-firebase`. Pre-launch, no users.
 
+## Repo identity
+
+`origin` must be `https://github.com/jltodd-15/knect-initial.git`. Check with `git remote -v`
+before doing anything else. If `origin` points anywhere else (a fork, e.g.
+`kysonallstar-stack/knect-initial`), stop and ask — do not fetch, branch, or commit against it.
+This repo has been mixed up with a fork before, causing a session to work from stale code and miss
+this file entirely.
+
 ## Read this first: most of this repo is a generated guess
 
 One commit — `71a7c07`, "adding latest changes from AI studios" — produced almost everything in
@@ -50,14 +58,17 @@ confidently into a spec-driven codebase is more expensive than a question.
 **Don't fix adjacent things.** This repo has many known bugs and each one belongs to a ticket. An
 unrelated bug found in passing gets reported, not fixed.
 
+**Keep `README.md` and this file in sync with what has actually landed.** When a ticket's changes
+make a line here stale (a "known bug" gets fixed, a convention changes), update it as part of that
+ticket. Never get ahead of it — don't describe a decision, a data shape, or a capability for a
+ticket that hasn't been built yet, even if you know it's coming.
+
 ## Known bugs that are somebody else's ticket
 
 - Three of four tabs crash on load — `index.js` registers `App` instead of the `ErrorBoundary`-wrapped
   `Root`. (Ticket 0.1)
 - `components/ChatEventWidget.tsx` and `utils/votingLogic.ts` are dead — nothing imports either.
   Don't build on them. The live vote UI is inside `SocialDashboard.tsx`.
-- `android/app/build.gradle` already declares the Firestore and Analytics artifacts under the BOM. A
-  Gradle edit to add one is a stop-and-ask.
 
 ## Verification
 
@@ -66,3 +77,20 @@ grep away from being an acceptance criterion — use them that way.
 
 `npm run lint` and `npm test` pass before anything is considered finished. Rules tests are separate:
 `npm run test:rules`, and they need the Firestore emulator running.
+
+### Testing protocol
+
+- **Test-first.** For any ticket with testable JS/TS behavior, write the test before the
+  implementation, per the `tdd-workflow` skill. It should fail for a specific, legible reason
+  before you make it pass.
+- **Never quietly narrow a failing assertion.** When a failing test needs its assertion changed,
+  say so out loud in chat at the moment it happens, and classify it as one of two things:
+  - *"This assertion was wrong, here's the fix"* — a genuine bug fix in the test.
+  - *"I'm narrowing what this test covers, here's why"* — a scope reduction.
+
+  These can produce an identical-looking diff, which is exactly why the distinction has to be
+  said out loud rather than left for someone to infer from the diff.
+- **A scope reduction is never silent.** It comes with a concrete note on what's now unverified
+  and how it will actually get covered — e.g. flagged for on-device verification, deferred to
+  another ticket. "I removed this assertion" without that note is not an acceptable stopping
+  point.
