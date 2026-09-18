@@ -3,10 +3,10 @@
 A React Native app. Pre-launch — no real users yet, no App Store or Play Store listing.
 
 Firebase reaches the app through [`@react-native-firebase`](https://rnfirebase.io/) — `app`,
-`auth`, and `analytics` are wired in on Android. There is no hand-written native bridge and no
+`auth`, `analytics` and `firestore` are wired in on Android. There is no hand-written native bridge and no
 `NativeModules.FirebaseModule`; the previous Kotlin bridge was deleted in favor of the SDK.
-Sign-in is not implemented yet — tapping SIGN IN / CREATE ACCOUNT is inert on purpose. Firestore
-reads and writes don't exist yet either.
+Sign-in is not implemented yet — tapping SIGN IN / CREATE ACCOUNT is inert on purpose. Firestore is
+configured once, in `services/firestore.ts`, with offline persistence on; no reads or writes exist yet.
 
 Development here is ticket-driven: **[`CLAUDE.md`](CLAUDE.md)** is the source of truth for data
 conventions (Firestore field naming, timestamp handling, collection shapes), styling conventions,
@@ -48,6 +48,8 @@ New behavior should have a failing test written before the implementation — se
 - `components/` — screens and widgets. Mostly generated from an AI-studio commit (`71a7c07`) —
   see `CLAUDE.md` for which pieces are hand-written and trustworthy versus generated shape that
   yields to the schema.
+- `services/firestore.ts` — the one place Firestore is configured (offline persistence on). Other
+  files import `db` from here; imported first in `index.js` so it runs before any Firestore call.
 - `utils/storage.ts` — hand-written async storage wrapper; not the browser's `localStorage`.
 - `android/`, `ios/` — native projects. Firebase config lives at `android/app/google-services.json`
   (Android) and `ios/GoogleService-Info.plist` (iOS).
