@@ -77,3 +77,20 @@ grep away from being an acceptance criterion — use them that way.
 
 `npm run lint` and `npm test` pass before anything is considered finished. Rules tests are separate:
 `npm run test:rules`, and they need the Firestore emulator running.
+
+### Testing protocol
+
+- **Test-first.** For any ticket with testable JS/TS behavior, write the test before the
+  implementation, per the `tdd-workflow` skill. It should fail for a specific, legible reason
+  before you make it pass.
+- **Never quietly narrow a failing assertion.** When a failing test needs its assertion changed,
+  say so out loud in chat at the moment it happens, and classify it as one of two things:
+  - *"This assertion was wrong, here's the fix"* — a genuine bug fix in the test.
+  - *"I'm narrowing what this test covers, here's why"* — a scope reduction.
+
+  These can produce an identical-looking diff, which is exactly why the distinction has to be
+  said out loud rather than left for someone to infer from the diff.
+- **A scope reduction is never silent.** It comes with a concrete note on what's now unverified
+  and how it will actually get covered — e.g. flagged for on-device verification, deferred to
+  another ticket. "I removed this assertion" without that note is not an acceptable stopping
+  point.
