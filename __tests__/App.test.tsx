@@ -8,6 +8,12 @@ import App from '../App';
 
 const authMock = require('@react-native-firebase/auth');
 
+// App imports the Users repository, which imports the native Firestore module; none of these
+// tests reach the sign-up write (see App.signup.test.tsx), so cut that import chain off here.
+jest.mock('../services/UsersRepository', () => ({
+  UsersRepository: {createUserDocuments: jest.fn(async () => {})},
+}));
+
 afterEach(() => {
   jest.clearAllMocks();
   authMock.__resetAuthMock();

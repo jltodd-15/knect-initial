@@ -6,7 +6,9 @@ Firebase reaches the app through [`@react-native-firebase`](https://rnfirebase.i
 `auth`, `analytics` and `firestore` are wired in on Android. There is no hand-written native bridge and no
 `NativeModules.FirebaseModule`; the previous Kotlin bridge was deleted in favor of the SDK.
 Sign-in is not implemented yet — tapping SIGN IN / CREATE ACCOUNT is inert on purpose. Firestore is
-configured once, in `services/firestore.ts`, with offline persistence on; no reads or writes exist yet.
+configured once, in `services/firestore.ts`, with offline persistence on. The only write today is the
+sign-up batch that creates a user's `Users` documents (`services/UsersRepository.ts`); nothing reads
+from Firestore yet.
 
 Development here is ticket-driven: **[`CLAUDE.md`](CLAUDE.md)** is the source of truth for data
 conventions (Firestore field naming, timestamp handling, collection shapes), styling conventions,
@@ -50,6 +52,10 @@ New behavior should have a failing test written before the implementation — se
   yields to the schema.
 - `services/firestore.ts` — the one place Firestore is configured (offline persistence on). Other
   files import `db` from here; imported first in `index.js` so it runs before any Firestore call.
+- `services/UsersRepository.ts` — creates `Users/{uid}` and `Users/{uid}/Private_info/main` in one
+  batch at sign-up. Doesn't accept a password.
+- `MASTER_SCHEMA.md` — repo copy of the Firestore Master Schema; where code and schema disagree, the
+  schema wins (see `CLAUDE.md`). It can lag the source doc, so flag a mismatch rather than guessing.
 - `utils/storage.ts` — hand-written async storage wrapper; not the browser's `localStorage`.
 - `android/`, `ios/` — native projects. Firebase config lives at `android/app/google-services.json`
   (Android) and `ios/GoogleService-Info.plist` (iOS).

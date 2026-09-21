@@ -19,8 +19,9 @@ export const AuthService = {
     await signInWithEmailAndPassword(getAuth(), email, password);
   },
 
-  signUp: async (email: string, password: string): Promise<void> => {
-    await createUserWithEmailAndPassword(getAuth(), email, password);
+  signUp: async (email: string, password: string): Promise<string> => {
+    const credential = await createUserWithEmailAndPassword(getAuth(), email, password);
+    return credential.user.uid;
   },
 
   signOutUser: async (): Promise<void> => {

@@ -15,7 +15,7 @@ this file entirely.
 One commit — `71a7c07`, "adding latest changes from AI studios" — produced almost everything in
 `components/`, `types.ts` and `services/`. Those shapes were generated, not decided.
 
-**Where the code disagrees with the Master Schema, the schema wins.** Do not preserve a field name,
+**Where the code disagrees with the Master Schema (copy in `MASTER_SCHEMA.md`), the schema wins.** Do not preserve a field name,
 a type, or a data shape because you found it in the codebase. Do not "reconcile" the two — replace
 the code.
 
