@@ -13,12 +13,18 @@ export interface CreateProfileData {
   password: string;
 }
 
+// Ticket 2.3: the state of the real signup write, driven from App.tsx. 'failed' is the
+// retry-available state (red outline, "Try Again") — the same button that submitted the first
+// time is what retries, so this is the only extra thing the button needs to know.
+export type ProfileSubmitState = 'idle' | 'submitting' | 'failed';
+
 interface Props {
   isDarkMode: boolean;
   onComplete: (profileData: CreateProfileData) => void;
+  submitting: ProfileSubmitState;
 }
 
-const CreateProfilePage: React.FC<Props> = ({ isDarkMode, onComplete }) => {
+const CreateProfilePage: React.FC<Props> = ({ isDarkMode, onComplete, submitting }) => {
   const styles = getStyles(isDarkMode);
   const [name, setName] = useState('');
   const [role, setRole] = useState('');
@@ -208,12 +214,18 @@ const CreateProfilePage: React.FC<Props> = ({ isDarkMode, onComplete }) => {
               </View>
           </View>
 
-          <TouchableOpacity 
-              style={[styles.submitBtn, (!name || !role) && styles.submitBtnDisabled]} 
+          <TouchableOpacity
+              style={[
+                styles.submitBtn,
+                (!name || !role) && styles.submitBtnDisabled,
+                submitting === 'failed' && { borderWidth: 2, borderColor: '#ff8080', backgroundColor: 'transparent' },
+              ]}
               onPress={() => onComplete({ name, role, interests, avatar, email, password })}
-              disabled={!name || !role}
+              disabled={!name || !role || submitting === 'submitting'}
           >
-              <Text style={styles.submitBtnText}>COMPLETE PROFILE</Text>
+              <Text style={[styles.submitBtnText, submitting === 'failed' && { color: '#ff8080' }]}>
+                {submitting === 'submitting' ? 'SAVING PROFILE...' : submitting === 'failed' ? 'TRY AGAIN' : 'COMPLETE PROFILE'}
+              </Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>

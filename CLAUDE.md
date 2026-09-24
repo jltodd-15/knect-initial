@@ -78,8 +78,13 @@ ticket that hasn't been built yet, even if you know it's coming.
 Prefer a check you can run over a claim that the work looks done. Most conventions above are one
 grep away from being an acceptance criterion — use them that way.
 
-`npm run lint` and `npm test` pass before anything is considered finished. Rules tests are separate:
-`npm run test:rules`, and they need the Firestore emulator running.
+`npm test` passes, and `npm run lint` reports no errors in the files the ticket touched, before
+anything is considered finished. (The repo has older lint errors in files no ticket has touched
+yet; those don't block a ticket.) Rules tests are separate: `npm run test:rules`, and they need
+the Firestore emulator running.
+
+Anything that can only be checked on a device or emulator goes in `DEVICE_TESTS.md`, under the
+ticket's own heading, as part of that ticket.
 
 ### Testing protocol
 

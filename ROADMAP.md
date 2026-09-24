@@ -28,6 +28,9 @@ is fine well ahead of time, invented implementation detail isn't.
 - [ ] 1.2 — Real auth, wired to `react-native-firebase`'s auth SDK 📄
 - [ ] 1.3 — Google & Apple sign-in (includes regenerating `google-services.json`) 📄 ⭐ *gates App Review; needs a paid Apple Developer membership*
 - [ ] 1.4 — Onboarding sequence / `CreateProfilePage` screen work 📄
+  - *Open for the ticket writer (from 2.3):* the login email is fixed the moment the account is created, but after a failed profile save the email and password fields stay editable, so editing them looks like it fixes a typo and doesn't. Lock them, or explain it?
+  - *Open:* nothing catches a mistyped email (`Kysn@` for `Kyson@`); a format check can't. A confirm step (type it twice, or show it back before the account is created) would catch most typos without sending an email.
+  - *Context:* 2.3 added a stopgap for a signed-in user with no profile: submitting saves to their existing account instead of creating a new one. The email/password step still shows and is ignored, and the screen has no sign-out. Real recovery is this ticket's.
 
 ## Project 2 — Firestore & the user document
 - [ ] 2.1 — Firestore config module, including turning on offline persistence 📄
@@ -114,6 +117,7 @@ Not owned by any numbered project above.
 ### Pending Jonathan
 - [ ] D6 — Own-profile tab
 - [ ] D8 — Settings, logout & account deletion
+  - *Open:* no ticket lets a user change their login email, so a typo made at signup is permanent, and password-reset emails go to the mistyped address. Does changing email belong here? (Firebase's safe way applies the change only after a link at the new address is clicked.)
 
 ### Real work, no ticket, no owner ❓
 - [ ] `firestore.indexes.json` — six tickets need composite indexes. Firestore fails a missing composite at runtime: survivable in dev, a launch blocker in production.
@@ -122,6 +126,7 @@ Not owned by any numbered project above.
 - [ ] `@d11/react-native-fast-image` — in `dependencies`, named in no ticket. Probably Project 6 or 11. Someone has to decide whether it stays.
 - [ ] Firebase Console config — Email/Password provider **on** and email-enumeration protection **off**. Both one-time Console actions, neither is build scope, and the first blocks 1.2 from being verified at all.
 - [ ] Published contact information — App Review Guideline 1.2 requires it and it has no home.
+- [ ] Email verification — nothing sends a "confirm your email" message. It proves the user owns the address and exposes typos, but doesn't fix them without a way to change email (see D8). Needs decisions first: can someone use the app before verifying, and what happens to accounts that never do? Decide before launch.
 
 ---
 

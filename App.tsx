@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, StatusBar, ActivityIndicator } from 'react-native';
 import {  SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { AppTab } from './types';
@@ -7,12 +7,19 @@ import DiscoveryFeed from './components/DiscoveryFeed';
 import EventPlanner from './components/EventPlanner';
 import SocialDashboard from './components/SocialDashboard';
 import ProfilePage from './components/ProfilePage';
-import CreateProfilePage, { CreateProfileData } from './components/CreateProfilePage';
+import CreateProfilePage, { CreateProfileData, ProfileSubmitState } from './components/CreateProfilePage';
 
 import { DiscoveryItem } from './types';
 
 import { AuthService } from './services/AuthService';
 import { UsersRepository } from './services/UsersRepository';
+import { checkUserProfileExists, withTimeout, WRITE_TIMEOUT_MS } from './hooks/useProfileCheck';
+
+// Ticket 2.3: told once, at the moment the account survives a second failed profile write and
+// the user is signed out. The account is real and the email is taken — signing back in, not
+// signing up again, is the way forward.
+const SIGN_OUT_COPY =
+  'Your account was created, but saving your profile failed. That email is already registered — sign in with it to pick up where you left off.';
 
 type AuthErrorField = 'email' | 'credential' | 'network' | null;
 
@@ -56,6 +63,22 @@ const App: React.FC = () => {
   const [authView, setAuthView] = useState<'signin' | 'forgotPassword' | 'resetSent'>('signin');
   const [resetEmail, setResetEmail] = useState('');
 
+  // Ticket 2.3: the signup write's submitting/failed treatment, and the missing-profile
+  // detection that runs after every sign-in (not just a fresh signup).
+  const [submitState, setSubmitState] = useState<ProfileSubmitState>('idle');
+  const [currentUid, setCurrentUid] = useState<string | null>(null);
+  const [profileCheckStatus, setProfileCheckStatus] = useState<'checking' | 'present' | 'missing'>('checking');
+  const [signOutNotice, setSignOutNotice] = useState<string | null>(null);
+
+  // Guards that must act synchronously, ahead of React's own state batching:
+  const writeInFlightRef = useRef(false); // double-submit guard for the profile write
+  const attemptCountRef = useRef(0); // write attempts (not auth attempts); 2 failures signs out
+  // The account the profile is being saved to: its uid and the email it was created with, kept
+  // together so a retry can never pair one account's uid with a different, since-edited email.
+  const accountRef = useRef<{ uid: string; email: string } | null>(null);
+  const signedInEmailRef = useRef<string | null>(null); // email onAuthStateChanged reports
+  const checkSeqRef = useRef(0); // invalidates a stale missing-profile read after our own write lands
+
   useEffect(() => {
     setIsDarkMode(false);
   }, []);
@@ -63,14 +86,39 @@ const App: React.FC = () => {
   useEffect(() => {
     const unsubscribe = AuthService.subscribeToAuthState((user) => {
       setIsAuth(user !== null);
+      // Keyed only off the uid onAuthStateChanged itself reports — never a locally stored id.
+      setCurrentUid(user ? user.uid : null);
+      signedInEmailRef.current = user ? user.email : null;
       setInitializing(false);
       setLoading(false);
     });
     return unsubscribe;
   }, []);
 
+  // The one-time Users/{uid} read (a get(), never a listener) that catches an Auth account with
+  // no profile document behind it — the state a failed-then-signed-out signup can leave behind.
+  useEffect(() => {
+    const seq = ++checkSeqRef.current;
+    if (!currentUid) {
+      setProfileCheckStatus('checking');
+      return;
+    }
+    setProfileCheckStatus('checking');
+    checkUserProfileExists(currentUid)
+      .then((exists) => {
+        if (checkSeqRef.current !== seq) return; // superseded by a newer check or a fresh write
+        setProfileCheckStatus(exists ? 'present' : 'missing');
+      })
+      .catch(() => {
+        if (checkSeqRef.current !== seq) return;
+        // Rare edge case: offline with no cached copy of this doc. Stay on the checking/loading
+        // visual rather than guessing - no sign-out, no new screen, per the ticket's decision.
+      });
+  }, [currentUid]);
+
   const handleAuth = async () => {
     setAuthError({ field: null, message: '' });
+    setSignOutNotice(null);
     setLoading(true);
     try {
       await AuthService.signIn(email, password);
@@ -82,24 +130,102 @@ const App: React.FC = () => {
 
   const handleSignUp = () => {
     setLoading(false);
+    setAuthError({ field: null, message: '' });
+    setSignOutNotice(null);
+    writeInFlightRef.current = false;
+    attemptCountRef.current = 0;
+    accountRef.current = null;
+    setSubmitState('idle');
     setShowCreateProfile(true);
   };
 
+  // Submit from CREATE ACCOUNT: creates the Auth account, then saves its profile.
   const handleProfileComplete = async (profileData: CreateProfileData) => {
-    setShowCreateProfile(false);
-    setLoading(true);
-    try {
-      const uid = await AuthService.signUp(profileData.email, profileData.password);
-      await UsersRepository.createUserDocuments(uid, {
-        name: profileData.name,
-        role: profileData.role,
-        interests: profileData.interests,
-        email: profileData.email,
-      });
-    } catch (e: any) {
-      setLoading(false);
-      setAuthError(mapAuthError(e.code));
+    // Double-submit guard: synchronous, so a second tap arriving before React re-renders the
+    // disabled button can't slip through the same window a state check alone would leave open.
+    if (writeInFlightRef.current) return;
+    writeInFlightRef.current = true;
+    setSubmitState('submitting');
+
+    // The auth call happens once per signup session. A retry reuses the account it created and
+    // never calls signUp again - a second call with the same email would wrongly report
+    // auth/email-already-in-use even though the real failure was the Firestore write.
+    let account = accountRef.current;
+    if (!account) {
+      try {
+        const uid = await AuthService.signUp(profileData.email, profileData.password);
+        account = { uid, email: profileData.email };
+        accountRef.current = account;
+      } catch (e: any) {
+        // Auth failure - 1.2's unchanged territory, and not a write failure: it doesn't consume
+        // a write attempt or enter the retry machinery below.
+        writeInFlightRef.current = false;
+        setSubmitState('idle');
+        setShowCreateProfile(false);
+        setAuthError(mapAuthError(e.code));
+        return;
+      }
     }
+
+    await saveProfile(account, profileData);
+  };
+
+  // Submit from the missing-profile screen: the user is already signed into an account that has
+  // no profile (e.g. an earlier save failed and they closed the app). Never create a second
+  // account here - save the profile to the one they're signed into, under that account's own
+  // email, whatever the email field says. Interim until 1.4 builds real recovery.
+  const handleMissingProfileComplete = async (profileData: CreateProfileData) => {
+    if (writeInFlightRef.current || !currentUid) return;
+    writeInFlightRef.current = true;
+    setSubmitState('submitting');
+
+    const account = { uid: currentUid, email: signedInEmailRef.current ?? profileData.email };
+    accountRef.current = account;
+    await saveProfile(account, profileData);
+  };
+
+  // The profile write both paths share: bounded by a timeout, retried once from the same button,
+  // then the user is signed out.
+  const saveProfile = async (account: { uid: string; email: string }, profileData: CreateProfileData) => {
+    attemptCountRef.current += 1;
+    try {
+      await withTimeout(
+        UsersRepository.createUserDocuments(account.uid, {
+          name: profileData.name,
+          role: profileData.role,
+          interests: profileData.interests,
+          email: account.email,
+        }),
+        WRITE_TIMEOUT_MS,
+      );
+    } catch {
+      writeInFlightRef.current = false;
+      if (attemptCountRef.current >= 2) {
+        // Retry exhausted. The Auth account survives this - the missing-profile check catches it
+        // the next time they sign in.
+        attemptCountRef.current = 0;
+        accountRef.current = null;
+        setSubmitState('idle');
+        setShowCreateProfile(false);
+        setAuthError({ field: null, message: '' });
+        setSignOutNotice(SIGN_OUT_COPY);
+        await AuthService.signOutUser();
+      } else {
+        setSubmitState('failed'); // red outline / "Try Again" on the same button
+      }
+      return;
+    }
+
+    // Both documents are confirmed written.
+    writeInFlightRef.current = false;
+    attemptCountRef.current = 0;
+    accountRef.current = null;
+    checkSeqRef.current += 1; // pre-empts a stale missing-profile read racing this same uid
+    setProfileCheckStatus('present');
+    setSubmitState('idle');
+    // Always land on Planner, even if the previous user this session logged out from another tab.
+    setActiveTab(AppTab.PLANNER);
+    setShowCreateProfile(false); // only now is the tab tree reachable
   };
 
   const handleLogout = async () => {
@@ -148,7 +274,7 @@ const App: React.FC = () => {
         <SafeAreaProvider>
           <SafeAreaView style={styles.container}>
               <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-              <CreateProfilePage isDarkMode={isDarkMode} onComplete={handleProfileComplete} />
+              <CreateProfilePage isDarkMode={isDarkMode} onComplete={handleProfileComplete} submitting={submitState} />
           </SafeAreaView>
         </SafeAreaProvider>
       );
@@ -193,6 +319,10 @@ const App: React.FC = () => {
                 <Text style={styles.errorText}>
                   {authError.field === 'network' ? authError.message : `Unable to sign in: ${authError.message}`}
                 </Text>
+              )}
+
+              {signOutNotice && (
+                <Text style={styles.errorText}>{signOutNotice}</Text>
               )}
 
                <TouchableOpacity style={styles.signInBtn} onPress={handleAuth} disabled={loading}>
@@ -256,6 +386,35 @@ const App: React.FC = () => {
           )}
         </View>
       </View>
+    );
+  }
+
+  // Ticket 2.3: the moment after onAuthStateChanged reports a signed-in user but before the
+  // one-time Users/{uid} read resolves. Neither the tab tree nor the login screen is correct
+  // here - same visual family as the `initializing` state above, for the same reason: flashing
+  // the wrong screen at a user who turns out to have a perfectly good profile is the bug this
+  // state exists to prevent. A rejected read (no cache, no connection) also lands here and stays
+  // here, rather than guessing.
+  if (profileCheckStatus === 'checking') {
+    return (
+      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+        <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
+        <ActivityIndicator size="large" color="#10b981" />
+      </View>
+    );
+  }
+
+  // The interim branch for a signed-in user with no Users document - the account a failed profile
+  // write can leave behind. It reuses the signup screen, but submitting saves a profile to the
+  // account they're signed into rather than creating a new one. Real recovery is 1.4's.
+  if (profileCheckStatus === 'missing') {
+    return (
+      <SafeAreaProvider>
+        <SafeAreaView style={styles.container}>
+            <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
+            <CreateProfilePage isDarkMode={isDarkMode} onComplete={handleMissingProfileComplete} submitting={submitState} />
+        </SafeAreaView>
+      </SafeAreaProvider>
     );
   }
 

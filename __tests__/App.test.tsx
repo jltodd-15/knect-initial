@@ -14,6 +14,17 @@ jest.mock('../services/UsersRepository', () => ({
   UsersRepository: {createUserDocuments: jest.fn(async () => {})},
 }));
 
+// Ticket 2.3: App now also imports hooks/useProfileCheck, which imports services/firestore (the
+// native Firestore initializer). None of these tests sign a user in (the shared auth mock doesn't
+// cascade onAuthStateChanged on success — see jest.setup.js), so the missing-profile read never
+// actually runs here; this mock only keeps the import chain out of the way. See
+// App.profileCheck.test.tsx for the read itself.
+jest.mock('../hooks/useProfileCheck', () => ({
+  checkUserProfileExists: jest.fn(async () => true),
+  withTimeout: jest.fn((promise: Promise<unknown>) => promise),
+  WRITE_TIMEOUT_MS: 15000,
+}));
+
 afterEach(() => {
   jest.clearAllMocks();
   authMock.__resetAuthMock();
