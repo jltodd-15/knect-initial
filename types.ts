@@ -16,6 +16,24 @@ export interface User {
   bio?: string;
 }
 
+// Schema-shaped: exactly what ticket 2.2 writes to Users/{uid} at signup. Other users can read this
+// document, so no email here. current_status, status_visibility and status_expires_at are absent
+// on purpose (the status feature owns their first write); anything reading them must handle undefined.
+export interface UserDocument {
+  name: string;
+  name_lowercase: string;
+  profile_info: string;
+  profile_picture_url: string;
+  interests: string[];
+}
+
+// Schema-shaped: exactly what ticket 2.2 writes to Users/{uid}/Private_info/main at signup. Owner-only.
+export interface PrivateInfoDocument {
+  email: string;
+  blocked_users: string[];
+  fcm_tokens: string[];
+}
+
 export interface Friend {
   id: string;
   name: string;

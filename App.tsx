@@ -12,6 +12,7 @@ import CreateProfilePage, { CreateProfileData } from './components/CreateProfile
 import { DiscoveryItem } from './types';
 
 import { AuthService } from './services/AuthService';
+import { UsersRepository } from './services/UsersRepository';
 
 type AuthErrorField = 'email' | 'credential' | 'network' | null;
 
@@ -88,7 +89,13 @@ const App: React.FC = () => {
     setShowCreateProfile(false);
     setLoading(true);
     try {
-      await AuthService.signUp(profileData.email, profileData.password);
+      const uid = await AuthService.signUp(profileData.email, profileData.password);
+      await UsersRepository.createUserDocuments(uid, {
+        name: profileData.name,
+        role: profileData.role,
+        interests: profileData.interests,
+        email: profileData.email,
+      });
     } catch (e: any) {
       setLoading(false);
       setAuthError(mapAuthError(e.code));
