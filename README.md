@@ -6,15 +6,17 @@ Firebase reaches the app through [`@react-native-firebase`](https://rnfirebase.i
 `auth`, `analytics` and `firestore` are wired in on Android. There is no hand-written native bridge and no
 `NativeModules.FirebaseModule`; the previous Kotlin bridge was deleted in favor of the SDK.
 Sign-in is not implemented yet — tapping SIGN IN / CREATE ACCOUNT is inert on purpose. Firestore is
-configured once, in `services/firestore.ts`, with offline persistence on. The only write today is the
-sign-up batch that creates a user's `Users` documents (`services/UsersRepository.ts`); nothing reads
-from Firestore yet.
+configured once, in `services/firestore.ts`, with offline persistence on. The only write is the
+sign-up batch that creates a user's `Users` documents (`services/UsersRepository.ts`); the only read
+is a one-time `get()` of `Users/{uid}` after sign-in (`hooks/useProfileCheck.ts`), used to detect an
+Auth account with no profile document behind it.
 
 Development here is ticket-driven: **[`CLAUDE.md`](CLAUDE.md)** is the source of truth for data
 conventions (Firestore field naming, timestamp handling, collection shapes), styling conventions,
 and how work is scoped and reviewed in this repo. **[`ROADMAP.md`](ROADMAP.md)** tracks what's
 shipped and what's planned, project by project. Read both before making changes — this README is
-just the "how do I run it" layer on top.
+just the "how do I run it" layer on top. **[`DEVICE_TESTS.md`](DEVICE_TESTS.md)** lists the checks
+that need a real device or emulator, ticket by ticket.
 
 ## Running it
 
