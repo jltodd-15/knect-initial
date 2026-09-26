@@ -13,8 +13,12 @@ part.
 - Use throwaway test emails (e.g. `test1@example.com`, `test2@example.com`). Delete them from both
   places in the Console when you're done.
 - "Go offline" means turning on airplane mode on the device or emulator.
-- Known, unrelated: switching to some tabs crashes the app (ticket 0.1). That isn't a failure of
-  any check below. Stay on the Planner tab unless a check says otherwise.
+- The tab crashes were fixed in ticket 0.1. If any screen turns pink and says **"Something went
+  wrong"**, that's a real bug: screenshot it (the message under the title matters) and note which
+  tab and what you tapped.
+- Expected, not bugs: the tabs show sample data (friends, chats, activities, and "Alex Rivera" on
+  the Profile tab), not what you typed at signup, and changes there are only saved on that phone.
+  Later tickets connect them to Firebase.
 
 ---
 

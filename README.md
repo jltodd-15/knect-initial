@@ -3,13 +3,25 @@
 A React Native app. Pre-launch — no real users yet, no App Store or Play Store listing.
 
 Firebase reaches the app through [`@react-native-firebase`](https://rnfirebase.io/) — `app`,
-`auth`, `analytics` and `firestore` are wired in on Android. There is no hand-written native bridge and no
+`auth`, `analytics` and `firestore`. There is no hand-written native bridge and no
 `NativeModules.FirebaseModule`; the previous Kotlin bridge was deleted in favor of the SDK.
-Sign-in is not implemented yet — tapping SIGN IN / CREATE ACCOUNT is inert on purpose. Firestore is
-configured once, in `services/firestore.ts`, with offline persistence on. The only write is the
-sign-up batch that creates a user's `Users` documents (`services/UsersRepository.ts`); the only read
-is a one-time `get()` of `Users/{uid}` after sign-in (`hooks/useProfileCheck.ts`), used to detect an
-Auth account with no profile document behind it.
+Firestore is configured once, in `services/firestore.ts`, with offline persistence on. The only write
+is the sign-up batch that creates a user's `Users` documents (`services/UsersRepository.ts`); the only
+read is a one-time `get()` of `Users/{uid}` after sign-in (`hooks/useProfileCheck.ts`), used to detect
+an Auth account with no profile document behind it.
+
+## Current state
+
+- **Real, backed by Firebase:** email/password sign-in, sign-out, forgot password, and signup (a
+  two-step onboarding sequence that creates the account and writes the `Users` documents). A
+  signed-in user with no profile is sent back to finish signup.
+- **Hidden:** Google and Apple sign-in, until ticket 1.3 (needs a paid Apple Developer account).
+- **Reachable but not real yet:** the Planner, Feed, Social and Profile tabs. They open without
+  crashing, but show sample data. Anything changed there is saved only on that phone, never to
+  Firebase. The Profile tab shows "Alex Rivera", not the profile created at signup.
+- **Not verified on a device:** tickets 2.3 and 1.4. Their checks are in `DEVICE_TESTS.md`. Test on Android for now: iOS is missing its Firebase config on this branch (see below).
+- **Known bugs** that belong to other tickets are listed in [`CLAUDE.md`](CLAUDE.md), under
+  "Known bugs that are somebody else's ticket".
 
 Development here is ticket-driven: **[`CLAUDE.md`](CLAUDE.md)** is the source of truth for data
 conventions (Firestore field naming, timestamp handling, collection shapes), styling conventions,
@@ -65,4 +77,5 @@ New behavior should have a failing test written before the implementation — se
   schema wins (see `CLAUDE.md`). It can lag the source doc, so flag a mismatch rather than guessing.
 - `utils/storage.ts` — hand-written async storage wrapper; not the browser's `localStorage`.
 - `android/`, `ios/` — native projects. Firebase config lives at `android/app/google-services.json`
-  (Android) and `ios/GoogleService-Info.plist` (iOS).
+  (Android) and `ios/Knect/GoogleService-Info.plist` (iOS). The iOS file arrives with ticket 0.2's
+  PR (#3), which isn't merged into this branch yet — see the known bugs in `CLAUDE.md`.

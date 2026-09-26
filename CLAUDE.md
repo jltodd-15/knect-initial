@@ -72,8 +72,11 @@ ticket that hasn't been built yet, even if you know it's coming.
 
 ## Known bugs that are somebody else's ticket
 
-- Three of four tabs crash on load — `index.js` registers `App` instead of the `ErrorBoundary`-wrapped
-  `Root`. (Ticket 0.1)
+- Every tab except signup still runs on sample data and on-device storage, not Firestore. The
+  Profile tab shows "Alex Rivera", not the profile written at signup (D6). Friends, chats, and
+  activities are sample data (Projects 5, 9, 11 and 15).
+- iOS has no Firebase config on this branch stack: `ios/Knect/GoogleService-Info.plist` is only in
+  ticket 0.2's PR (#3), not merged yet. Until it is, test on Android. (Ticket 0.2)
 - `components/ChatEventWidget.tsx` and `utils/votingLogic.ts` are dead — nothing imports either.
   Don't build on them. The live vote UI is inside `SocialDashboard.tsx`.
 
