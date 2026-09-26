@@ -48,7 +48,12 @@ New behavior should have a failing test written before the implementation — se
 
 ## Structure
 
-- `App.tsx` — root component; tab switching and the (currently inert) auth screen.
+- `App.tsx` — root component: the sign-in screen (Firebase Auth), the signup/onboarding screen, the
+  missing-profile check, and tab switching.
+- `components/CreateProfilePage.tsx` — the onboarding sequence: an email/password step, then a
+  profile step (name, optional bio, interests from a fixed list of 35, initials avatar).
+- `components/InitialsAvatar.tsx` — the picture every user has until they upload one, drawn from
+  their name. Also the placeholder for a person who no longer exists.
 - `components/` — screens and widgets. Mostly generated from an AI-studio commit (`71a7c07`) —
   see `CLAUDE.md` for which pieces are hand-written and trustworthy versus generated shape that
   yields to the schema.

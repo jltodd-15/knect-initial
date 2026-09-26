@@ -28,9 +28,11 @@ is fine well ahead of time, invented implementation detail isn't.
 - [ ] 1.2 — Real auth, wired to `react-native-firebase`'s auth SDK 📄
 - [ ] 1.3 — Google & Apple sign-in (includes regenerating `google-services.json`) 📄 ⭐ *gates App Review; needs a paid Apple Developer membership*
 - [ ] 1.4 — Onboarding sequence / `CreateProfilePage` screen work 📄
-  - *Open for the ticket writer (from 2.3):* the login email is fixed the moment the account is created, but after a failed profile save the email and password fields stay editable, so editing them looks like it fixes a typo and doesn't. Lock them, or explain it?
+  - *Decided (1.4):* once the account exists, the back arrow to the email/password step is grayed out and locked, with no message. Next and back are arrows, not words.
   - *Open:* nothing catches a mistyped email (`Kysn@` for `Kyson@`); a format check can't. A confirm step (type it twice, or show it back before the account is created) would catch most typos without sending an email.
-  - *Context:* 2.3 added a stopgap for a signed-in user with no profile: submitting saves to their existing account instead of creating a new one. The email/password step still shows and is ignored, and the screen has no sign-out. Real recovery is this ticket's.
+  - *Built (1.4), not yet device-tested:* a signed-in user with no profile resumes at the profile step, with no email/password step. That screen still has no sign-out. ❓ no ticket owns adding one.
+  - *Built (1.4):* `components/InitialsAvatar.tsx`, the picture every user has until they upload one. Other tickets that show a person reuse it (noted on each below).
+  - *Google & Apple buttons are hidden* on the login screen until 1.3 lands.
 
 ## Project 2 — Firestore & the user document
 - [ ] 2.1 — Firestore config module, including turning on offline persistence 📄
@@ -45,15 +47,19 @@ is fine well ahead of time, invented implementation detail isn't.
 
 ## Project 4 — User search
 - [ ] 4 — User search tab 📄
+  - *Uses `components/InitialsAvatar.tsx`* (from 1.4) for any person with no uploaded picture, or who no longer exists ("Deleted user"). Don't build a second placeholder.
 
 ## Project 5 — Friend requests
 - [ ] 5 — Friend request logic 📄 *depends on D2 and 15.1 — see Running Order F1*
+  - *Uses `components/InitialsAvatar.tsx`* (from 1.4) for any person with no uploaded picture, or who no longer exists ("Deleted user"). Don't build a second placeholder.
 
 ## Project 6 — Profile pictures
 - [ ] 6 — Profile picture upload 📄
+  - *Uses `components/InitialsAvatar.tsx`* (from 1.4) as the fallback: until someone uploads, `profile_picture_url` is `""` and the initials avatar shows. Upload replaces it for that user; the fallback stays for everyone else.
 
 ## Project 7 — Public profile
 - [ ] 7 — Public profile routing 📄
+  - *Uses `components/InitialsAvatar.tsx`* (from 1.4) for any person with no uploaded picture, or who no longer exists ("Deleted user"). Don't build a second placeholder.
 
 ## Project 8 — Activity schema
 - [ ] 8 — Define the activity schema 📄 *pins the final `category` value set*
@@ -80,7 +86,9 @@ is fine well ahead of time, invented implementation detail isn't.
 
 ## Project 15 — Group chat & messaging
 - [ ] 15.1 — Group chat infrastructure: chat creation & data model 📄
+  - *Uses `components/InitialsAvatar.tsx`* (from 1.4) for any person with no uploaded picture, or who no longer exists ("Deleted user"). Don't build a second placeholder.
 - [ ] 15.2 — Real-time messaging & listeners 📄 *depends on D2*
+  - *Uses `components/InitialsAvatar.tsx`* (from 1.4) for any person with no uploaded picture, or who no longer exists ("Deleted user"). Don't build a second placeholder.
 
 ## Project 16 — Activity proposals
 - [ ] 16.1 — Propose an activity, the `Events` write, RSVPs 📄 🚧 **hard-blocked on Project 3** — no `/Events/` rule exists, so every Events read and write is denied today
@@ -116,7 +124,9 @@ Not owned by any numbered project above.
 
 ### Pending Jonathan
 - [ ] D6 — Own-profile tab
+  - *Uses `components/InitialsAvatar.tsx`* (from 1.4) for any person with no uploaded picture, or who no longer exists ("Deleted user"). Don't build a second placeholder.
 - [ ] D8 — Settings, logout & account deletion
+  - *Uses `components/InitialsAvatar.tsx`* (from 1.4): a deleted account shows as "Deleted user" with that component's plain person icon.
   - *Open:* no ticket lets a user change their login email, so a typo made at signup is permanent, and password-reset emails go to the mistyped address. Does changing email belong here? (Firebase's safe way applies the change only after a link at the new address is clicked.)
 
 ### Real work, no ticket, no owner ❓

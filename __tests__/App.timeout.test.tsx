@@ -27,10 +27,18 @@ jest.mock('../services/UsersRepository', () => ({
 
 // Same stub as App.signup.test.tsx: shows the `submitting` prop, and exposes onComplete so the
 // test can submit without fireEvent's act() scope staying open for the whole write.
-const latestOnComplete: {current: ((data: unknown) => unknown) | null} = {current: null};
+const latestOnComplete: {current: ((profile: unknown, credentials: unknown) => unknown) | null} = {
+  current: null,
+};
 jest.mock('../components/CreateProfilePage', () => ({
   __esModule: true,
-  default: ({onComplete, submitting}: {onComplete: (data: unknown) => unknown; submitting: string}) => {
+  default: ({
+    onComplete,
+    submitting,
+  }: {
+    onComplete: (profile: unknown, credentials: unknown) => unknown;
+    submitting: string;
+  }) => {
     const mockReact = require('react');
     const {Text} = require('react-native');
     latestOnComplete.current = onComplete;
@@ -54,14 +62,10 @@ test('a save that never finishes (offline) reaches the "Try Again" state once th
 
   let submitted!: Promise<unknown>;
   act(() => {
-    submitted = latestOnComplete.current!({
-      name: 'John Smith',
-      role: 'Digital nomad',
-      interests: [],
-      avatar: '',
-      email: 'john@example.com',
-      password: 'hunter2-Secret',
-    }) as Promise<unknown>;
+    submitted = latestOnComplete.current!(
+      {name: 'John Smith', bio: 'Digital nomad', interests: [], profile_picture_url: ''},
+      {email: 'john@example.com', password: 'Hunter2-Secret'},
+    ) as Promise<unknown>;
   });
   expect(screen.getByText('SUBMIT STATE: submitting')).toBeTruthy();
 

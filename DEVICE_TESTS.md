@@ -18,6 +18,82 @@ part.
 
 ---
 
+## 1.4: Onboarding sequence
+
+Not yet run. Sign up from scratch on a real Android device or emulator.
+
+**Screenshots wanted.** Kyson can't run the app, so this ticket's look is judged from your
+screenshots. Please send one of each: the login screen, the email/password step (empty, then with
+the password partly typed), the profile step (with no name, then with a name and a few interests
+picked), the button while saving, the TRY AGAIN state, and the "Email already in use" message.
+
+**Before you start:** in the Firebase Console, check **Authentication → Settings → Password policy**
+is set to: minimum 8, maximum 24 characters, require an uppercase letter, require a number. If it
+says anything else, write down what it says. The app and the Console have to match.
+
+**The two steps**
+- [ ] **One step at a time.** Tap **CREATE ACCOUNT**. Only the email and password step shows. Fill it
+  in, tap the **→** arrow. The email and password step is **gone**, not just scrolled away, and only the
+  profile step shows.
+- [ ] **Back fixes a typo.** On the profile step tap the **←** arrow. The email you typed is still there.
+  Change it, tap the **→** arrow, finish signing up. In the Console, Authentication shows the **changed**
+  email.
+- [ ] **Back locks once the account exists.** Go offline, reach the profile step, tap **COMPLETE
+  PROFILE**, wait for **TRY AGAIN**. The **←** arrow is grayed out and does nothing when tapped.
+
+- [ ] **No Google or Apple buttons.** The login screen has no Google or Apple button and no "OR"
+  line. (Hidden until ticket 1.3.)
+
+**Password rule**
+- [ ] **Show/hide password.** Inside the right end of the password field there's a plain eye icon.
+  Tapping it shows what you typed; tapping again hides it.
+- [ ] **Requirements show up front.** Before typing anything, the password field shows
+  *8–24 characters*, *A capital letter* and *A number* underneath it. Each one turns green as you
+  meet it.
+- [ ] **Accepted and rejected.** `Passw0rd` moves on to the profile step. Each of these stays on the
+  first step and shows *"Password must be at least 8 characters and include a capital letter and a
+  number"*: `Passw0r`, `password1`, `Password`, and a 25-character one like `Passw0rdPassw0rdPassw0rdP`.
+- [ ] **Firebase agrees.** Finish a signup with `Passw0rd`. The account is created. If instead the
+  password message appears after tapping **COMPLETE PROFILE**, the Console policy and the app disagree:
+  note what the Console says.
+- [ ] **Sign-in isn't checked.** On the login screen, sign in to any existing account. No password
+  rule message appears before the sign-in attempt.
+
+**Profile step**
+- [ ] **Picture from your name.** With the name empty, the circle shows a plain person icon. Type a
+  name: the circle shows its initials and updates as you type (`Alex` → **A**, `Alex Rivera` → **AR**).
+  There's no camera button and nothing happens when you tap the circle.
+- [ ] **Bio is optional.** With a name and no bio, **COMPLETE PROFILE** can be tapped. With no name,
+  it can't.
+- [ ] **Interests.** There are exactly 35 options to tap, no text box to type your own. Tapping one
+  turns it green, tapping again turns it back. Pick `Board games` and `Musicals & Theater`, finish
+  signing up. In the Console, `Users/{uid}` → `interests` is exactly `Board games`,
+  `Musicals & Theater`, **not** in capitals.
+- [ ] **No interests is fine.** Sign up with none picked. It lands in the app, and `interests` in the
+  Console is an empty list.
+- [ ] **Bio saved.** The bio you typed is in `Users/{uid}` → `profile_info`. `profile_picture_url`
+  is empty (`""`).
+
+**Loading and errors**
+- [ ] **Spinner.** Tap **COMPLETE PROFILE**. The button shows a spinning indicator with **SAVING
+  PROFILE...** until it lands in the app.
+- [ ] **Email already in use.** Sign up with an email that already has an account. You're taken back
+  to the email step, the message *"Email already in use"* is under the email, and you are **not**
+  thrown back to the login screen. Change the email and finish: it works.
+- [ ] **Lands on Planner.** A finished signup opens the app on the **Planner** tab.
+
+**Coming back after a failed save**
+- [ ] **Resumes at the profile step.** Go offline, sign up, tap **COMPLETE PROFILE**, wait for **TRY
+  AGAIN**, tap it, wait again. You're signed out with the explanation. Go online and sign in with the
+  same email and password. You land on the **profile step** (name, bio, interests), with no email or
+  password step and no **←** arrow. Finish it: the app opens, and the Console shows one account, now
+  with a `Users` document.
+
+**Not checkable yet:** the Google/Apple path (arriving with or without a name) can't be tried on a
+device until ticket 1.3 is built. It's covered by automated tests only.
+
+---
+
 ## 2.3: Signup states and missing-profile detection
 
 Not yet run.
@@ -52,8 +128,8 @@ Not yet run.
 **Signing in without a profile**
 - [ ] **Caught on sign-in.** Sign in as the account from the previous check (online). You see the
   create-profile screen, not the app.
-- [ ] **Recovering saves to the same account.** On that screen, fill in the form. The first step asks
-  for an email and password again: type anything valid, it's ignored. Tap **COMPLETE PROFILE**. The app
+- [ ] **Recovering saves to the same account.** On that screen, fill in the form. (Since 1.4 it opens
+  on the profile step; there's no email or password step.) Tap **COMPLETE PROFILE**. The app
   lands on **Planner**. In the Console that account now has a `Users` document, `Private_info/main` →
   `email` matches the account's email, and **no second account** appeared in Authentication.
 - [ ] **Closing the app mid-signup.** Go offline, create an account, tap **COMPLETE PROFILE**, wait for

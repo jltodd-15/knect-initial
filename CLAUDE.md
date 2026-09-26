@@ -32,6 +32,10 @@ Hand-written and worth respecting: `CreateProfilePage.tsx`, `utils/storage.ts`.
 - `name_lowercase` is a **stored** field, computed with `.toLowerCase()` at write time. It is never
   derived at query time. Do not optimize it away.
 - No denormalized names or profile pictures anywhere. A screen showing a person reads the person.
+- A person with no uploaded picture, or who resolves to nothing ("Deleted user"), renders
+  `components/InitialsAvatar.tsx`. Don't build a second placeholder.
+- `interests` values come only from the fixed `INTERESTS` list in `components/CreateProfilePage.tsx`,
+  stored verbatim. Never uppercase or reformat them.
 - The Firestore instance is `db` from `services/firestore.ts`, configured once with offline
   persistence on. Import it from there; never call `initializeFirestore`, or set persistence or a
   cache size, anywhere else.

@@ -7,7 +7,13 @@ import DiscoveryFeed from './components/DiscoveryFeed';
 import EventPlanner from './components/EventPlanner';
 import SocialDashboard from './components/SocialDashboard';
 import ProfilePage from './components/ProfilePage';
-import CreateProfilePage, { CreateProfileData, ProfileSubmitState } from './components/CreateProfilePage';
+import CreateProfilePage, {
+  Credentials,
+  ProfilePayload,
+  ProfileSubmitState,
+  SignupError,
+  SignupIdentity,
+} from './components/CreateProfilePage';
 
 import { DiscoveryItem } from './types';
 
@@ -42,6 +48,22 @@ const mapAuthError = (code: string): { field: AuthErrorField; message: string } 
   }
 };
 
+// Ticket 1.4: an account-creation rejection stays on the signup screen, aimed at the field it's
+// about, with 1.2's copy.
+const signupErrorFor = (code: string): SignupError => {
+  const { message } = mapAuthError(code);
+  switch (code) {
+    case 'auth/email-already-in-use':
+    case 'auth/invalid-email':
+      return { target: 'email', message };
+    case 'auth/password-does-not-meet-requirements':
+    case 'auth/weak-password':
+      return { target: 'password', message };
+    default:
+      return { target: 'general', message };
+  }
+};
+
 const App: React.FC = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [activeTab, setActiveTab] = useState<AppTab>(AppTab.PLANNER);
@@ -69,6 +91,10 @@ const App: React.FC = () => {
   const [currentUid, setCurrentUid] = useState<string | null>(null);
   const [profileCheckStatus, setProfileCheckStatus] = useState<'checking' | 'present' | 'missing'>('checking');
   const [signOutNotice, setSignOutNotice] = useState<string | null>(null);
+  const [signupError, setSignupError] = useState<SignupError | null>(null);
+  // Who onAuthStateChanged says is signed in. A resumed signup (signed in, no profile) starts
+  // from this instead of asking for credentials again.
+  const [signedInIdentity, setSignedInIdentity] = useState<SignupIdentity | null>(null);
 
   // Guards that must act synchronously, ahead of React's own state batching:
   const writeInFlightRef = useRef(false); // double-submit guard for the profile write
@@ -76,7 +102,6 @@ const App: React.FC = () => {
   // The account the profile is being saved to: its uid and the email it was created with, kept
   // together so a retry can never pair one account's uid with a different, since-edited email.
   const accountRef = useRef<{ uid: string; email: string } | null>(null);
-  const signedInEmailRef = useRef<string | null>(null); // email onAuthStateChanged reports
   const checkSeqRef = useRef(0); // invalidates a stale missing-profile read after our own write lands
 
   useEffect(() => {
@@ -88,7 +113,7 @@ const App: React.FC = () => {
       setIsAuth(user !== null);
       // Keyed only off the uid onAuthStateChanged itself reports — never a locally stored id.
       setCurrentUid(user ? user.uid : null);
-      signedInEmailRef.current = user ? user.email : null;
+      setSignedInIdentity(user ? { email: user.email ?? '', name: user.displayName } : null);
       setInitializing(false);
       setLoading(false);
     });
@@ -136,64 +161,62 @@ const App: React.FC = () => {
     attemptCountRef.current = 0;
     accountRef.current = null;
     setSubmitState('idle');
+    setSignupError(null);
     setShowCreateProfile(true);
   };
 
-  // Submit from CREATE ACCOUNT: creates the Auth account, then saves its profile.
-  const handleProfileComplete = async (profileData: CreateProfileData) => {
+  // Submit from the onboarding sequence. With credentials (a fresh email/password signup) it
+  // creates the Auth account, then saves the profile. With none, the user is already signed in (a
+  // resumed signup, or a social sign-in) and the profile is saved to that account — never a second
+  // one.
+  const handleProfileComplete = async (profile: ProfilePayload, credentials: Credentials | null) => {
     // Double-submit guard: synchronous, so a second tap arriving before React re-renders the
     // disabled button can't slip through the same window a state check alone would leave open.
     if (writeInFlightRef.current) return;
+
+    let account = accountRef.current;
+    if (!account && !credentials) {
+      if (!currentUid) return;
+      account = { uid: currentUid, email: signedInIdentity?.email ?? '' };
+      accountRef.current = account;
+    }
+
     writeInFlightRef.current = true;
+    setSignupError(null);
     setSubmitState('submitting');
 
     // The auth call happens once per signup session. A retry reuses the account it created and
     // never calls signUp again - a second call with the same email would wrongly report
     // auth/email-already-in-use even though the real failure was the Firestore write.
-    let account = accountRef.current;
-    if (!account) {
+    if (!account && credentials) {
       try {
-        const uid = await AuthService.signUp(profileData.email, profileData.password);
-        account = { uid, email: profileData.email };
+        const uid = await AuthService.signUp(credentials.email, credentials.password);
+        account = { uid, email: credentials.email };
         accountRef.current = account;
       } catch (e: any) {
-        // Auth failure - 1.2's unchanged territory, and not a write failure: it doesn't consume
-        // a write attempt or enter the retry machinery below.
+        // Auth failure - not a write failure: it doesn't consume a write attempt or enter the
+        // retry machinery below. It stays on this screen, where the user can fix it.
         writeInFlightRef.current = false;
         setSubmitState('idle');
-        setShowCreateProfile(false);
-        setAuthError(mapAuthError(e.code));
+        setSignupError(signupErrorFor(e.code));
         return;
       }
     }
 
-    await saveProfile(account, profileData);
-  };
-
-  // Submit from the missing-profile screen: the user is already signed into an account that has
-  // no profile (e.g. an earlier save failed and they closed the app). Never create a second
-  // account here - save the profile to the one they're signed into, under that account's own
-  // email, whatever the email field says. Interim until 1.4 builds real recovery.
-  const handleMissingProfileComplete = async (profileData: CreateProfileData) => {
-    if (writeInFlightRef.current || !currentUid) return;
-    writeInFlightRef.current = true;
-    setSubmitState('submitting');
-
-    const account = { uid: currentUid, email: signedInEmailRef.current ?? profileData.email };
-    accountRef.current = account;
-    await saveProfile(account, profileData);
+    await saveProfile(account!, profile);
   };
 
   // The profile write both paths share: bounded by a timeout, retried once from the same button,
   // then the user is signed out.
-  const saveProfile = async (account: { uid: string; email: string }, profileData: CreateProfileData) => {
+  const saveProfile = async (account: { uid: string; email: string }, profile: ProfilePayload) => {
     attemptCountRef.current += 1;
     try {
       await withTimeout(
         UsersRepository.createUserDocuments(account.uid, {
-          name: profileData.name,
-          role: profileData.role,
-          interests: profileData.interests,
+          name: profile.name,
+          // 2.2's field is still called `role`; it's the bio, written to profile_info.
+          role: profile.bio,
+          interests: profile.interests,
           email: account.email,
         }),
         WRITE_TIMEOUT_MS,
@@ -274,7 +297,12 @@ const App: React.FC = () => {
         <SafeAreaProvider>
           <SafeAreaView style={styles.container}>
               <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-              <CreateProfilePage isDarkMode={isDarkMode} onComplete={handleProfileComplete} submitting={submitState} />
+              <CreateProfilePage
+                isDarkMode={isDarkMode}
+                onComplete={handleProfileComplete}
+                submitting={submitState}
+                signupError={signupError}
+              />
           </SafeAreaView>
         </SafeAreaProvider>
       );
@@ -337,20 +365,8 @@ const App: React.FC = () => {
                   <Text style={styles.forgotPasswordText}>Forgot password?</Text>
                </TouchableOpacity>
 
-               <View style={styles.divider}>
-                 <View style={styles.line} />
-                 <Text style={styles.orText}>OR</Text>
-                 <View style={styles.line} />
-               </View>
-
-               <View style={styles.socialRow}>
-                  <TouchableOpacity style={[styles.socialBtn, styles.socialBtnDisabled]} disabled={true}>
-                     <Text style={[styles.socialText, styles.socialTextDisabled]}>Google</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={[styles.socialBtn, styles.socialBtnDisabled]} disabled={true}>
-                     <Text style={[styles.socialText, styles.socialTextDisabled]}>Apple</Text>
-                  </TouchableOpacity>
-               </View>
+               {/* Google and Apple sign-in are hidden until ticket 1.3 wires them up (it needs a paid
+                   Apple Developer account). */}
             </View>
           )}
 
@@ -404,15 +420,21 @@ const App: React.FC = () => {
     );
   }
 
-  // The interim branch for a signed-in user with no Users document - the account a failed profile
-  // write can leave behind. It reuses the signup screen, but submitting saves a profile to the
-  // account they're signed into rather than creating a new one. Real recovery is 1.4's.
+  // Ticket 1.4: a signed-in user with no Users document - the account a failed profile write can
+  // leave behind - resumes the signup at step two. They're already signed in, so step one is
+  // skipped and the profile is saved to the account they're in.
   if (profileCheckStatus === 'missing') {
     return (
       <SafeAreaProvider>
         <SafeAreaView style={styles.container}>
             <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-            <CreateProfilePage isDarkMode={isDarkMode} onComplete={handleMissingProfileComplete} submitting={submitState} />
+            <CreateProfilePage
+              isDarkMode={isDarkMode}
+              onComplete={handleProfileComplete}
+              submitting={submitState}
+              identity={signedInIdentity ?? { email: '' }}
+              signupError={signupError}
+            />
         </SafeAreaView>
       </SafeAreaProvider>
     );
@@ -479,14 +501,6 @@ const getStyles = (isDark: boolean) => StyleSheet.create({
   input: { backgroundColor: isDark ? '#2C2C2C' : '#f4f4f5', padding: 20, borderRadius: 24, fontSize: 12, fontWeight: 'bold', color: isDark ? 'white' : 'black', fontFamily: 'Inter' },
   signInBtn: { backgroundColor: '#10b981', padding: 20, borderRadius: 24, alignItems: 'center' },
   signInText: { color: 'white', fontWeight: '900', fontSize: 12, letterSpacing: 2, fontFamily: 'Inter' },
-  divider: { flexDirection: 'row', alignItems: 'center', marginVertical: 8 },
-  line: { flex: 1, height: 1, backgroundColor: isDark ? '#333' : '#eee' },
-  orText: { marginHorizontal: 16, fontSize: 10, fontWeight: '900', color: '#71717a', fontFamily: 'Inter' },
-  socialRow: { flexDirection: 'row', gap: 16 },
-  socialBtn: { flex: 1, padding: 16, borderRadius: 24, borderWidth: 1, borderColor: isDark ? '#333' : '#eee', alignItems: 'center' },
-  socialText: { fontWeight: 'bold', color: '#71717a', fontSize: 10, textTransform: 'uppercase', fontFamily: 'Inter' },
-  socialBtnDisabled: { opacity: 0.4, borderColor: isDark ? '#27272a' : '#e4e4e7' },
-  socialTextDisabled: { color: isDark ? '#52525b' : '#a1a1aa' },
 
   forgotPasswordText: { color: '#71717a', fontSize: 11, fontWeight: '700', textAlign: 'center', marginTop: 12, fontFamily: 'Inter' },
 
