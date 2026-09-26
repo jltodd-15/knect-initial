@@ -4,8 +4,9 @@
  * two-attempt retry-then-sign-out path, and the tab tree is only reachable after a confirmed
  * write.
  *
- * CreateProfilePage is stubbed: driving its multi-step form is ticket 1.4's, and this test only
- * cares about what App does with the payload it is handed. The repository is mocked (its own
+ * CreateProfilePage is stubbed: its own steps are pinned in CreateProfilePage.test.tsx, and this
+ * test only cares about what App does with the profile and credentials it is handed (ticket 1.4:
+ * two separate arguments, so the password never rides along with the profile). The repository is mocked (its own
  * behavior is pinned in UsersRepository.test.ts), which also keeps the native Firestore module
  * out of the App import graph. hooks/useProfileCheck is mocked for the same reason (it imports
  * services/firestore, which calls the native Firestore initializer at module load) — none of
@@ -37,13 +38,21 @@ jest.mock('../hooks/useProfileCheck', () => ({
 // fireEvent/act() entirely for the one test that fires several rapid, overlapping taps (React's
 // act() only supports one open scope at a time, so simulating a real rapid tap sequence needs to
 // sidestep it rather than fight it).
-const latestOnComplete: {current: ((data: unknown) => void) | null} = {current: null};
+const latestOnComplete: {current: ((profile: unknown, credentials: unknown) => void) | null} = {current: null};
 jest.mock('../components/CreateProfilePage', () => {
   const mockReact = require('react');
   const {TouchableOpacity, Text} = require('react-native');
   return {
     __esModule: true,
-    default: ({onComplete, submitting}: {onComplete: (data: unknown) => void; submitting: string}) => {
+    default: ({
+      onComplete,
+      submitting,
+      signupError,
+    }: {
+      onComplete: (profile: unknown, credentials: unknown) => void;
+      submitting: string;
+      signupError?: {target: string; message: string} | null;
+    }) => {
       latestOnComplete.current = onComplete;
       return mockReact.createElement(
         mockReact.Fragment,
@@ -52,18 +61,22 @@ jest.mock('../components/CreateProfilePage', () => {
           TouchableOpacity,
           {
             onPress: () =>
-              onComplete({
-                name: 'John Smith',
-                role: 'Digital nomad',
-                interests: ['Board games', 'HIKING'],
-                avatar: 'data:image/png;base64,AAAA',
-                email: 'john@example.com',
-                password: 'hunter2-Secret',
-              }),
+              onComplete(
+                {
+                  name: 'John Smith',
+                  bio: 'Digital nomad',
+                  interests: ['Board games', 'Hiking'],
+                  profile_picture_url: '',
+                },
+                {email: 'john@example.com', password: 'Hunter2-Secret'},
+              ),
           },
           mockReact.createElement(Text, null, 'SUBMIT PROFILE'),
         ),
         mockReact.createElement(Text, null, `SUBMIT STATE: ${submitting}`),
+        signupError
+          ? mockReact.createElement(Text, null, `SIGNUP ERROR (${signupError.target}): ${signupError.message}`)
+          : null,
       );
     },
   };
@@ -72,12 +85,11 @@ jest.mock('../components/CreateProfilePage', () => {
 const createUserDocuments = UsersRepository.createUserDocuments as jest.Mock;
 const profileData = {
   name: 'John Smith',
-  role: 'Digital nomad',
-  interests: ['Board games', 'HIKING'],
-  avatar: 'data:image/png;base64,AAAA',
-  email: 'john@example.com',
-  password: 'hunter2-Secret',
+  bio: 'Digital nomad',
+  interests: ['Board games', 'Hiking'],
+  profile_picture_url: '',
 };
+const credentials = {email: 'john@example.com', password: 'Hunter2-Secret'};
 
 afterEach(() => {
   jest.clearAllMocks();
@@ -109,13 +121,13 @@ test('after the auth account is created, the Users repository is called with its
   expect(authMock.createUserWithEmailAndPassword).toHaveBeenCalledWith(
     expect.anything(),
     'john@example.com',
-    'hunter2-Secret',
+    'Hunter2-Secret',
   );
   // 'test-uid' is the uid the auth mock hands back: it proves signUp passes the uid through.
   expect(createUserDocuments).toHaveBeenCalledWith('test-uid', {
     name: 'John Smith',
     role: 'Digital nomad',
-    interests: ['Board games', 'HIKING'],
+    interests: ['Board games', 'Hiking'],
     email: 'john@example.com',
   });
 });
@@ -129,12 +141,13 @@ test('the auth call resolves before the repository is called', async () => {
   expect(authOrder).toBeLessThan(repoOrder);
 });
 
-test('the password and avatar are not handed to the repository', async () => {
+test('the password and picture are not handed to the repository', async () => {
   await submitSignUp();
 
   await waitFor(() => expect(createUserDocuments).toHaveBeenCalled());
   const [, profile] = createUserDocuments.mock.calls[0];
   expect(profile).not.toHaveProperty('password');
+  expect(profile).not.toHaveProperty('profile_picture_url');
   expect(profile).not.toHaveProperty('avatar');
 });
 
@@ -145,6 +158,57 @@ test('no repository call is made when the auth account could not be created', as
 
   await waitFor(() => expect(screen.getByText(/Email already in use/)).toBeTruthy());
   expect(createUserDocuments).not.toHaveBeenCalled();
+});
+
+test('an auth rejection stays on the create-account screen, aimed at the field it is about', async () => {
+  authMock.createUserWithEmailAndPassword.mockRejectedValueOnce({code: 'auth/email-already-in-use'});
+
+  await submitSignUp();
+
+  await waitFor(() =>
+    expect(screen.getByText('SIGNUP ERROR (email): Email already in use')).toBeTruthy(),
+  );
+  expect(screen.getByText('SUBMIT STATE: idle')).toBeTruthy();
+  expect(screen.queryByText('SIGN IN')).toBeNull();
+});
+
+test('a password-policy rejection is aimed at the password field', async () => {
+  authMock.createUserWithEmailAndPassword.mockRejectedValueOnce({
+    code: 'auth/password-does-not-meet-requirements',
+  });
+
+  await submitSignUp();
+
+  await waitFor(() =>
+    expect(
+      screen.getByText(
+        'SIGNUP ERROR (password): Password must be at least 8 characters and include a capital letter and a number',
+      ),
+    ).toBeTruthy(),
+  );
+});
+
+test('a network rejection is a general error', async () => {
+  authMock.createUserWithEmailAndPassword.mockRejectedValueOnce({code: 'auth/network-request-failed'});
+
+  await submitSignUp();
+
+  await waitFor(() => expect(screen.getByText(/SIGNUP ERROR \(general\)/)).toBeTruthy());
+});
+
+test('after an auth rejection, a corrected resubmit creates the account', async () => {
+  authMock.createUserWithEmailAndPassword.mockRejectedValueOnce({code: 'auth/email-already-in-use'});
+
+  await submitSignUp();
+  await waitFor(() => expect(screen.getByText(/SIGNUP ERROR/)).toBeTruthy());
+
+  await act(async () => {
+    await latestOnComplete.current!(profileData, {...credentials, email: 'other@example.com'});
+  });
+
+  expect(authMock.createUserWithEmailAndPassword).toHaveBeenCalledTimes(2);
+  expect(createUserDocuments).toHaveBeenCalledWith('test-uid', expect.objectContaining({email: 'other@example.com'}));
+  expect(screen.queryByText(/SIGNUP ERROR/)).toBeNull();
 });
 
 // These two tests leave the write genuinely pending (never resolved until the test says so) so
@@ -191,9 +255,9 @@ test('repeated taps during an in-flight write produce exactly one auth call and 
   const onComplete = latestOnComplete.current!;
   let firstPress!: Promise<void>;
   act(() => {
-    firstPress = onComplete(profileData) as unknown as Promise<void>;
-    onComplete(profileData); // guarded: returns immediately
-    onComplete(profileData); // guarded: returns immediately
+    firstPress = onComplete(profileData, credentials) as unknown as Promise<void>;
+    onComplete(profileData, credentials); // guarded: returns immediately
+    onComplete(profileData, credentials); // guarded: returns immediately
   });
 
   await waitFor(() => expect(createUserDocuments).toHaveBeenCalledTimes(1));
@@ -240,7 +304,7 @@ test('"Try Again" saves the email the account was created with, even if the fiel
 
   // The email field is still editable after a failure; the user changes it, then retries.
   await act(async () => {
-    await latestOnComplete.current!({...profileData, email: 'edited@example.com'});
+    await latestOnComplete.current!(profileData, {...credentials, email: 'edited@example.com'});
   });
 
   expect(createUserDocuments).toHaveBeenCalledTimes(2);

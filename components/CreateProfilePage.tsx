@@ -1,16 +1,58 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
-import FastImage from '@d11/react-native-fast-image';
+import React, { useEffect, useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Svg, { Path, Circle, } from 'react-native-svg';
+import Svg, { Circle, Path } from 'react-native-svg';
+import InitialsAvatar from './InitialsAvatar';
 
-export interface CreateProfileData {
+// Ticket 1.4: the fixed interests vocabulary, stored verbatim. These strings are also the tag
+// vocabulary Project 9 has to use for Activities.tags, so 13.2's affinity seeding matches them.
+// Don't reword, reorder casually, or transform them (no uppercasing).
+export const INTERESTS = [
+  'Hiking', 'Art', 'Fashion', 'Style', 'Photography', 'Board games', 'Movies', 'TV Shows',
+  'Video Games', 'Baking', 'Cooking', 'Fast Food', 'Fine Dining', 'Running', 'Bodybuilding',
+  'Camping', 'Outdoors', 'Indoors', 'Music', 'Concerts', 'Dancing', 'Musicals & Theater',
+  'Travel', 'Family', 'Pets & Animals', 'Dating', 'Tech', 'Basketball', 'Baseball',
+  'Football', 'Hockey', 'Soccer', 'Sports', 'Reading', 'History',
+];
+
+// The signup password rule: 8-24 characters, a capital letter, a number. The same rule is set in
+// Firebase Console → Authentication → Password policy; if the two ever disagree, the Console wins
+// and this is the bug. Checked at signup only — never before a sign-in.
+const PASSWORD_RULES = [
+  { label: '8–24 characters', test: (p: string) => p.length >= 8 && p.length <= 24 },
+  { label: 'A capital letter', test: (p: string) => /[A-Z]/.test(p) },
+  { label: 'A number', test: (p: string) => /[0-9]/.test(p) },
+];
+const PASSWORD_REGEX = /^(?=.*[A-Z])(?=.*[0-9]).{8,24}$/;
+// 1.2's mapped copy for Firebase's own policy rejection, word for word.
+const PASSWORD_COPY = 'Password must be at least 8 characters and include a capital letter and a number';
+
+// What onboarding hands off for the Users write. No email and no password: credentials travel
+// separately, and profile_picture_url is "" until Project 6 builds upload (the initials avatar
+// is what shows in the meantime).
+export interface ProfilePayload {
   name: string;
-  role: string;
+  bio: string;
   interests: string[];
-  avatar: string;
+  profile_picture_url: string;
+}
+
+export interface Credentials {
   email: string;
   password: string;
+}
+
+// Someone who arrives already signed in: a social sign-in (1.3), or a resumed signup whose
+// profile write failed. Step one is skipped. `name` may be missing — Apple can withhold it.
+export interface SignupIdentity {
+  email: string;
+  name?: string | null;
+}
+
+// A rejection from creating the account, aimed at the field it's about.
+export interface SignupError {
+  target: 'email' | 'password' | 'general';
+  message: string;
 }
 
 // Ticket 2.3: the state of the real signup write, driven from App.tsx. 'failed' is the
@@ -20,77 +62,73 @@ export type ProfileSubmitState = 'idle' | 'submitting' | 'failed';
 
 interface Props {
   isDarkMode: boolean;
-  onComplete: (profileData: CreateProfileData) => void;
+  // `credentials` is null when the user arrived with an identity and never saw step one.
+  onComplete: (profile: ProfilePayload, credentials: Credentials | null) => void;
   submitting: ProfileSubmitState;
+  identity?: SignupIdentity;
+  signupError?: SignupError | null;
 }
 
-const CreateProfilePage: React.FC<Props> = ({ isDarkMode, onComplete, submitting }) => {
+const CreateProfilePage: React.FC<Props> = ({ isDarkMode, onComplete, submitting, identity, signupError }) => {
   const styles = getStyles(isDarkMode);
-  const [name, setName] = useState('');
-  const [role, setRole] = useState('');
+  const [step, setStep] = useState<'credentials' | 'profile'>(identity ? 'profile' : 'credentials');
+
+  const [name, setName] = useState(identity?.name ?? '');
+  // A name that arrived with the identity is shown, not asked for, until the user taps CHANGE.
+  const [editingName, setEditingName] = useState(!identity?.name);
+  const [bio, setBio] = useState('');
   const [interests, setInterests] = useState<string[]>([]);
-  const [newInterest, setNewInterest] = useState('');
-  const [avatar, setAvatar] = useState('https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=400&h=400&fit=crop');
   const [hideText, setHideText] = useState(true);
 
+  // The password lives here, in component state, and nowhere else. It is handed to onComplete as
+  // a credential, never as part of the profile.
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const [nextStep, setNextStep] = useState(false);
-  
   const [badEmail, setBadEmail] = useState(false);
   const [badPass, setBadPass] = useState(false);
 
-  var hideButton = false;
-
-  const handleAddInterest = () => {
-    if (newInterest.trim()) {
-      setInterests([...interests, newInterest.trim().toUpperCase()]);
-      setNewInterest('');
+  // An email or password rejection from creating the account belongs on step one.
+  useEffect(() => {
+    if (signupError && signupError.target !== 'general' && !identity) {
+      setStep('credentials');
     }
-  };
+  }, [signupError, identity]);
 
-  const handleNextStep = (goAhead: boolean) => {
-    if (goAhead) {
-      hideButton = true;
-      setNextStep(true);
-    }
-  };
-
-  const handleRemoveInterest = (index: number) => {
-    setInterests(interests.filter((_, i) => i !== index));
-  };
-
-  const handleImageUpload = () => {
-    // In a real app, this would open the image picker
-    // For this demo, we'll just cycle through some mock images
-    const mockImages = [
-        'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=400&h=400&fit=crop',
-        'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&h=400&fit=crop',
-        'https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=400&h=400&fit=crop',
-        'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=400&h=400&fit=crop'
-    ];
-    const currentIdx = mockImages.indexOf(avatar);
-    const nextIdx = (currentIdx + 1) % mockImages.length;
-    setAvatar(mockImages[nextIdx]);
+  const toggleInterest = (interest: string) => {
+    setInterests(current =>
+      current.includes(interest) ? current.filter(i => i !== interest) : [...current, interest],
+    );
   };
 
   function _formatVerify() {
     const emailRegex = new RegExp(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)
-    const passRegex = new RegExp(/^[a-zA-Z0-9!@#$%^&*()<>?{}\[\];',.\/\\`~]{2,24}$/);
     setBadEmail(!emailRegex.test(email));
-    setBadPass(!passRegex.test(password));
-    if (emailRegex.test(email) == false || passRegex.test(password) == false) {
-      return false;
-    }
-    else {
-      return true;
-    }; 
+    setBadPass(!PASSWORD_REGEX.test(password));
+    return emailRegex.test(email) && PASSWORD_REGEX.test(password);
   };
+
+  const handleNext = () => {
+    if (_formatVerify()) {
+      setStep('profile');
+    }
+  };
+
+  const handleComplete = () => {
+    onComplete(
+      { name: name.trim(), bio: bio.trim(), interests, profile_picture_url: '' },
+      identity ? null : { email, password },
+    );
+  };
+
+  // Once the account exists (or is being created), its email is fixed: going back to edit it
+  // would look like it fixes a typo and wouldn't.
+  const backLocked = submitting !== 'idle';
+  const canComplete = name.trim().length > 0 && submitting !== 'submitting';
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={{ padding: 24 }}>
-      { true && (
+      { step === 'credentials' && (
       <SafeAreaView>
         <View style={styles.header}>
           <Text style={styles.title}>Create Account</Text>
@@ -109,64 +147,93 @@ const CreateProfilePage: React.FC<Props> = ({ isDarkMode, onComplete, submitting
               { badEmail && (
               <Text style={styles.errorText}>Your email address is invalid (e.g, mark@example.com)</Text>
               )}
+              { signupError?.target === 'email' && (
+              <Text style={styles.errorText}>{signupError.message}</Text>
+              )}
           </View>
 
           <View style={styles.inputGroup}>
               <Text style={styles.label}>PASSWORD</Text>
-              <TextInput 
-                  style={styles.input} 
-                  value={password}
-                  onChangeText={setPassword}
-                  placeholder="correcthorsebatterystaple"
-                  placeholderTextColor={isDarkMode ? '#666' : '#999'}
-                  secureTextEntry={hideText}
-              />
+              <View style={styles.passwordRow}>
+                <TextInput 
+                    style={[styles.input, styles.passwordInput]} 
+                    value={password}
+                    onChangeText={setPassword}
+                    placeholder="Create a password"
+                    placeholderTextColor={isDarkMode ? '#666' : '#999'}
+                    secureTextEntry={hideText}
+                />
+                <TouchableOpacity
+                    style={styles.eyeBtn}
+                    onPress={() => setHideText(!hideText)}
+                    accessibilityLabel={hideText ? 'Show password' : 'Hide password'}
+                >
+                  <Svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#71717a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <Path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                    <Circle cx="12" cy="12" r="3" />
+                  </Svg>
+                </TouchableOpacity>
+              </View>
+              <View style={styles.ruleList}>
+                {PASSWORD_RULES.map(rule => {
+                  const met = rule.test(password);
+                  return (
+                    <Text key={rule.label} style={[styles.ruleText, met && styles.ruleMet]}>
+                      {rule.label}
+                    </Text>
+                  );
+                })}
+              </View>
               { badPass && (
-              <Text style={styles.errorText}>Your password must be 12-24 characters long</Text>
+              <Text style={styles.errorText}>{PASSWORD_COPY}</Text>
               )}
-              <TouchableOpacity style={styles.hideText} onPress={() => {setHideText(!hideText ? true : false); console.log(hideText)}}>
-                <Svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={'#c1c1c1'} strokeWidth="2.5">
-                  <Circle cx="12" cy="12" r="10" />
-                  <Circle cx="8" cy="8" r="10" />
-                </Svg>
-              </TouchableOpacity>
+              { signupError?.target === 'password' && !badPass && (
+              <Text style={styles.errorText}>{signupError.message}</Text>
+              )}
           </View>
 
-          { !hideButton && (
           <TouchableOpacity 
               style={[styles.submitBtn, (!email || !password) && styles.submitBtnDisabled]} 
-              onPress={() => { handleNextStep(_formatVerify()); }}
+              onPress={handleNext}
               disabled={!email || !password}
+              accessibilityLabel="Next"
           >
-              <Text style={styles.submitBtnText}>NEXT</Text>
+              <Svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <Path d="M5 12h14M13 6l6 6-6 6" />
+              </Svg>
           </TouchableOpacity>
-          )}
         </View>
       </SafeAreaView>
       )}
-      { nextStep && (
+      { step === 'profile' && (
       <SafeAreaView>
+        { !identity && (
+          <TouchableOpacity
+              testID="back-button"
+              style={[styles.backBtn, backLocked && styles.backBtnLocked]}
+              onPress={() => setStep('credentials')}
+              disabled={backLocked}
+              accessibilityLabel="Back"
+          >
+              <Svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={backLocked ? '#a1a1aa' : '#10b981'} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <Path d="M19 12H5M11 6l-6 6 6 6" />
+              </Svg>
+          </TouchableOpacity>
+        )}
+
         <View style={styles.header}>
           <Text style={styles.title}>Create Profile</Text>
           <Text style={styles.subtitle}>Tell us a bit about yourself</Text>
         </View>
 
         <View style={styles.avatarSection}>
-          <TouchableOpacity onPress={handleImageUpload} style={styles.avatarWrapper}>
-              <FastImage source={{ uri: avatar }} style={styles.avatar} />
-              <View style={styles.cameraIcon}>
-                  <Svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-                      <Path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
-                      <Path d="M12 13a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" />
-                  </Svg>
-              </View>
-          </TouchableOpacity>
-          <Text style={styles.photoHint}>Tap to change photo</Text>
+          <InitialsAvatar name={name} size={120} />
         </View>
 
           <View style={styles.form}>
             <View style={styles.inputGroup}>
                 <Text style={styles.label}>FULL NAME</Text>
+                { editingName ? (
                 <TextInput 
                     style={styles.input} 
                     value={name} 
@@ -174,58 +241,65 @@ const CreateProfilePage: React.FC<Props> = ({ isDarkMode, onComplete, submitting
                     placeholder="e.g. Alex Rivera"
                     placeholderTextColor={isDarkMode ? '#666' : '#999'}
                 />
+                ) : (
+                <View style={styles.prefilledRow}>
+                    <Text style={styles.prefilledName}>{name}</Text>
+                    <TouchableOpacity onPress={() => setEditingName(true)}>
+                        <Text style={styles.changeText}>CHANGE</Text>
+                    </TouchableOpacity>
+                </View>
+                )}
             </View>
 
             <View style={styles.inputGroup}>
-                <Text style={styles.label}>ROLE / LOCATION</Text>
+                <Text style={styles.label}>BIO</Text>
                 <TextInput 
                     style={styles.input} 
-                    value={role} 
-                    onChangeText={setRole}
-                    placeholder="e.g. Digital Nomad • SF"
+                    value={bio} 
+                    onChangeText={setBio}
+                    placeholder="A line about you (optional)"
                     placeholderTextColor={isDarkMode ? '#666' : '#999'}
                 />
             </View>
 
           <View style={styles.inputGroup}>
             <Text style={styles.label}>INTERESTS</Text>
-              <View style={styles.addInterestRow}>
-                  <TextInput 
-                      style={[styles.input, {flex: 1}]} 
-                      value={newInterest} 
-                      onChangeText={setNewInterest}
-                      placeholder="Add an interest..."
-                      placeholderTextColor={isDarkMode ? '#666' : '#999'}
-                      onSubmitEditing={handleAddInterest}
-                  />
-                  <TouchableOpacity style={styles.addBtn} onPress={handleAddInterest}>
-                      <Svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><Path d="M12 5v14M5 12h14"/></Svg>
-                  </TouchableOpacity>
-              </View>
               <View style={styles.tagCloud}>
-                  {interests.map((tag, idx) => (
-                      <TouchableOpacity key={idx} style={styles.tag} onPress={() => handleRemoveInterest(idx)}>
-                          <Text style={styles.tagText}>{tag}</Text>
-                          <Svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={isDarkMode ? "white" : "black"} strokeWidth="2" style={{marginLeft: 6}}>
-                              <Path d="M18 6L6 18M6 6l12 12"/>
-                          </Svg>
-                      </TouchableOpacity>
-                  ))}
+                  {INTERESTS.map(interest => {
+                      const selected = interests.includes(interest);
+                      return (
+                        <TouchableOpacity key={interest} style={[styles.tag, selected && styles.tagSelected]} onPress={() => toggleInterest(interest)}>
+                            <Text testID="interest-option" style={[styles.tagText, selected && styles.tagTextSelected]}>{interest}</Text>
+                        </TouchableOpacity>
+                      );
+                  })}
               </View>
           </View>
 
+          { signupError?.target === 'general' && (
+          <Text style={styles.errorText}>{signupError.message}</Text>
+          )}
+
           <TouchableOpacity
+              testID="complete-button"
               style={[
                 styles.submitBtn,
-                (!name || !role) && styles.submitBtnDisabled,
+                !name.trim() && styles.submitBtnDisabled,
                 submitting === 'failed' && { borderWidth: 2, borderColor: '#ff8080', backgroundColor: 'transparent' },
               ]}
-              onPress={() => onComplete({ name, role, interests, avatar, email, password })}
-              disabled={!name || !role || submitting === 'submitting'}
+              onPress={handleComplete}
+              disabled={!canComplete}
           >
+              { submitting === 'submitting' ? (
+              <View style={styles.submittingRow}>
+                  <ActivityIndicator testID="submit-spinner" color="white" />
+                  <Text style={styles.submitBtnText}>SAVING PROFILE...</Text>
+              </View>
+              ) : (
               <Text style={[styles.submitBtnText, submitting === 'failed' && { color: '#ff8080' }]}>
-                {submitting === 'submitting' ? 'SAVING PROFILE...' : submitting === 'failed' ? 'TRY AGAIN' : 'COMPLETE PROFILE'}
+                {submitting === 'failed' ? 'TRY AGAIN' : 'COMPLETE PROFILE'}
               </Text>
+              )}
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -240,28 +314,37 @@ const getStyles = (isDark: boolean) => StyleSheet.create({
   subtitle: { fontSize: 14, color: '#71717a', fontFamily: 'Inter' },
   
   avatarSection: { alignItems: 'center', marginBottom: 32 },
-  avatarWrapper: { position: 'relative' },
-  avatar: { width: 120, height: 120, borderRadius: 60 },
-  cameraIcon: { position: 'absolute', bottom: 0, right: 0, backgroundColor: '#10b981', width: 36, height: 36, borderRadius: 18, justifyContent: 'center', alignItems: 'center', borderWidth: 3, borderColor: isDark ? '#121212' : '#FDFCFB' },
-  photoHint: { marginTop: 12, color: '#71717a', fontSize: 12, fontWeight: '600' },
 
   form: { gap: 24 },
   inputGroup: { gap: 8 },
   label: { fontSize: 11, fontWeight: '900', color: '#71717a', letterSpacing: 1, fontFamily: 'Inter' },
   input: { backgroundColor: isDark ? '#1E1E1E' : '#f4f4f5', padding: 16, borderRadius: 16, fontSize: 16, color: isDark ? 'white' : 'black', fontFamily: 'Inter' },
   
-  addInterestRow: { flexDirection: 'row', gap: 12 },
-  addBtn: { width: 50, backgroundColor: '#10b981', borderRadius: 16, justifyContent: 'center', alignItems: 'center' },
-  
+  prefilledRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: isDark ? '#1E1E1E' : '#f4f4f5', padding: 16, borderRadius: 16 },
+  prefilledName: { fontSize: 16, color: isDark ? 'white' : 'black', fontFamily: 'Inter' },
+  changeText: { fontSize: 11, fontWeight: '900', color: '#10b981', letterSpacing: 1, fontFamily: 'Inter' },
+
+  ruleList: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
+  ruleText: { fontSize: 12, color: '#71717a', fontFamily: 'Inter' },
+  ruleMet: { color: '#10b981', fontWeight: '700' },
+
   tagCloud: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 8 },
   tag: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20, backgroundColor: isDark ? '#27272a' : '#fff', borderWidth: 1, borderColor: isDark ? '#333' : '#e4e4e7' },
+  tagSelected: { backgroundColor: '#10b981', borderColor: '#10b981' },
   tagText: { fontSize: 12, fontWeight: 'bold', color: isDark ? 'white' : 'black' },
+  tagTextSelected: { color: 'white' },
 
   submitBtn: { backgroundColor: '#10b981', padding: 20, borderRadius: 24, alignItems: 'center', marginTop: 24 },
   submitBtnDisabled: { opacity: 0.5 },
   submitBtnText: { color: 'white', fontWeight: '900', fontSize: 14, letterSpacing: 1 },
+  submittingRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
 
-  hideText: { backgroundColor: '#8f8f8f', borderRadius: 36, padding: 5, width: '9%' },
+  backBtn: { alignSelf: 'flex-start', paddingVertical: 8, paddingHorizontal: 4 },
+  backBtnLocked: { opacity: 0.4 },
+
+  passwordRow: { justifyContent: 'center' },
+  passwordInput: { paddingRight: 52 },
+  eyeBtn: { position: 'absolute', right: 12, padding: 4 },
   errorText: { color: '#ff8080', textAlign: 'center', fontFamily: 'Anonymous Pro' }
 });
 

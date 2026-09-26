@@ -151,3 +151,9 @@ Decisions from tickets that the schema above doesn't spell out. Not part of the 
 * Signup writes exactly these fields: `Users/{uid}`: `name`, `name_lowercase`, `profile_info`,
   `profile_picture_url` (`""`), `interests`. `Private_info/main`: `email`, `blocked_users` (`[]`),
   `fcm_tokens` (`[]`). Nothing else.
+* `interests` values are exactly the 35 fixed strings in `components/CreateProfilePage.tsx`
+  (`INTERESTS`), stored verbatim: no uppercasing or reformatting (ticket 1.4). Project 9's
+  `Activities.tags` has to use the same strings, or 13.2's affinity seeding matches nothing.
+* `profile_info` is the user's optional bio line (ticket 1.4). It can be `""`.
+* `profile_picture_url` stays `""` until the user uploads (Project 6). Screens show
+  `components/InitialsAvatar.tsx` instead (ticket 1.4).

@@ -116,13 +116,14 @@ test('requesting a password reset for an unregistered address shows the same con
   await waitFor(() => expect(screen.getByText('Password reset email sent')).toBeTruthy());
 });
 
-test('the Google and Apple buttons are disabled', async () => {
+// Ticket 1.4: hidden, not just disabled, until 1.3 (which needs a paid Apple Developer account)
+// actually wires them up.
+test('the Google and Apple buttons, and the OR divider above them, are not shown', async () => {
   await render(<App />);
 
-  const googleBtn = screen.getByText('Google');
-  const appleBtn = screen.getByText('Apple');
-  expect(googleBtn.parent?.props.accessibilityState?.disabled).toBe(true);
-  expect(appleBtn.parent?.props.accessibilityState?.disabled).toBe(true);
+  expect(screen.queryByText('Google')).toBeNull();
+  expect(screen.queryByText('Apple')).toBeNull();
+  expect(screen.queryByText('OR')).toBeNull();
 });
 
 test('no long setTimeout-based delay drives sign-in', async () => {

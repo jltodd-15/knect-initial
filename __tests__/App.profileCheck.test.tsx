@@ -139,10 +139,15 @@ const signInOnLoginScreen = async () => {
 // Fills the real CreateProfilePage (its two steps) and leaves it one tap from submitting.
 const fillCreateProfileForm = async (email = 'new@b.com') => {
   await fireEvent.changeText(screen.getByPlaceholderText('username@example.com'), email);
-  await fireEvent.changeText(screen.getByPlaceholderText('correcthorsebatterystaple'), 'password123');
-  await fireEvent.press(screen.getByText('NEXT'));
+  await fireEvent.changeText(screen.getByPlaceholderText('Create a password'), 'Passw0rd');
+  await fireEvent.press(screen.getByLabelText('Next'));
+  await fillProfileStep();
+};
+
+// Step two alone: all a resumed signup (signed in, no profile) is asked for.
+const fillProfileStep = async () => {
   await fireEvent.changeText(screen.getByPlaceholderText('e.g. Alex Rivera'), 'Alex Rivera');
-  await fireEvent.changeText(screen.getByPlaceholderText('e.g. Digital Nomad • SF'), 'Digital Nomad');
+  await fireEvent.changeText(screen.getByPlaceholderText('A line about you (optional)'), 'Digital Nomad');
 };
 
 test('once signed in, the profile-exists check runs once with the reported uid', async () => {
@@ -164,12 +169,13 @@ test('a present profile does not show the login screen or the missing-profile br
   expect(screen.queryByPlaceholderText('username@example.com')).toBeNull();
 });
 
-test('a missing profile renders CreateProfilePage instead of the tab tree', async () => {
+test('a missing profile resumes the signup at step two, not step one or the tab tree', async () => {
   checkUserProfileExistsMock.mockResolvedValue(false);
 
   await signIn();
 
-  await waitFor(() => expect(screen.getByPlaceholderText('username@example.com')).toBeTruthy());
+  await waitFor(() => expect(screen.getByPlaceholderText('e.g. Alex Rivera')).toBeTruthy());
+  expect(screen.queryByPlaceholderText('username@example.com')).toBeNull();
   expect(screen.queryByText('TAB TREE')).toBeNull();
 });
 
@@ -219,11 +225,10 @@ test('a signed-in user with no profile saves one to their existing account, with
   checkUserProfileExistsMock.mockResolvedValue(false);
 
   await signIn(); // signed in as a@b.com, uid test-uid, no Users document
-  await waitFor(() => expect(screen.getByPlaceholderText('username@example.com')).toBeTruthy());
+  await waitFor(() => expect(screen.getByPlaceholderText('e.g. Alex Rivera')).toBeTruthy());
 
-  // Whatever they type in the email field, the account they're already signed into is the one
-  // that gets the profile.
-  await fillCreateProfileForm('typed-something-else@b.com');
+  // No email step: the account they're already signed into is the one that gets the profile.
+  await fillProfileStep();
   await fireEvent.press(screen.getByText('COMPLETE PROFILE'));
 
   expect(authMock.createUserWithEmailAndPassword).not.toHaveBeenCalled();
@@ -294,8 +299,16 @@ test('full loop: two failed saves sign the user out; signing back in lands on th
   await waitFor(() => expect(screen.getByText(/That email is already registered/)).toBeTruthy());
   expect(authMock.signOut).toHaveBeenCalledTimes(1);
 
-  // Sign back in: the account exists but has no profile, so the create-profile screen shows.
+  // Sign back in: the account exists but has no profile, so the signup resumes at step two.
   await signInOnLoginScreen();
-  await waitFor(() => expect(screen.getByPlaceholderText('username@example.com')).toBeTruthy());
+  await waitFor(() => expect(screen.getByPlaceholderText('e.g. Alex Rivera')).toBeTruthy());
+  expect(screen.queryByPlaceholderText('username@example.com')).toBeNull();
   expect(screen.queryByText('TAB TREE')).toBeNull();
+
+  // ...and finishing it saves to that same account and lands in the app.
+  await fillProfileStep();
+  await fireEvent.press(screen.getByText('COMPLETE PROFILE'));
+  await waitFor(() => expect(screen.getByText('TAB TREE')).toBeTruthy());
+  expect(authMock.createUserWithEmailAndPassword).toHaveBeenCalledTimes(1);
+  expect(createUserDocuments).toHaveBeenLastCalledWith('test-uid', expect.objectContaining({email: 'a@b.com'}));
 });
