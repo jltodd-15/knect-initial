@@ -36,6 +36,8 @@ Hand-written and worth respecting: `CreateProfilePage.tsx`, `utils/storage.ts`.
   `components/InitialsAvatar.tsx`. Don't build a second placeholder.
 - `interests` values come only from the fixed `INTERESTS` list in `components/CreateProfilePage.tsx`,
   stored verbatim. Never uppercase or reformat them.
+- Security rules live in `firestore.rules` and are published only by `npm run rules:deploy`. Never
+  edit them in the Firebase Console: the next deploy silently overwrites a Console edit.
 - The Firestore instance is `db` from `services/firestore.ts`, configured once with offline
   persistence on. Import it from there; never call `initializeFirestore`, or set persistence or a
   cache size, anywhere else.
@@ -77,6 +79,10 @@ ticket that hasn't been built yet, even if you know it's coming.
   activities are sample data (Projects 5, 9, 11 and 15).
 - iOS has no Firebase config on this branch stack: `ios/Knect/GoogleService-Info.plist` is only in
   ticket 0.2's PR (#3), not merged yet. Until it is, test on Android. (Ticket 0.2)
+- The live Firestore rules (`firestore.rules`) are Rowy's default rules: only accounts with an
+  `ADMIN`/`OWNER` role can read or write anything, and there is no rule for `Users`. So the signup
+  write from ticket 2.2 is very likely rejected for ordinary accounts. Not yet confirmed on a
+  device. (Ticket 3.2)
 - `components/ChatEventWidget.tsx` and `utils/votingLogic.ts` are dead — nothing imports either.
   Don't build on them. The live vote UI is inside `SocialDashboard.tsx`.
 
@@ -87,8 +93,9 @@ grep away from being an acceptance criterion — use them that way.
 
 `npm test` passes, and `npm run lint` reports no errors in the files the ticket touched, before
 anything is considered finished. (The repo has older lint errors in files no ticket has touched
-yet; those don't block a ticket.) Rules tests are separate: `npm run test:rules`, and they need
-the Firestore emulator running.
+yet; those don't block a ticket.) Rules tests are separate: `npm run test:rules` needs Java 21
+and starts and stops the Firestore emulator itself. They live in `firestore-tests/`, are the only
+place the web `firebase` SDK may be imported, and never run under `npm test`.
 
 Anything that can only be checked on a device or emulator goes in `DEVICE_TESTS.md`, under the
 ticket's own heading, as part of that ticket.

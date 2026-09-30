@@ -165,6 +165,9 @@ Not yet run.
 
 - [ ] **Both documents land.** After a successful signup, the Console shows `Users/{uid}` and
   `Users/{uid}/Private_info/main` for the new account's UID.
+  *Expected to fail for now (found in ticket 3.1):* the live rules only let `ADMIN`/`OWNER`
+  accounts write, so an ordinary signup should see its write rejected. If this check passes,
+  the live rules differ from `firestore.rules`, and that needs looking into.
 - [ ] **They land together offline.** Covered by the **Offline doesn't hang** and **Retry works**
   checks under 2.3: after an offline attempt, either both documents exist or neither does.
 

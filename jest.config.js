@@ -7,4 +7,6 @@ module.exports = {
     'node_modules/(?!(@react-native|react-native|react-native-safe-area-context|@react-native-async-storage/async-storage|@d11/react-native-fast-image)/)',
   ],
   setupFiles: ['<rootDir>/jest.setup.js'],
+  // Rules tests need the Firestore emulator; they run via `npm run test:rules` instead.
+  testPathIgnorePatterns: ['/node_modules/', '/firestore-tests/'],
 };
