@@ -52,8 +52,15 @@ bundle exec pod install
 ```sh
 npm test            # Jest unit tests (__tests__/), react-native preset
 npm run lint         # ESLint
-npm run test:rules   # Firestore security rules tests — needs the Firestore emulator running
+npm run test:rules   # Firestore security rules tests (firestore-tests/) — needs Java 21; starts and stops the emulator itself
 ```
+
+## Security rules
+
+`firestore.rules` in this repo is the source of truth for the live Firestore rules on `knect-db`.
+`npm run rules:deploy` is the only way they get published. There is no sync back from the Console:
+an edit made in the Console is silently overwritten by the next deploy, so change the file instead.
+The first deploy needs `npx firebase login` once, as an account with access to `knect-db`.
 
 New behavior should have a failing test written before the implementation — see
 `.claude/skills/tdd-workflow/SKILL.md` for the loop this repo follows.

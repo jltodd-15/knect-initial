@@ -7,7 +7,9 @@
     "ios": "react-native run-ios",
     "lint": "eslint .",
     "start": "react-native start",
-    "test": "jest"
+    "test": "jest",
+    "test:rules": "firebase emulators:exec --only firestore \"jest --config jest.rules.config.js\"",
+    "rules:deploy": "firebase deploy --only firestore:rules"
   },
   "dependencies": {
     "@d11/react-native-fast-image": "^8.13.0",
@@ -27,6 +29,7 @@
     "@babel/core": "^7.25.2",
     "@babel/preset-env": "^7.25.3",
     "@babel/runtime": "^7.25.0",
+    "@firebase/rules-unit-testing": "^5.0.2",
     "@react-native-community/cli": "20.0.0",
     "@react-native-community/cli-platform-android": "20.0.0",
     "@react-native-community/cli-platform-ios": "^20.0.0",
@@ -36,9 +39,12 @@
     "@react-native/typescript-config": "0.83.1",
     "@testing-library/react-native": "^14.0.1",
     "@types/jest": "^29.5.13",
+    "@types/node": "^26.6.3",
     "@types/react": "^19.2.0",
     "@types/react-test-renderer": "^19.1.0",
     "eslint": "^8.19.0",
+    "firebase": "^12.19.0",
+    "firebase-tools": "^15.32.0",
     "jest": "^29.6.3",
     "prettier": "2.8.8",
     "react-test-renderer": "19.2.0",
