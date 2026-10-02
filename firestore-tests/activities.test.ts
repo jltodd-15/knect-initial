@@ -299,4 +299,37 @@ describe('creator edits: denied', () => {
       }),
     );
   });
+
+  test('the creator sets click_count on their own activity', async () => {
+    await seed(OWN, aliceActivity);
+    await assertFails(updateDoc(doc(as('alice'), OWN), { click_count: 500 }));
+  });
+});
+
+// A new activity starts its counters at zero: nobody creates one that is already popular.
+describe('counters at creation', () => {
+  test('allowed: an activity created with no counter fields at all', async () => {
+    const { likes, click_count, ...withoutCounters } = aliceActivity;
+    expect([likes, click_count]).toEqual([0, 0]);
+    await assertSucceeds(setDoc(doc(as('alice'), OWN), withoutCounters));
+  });
+
+  test('allowed: the creator opens their own activity, click_count +1', async () => {
+    await seed(OWN, aliceActivity);
+    await assertSucceeds(
+      updateDoc(doc(as('alice'), OWN), { click_count: increment(1) }),
+    );
+  });
+
+  test('denied: an activity created with likes already above zero', async () => {
+    await assertFails(
+      setDoc(doc(as('alice'), OWN), { ...aliceActivity, likes: 500 }),
+    );
+  });
+
+  test('denied: an activity created with click_count already above zero', async () => {
+    await assertFails(
+      setDoc(doc(as('alice'), OWN), { ...aliceActivity, click_count: 500 }),
+    );
+  });
 });

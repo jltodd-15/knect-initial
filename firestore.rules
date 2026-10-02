@@ -165,18 +165,22 @@ service cloud.firestore {
              'name', 'description', 'cost', 'source', 'creator_id', 'category',
              'tags', 'pictures', 'location', 'geohash', 'is_location_based',
              'click_count', 'likes', 'created_at'
-           ]);
+           ])
+        // Counters start at zero (or absent, which counts as zero).
+        && request.resource.data.get('click_count', 0) == 0
+        && request.resource.data.get('likes', 0) == 0;
 
       // The creator may edit their own activity, but not who owns it, where it came from, or
-      // its like count.
+      // its counters. (The counter clause below still lets them like or open it like anyone.)
       //
-      // IF `saves` OR `sends` COUNTERS ARE EVER ADDED: add them to the hasAny list here so a
-      // creator cannot set them, and to the counter clause below (its hasOnly list plus a
-      // steppedBy line each) so everyone else can only move them one step at a time.
+      // IF `saves` OR `sends` COUNTERS ARE EVER ADDED: add them in three places. The hasAny
+      // list here, so a creator cannot set them. The zero check on create above. And the
+      // counter clause below (its hasOnly list plus a steppedBy line each), so everyone can
+      // only move them one step at a time.
       allow update: if signedIn()
         && resource.data.source == "user_generated"
         && request.auth.uid == resource.data.creator_id
-        && !changedKeys().hasAny(['creator_id', 'source', 'likes']);
+        && !changedKeys().hasAny(['creator_id', 'source', 'likes', 'click_count']);
 
       allow delete: if signedIn()
         && resource.data.source == "user_generated"
