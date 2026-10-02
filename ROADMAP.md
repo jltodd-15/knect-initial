@@ -91,7 +91,7 @@ is fine well ahead of time, invented implementation detail isn't.
   - *Uses `components/InitialsAvatar.tsx`* (from 1.4) for any person with no uploaded picture, or who no longer exists ("Deleted user"). Don't build a second placeholder.
 
 ## Project 16 — Activity proposals
-- [ ] 16.1 — Propose an activity, the `Events` write, RSVPs 📄 🚧 **hard-blocked on Project 3** — no `/Events/` rule exists, so every Events read and write is denied today
+- [ ] 16.1 — Propose an activity, the `Events` write, RSVPs 📄 🚧 **blocked on 3.3 merging** — the `/Events/` rule is written and tested on `ticket/3.3`
 - [ ] 16.2 — Proposal resolution, the 24h sweep, expiry, cancel 📄 🚧 *same block; depends on D2*
 
 ## Project 17 — Voting system

@@ -195,5 +195,195 @@ service cloud.firestore {
             || steppedBy('likes', 1)
             || (steppedBy('likes', -1) && request.resource.data.likes >= 0));
     }
+
+    // Knect: the trust boundary for chats, votes and events. Anything a client can write, a
+    // client can lie about. So everything that decides an outcome (event status other than an
+    // owner's cancel, every vote result field, every chat preview field) has no client clause
+    // at all and is written only by the Admin SDK. Don't add one.
+    //
+    // User-owned state in a shared document is a map keyed by UID (ballots, RSVPs), and a
+    // participant may write only their own key. A missing map counts as empty.
+
+    // True when the only change to `field`, a UID-keyed map, is the signed-in user's own key.
+    function onlyOwnKey(field) {
+      return request.resource.data.get(field, {})
+        .diff(resource.data.get(field, {}))
+        .affectedKeys().hasOnly([request.auth.uid]);
+    }
+
+    // BLOCKING IS NOT ENFORCED BY ANY RULE BELOW, and must never be described as enforced.
+    // blocked_users lives in Private_info, which only its owner can read, so checking it per
+    // message would need a new readable block record and a billed get() on every send. Ruled
+    // for MVP: 15.2's receive-side filter is the protection. A blocked user's messages are still
+    // created, stored and delivered, then hidden. Revisit if reporting (13.3) needs a
+    // server-side record of who blocked whom.
+
+    // Additions to participants are unconstrained (15.1's add-member); removals are limited to
+    // leaving. participant_hash and chat_origin are set at creation only, and the recent_message
+    // preview fields are Admin-SDK-only.
+    //
+    // No delete clause. The old published rule had none either, so this is inherited rather
+    // than decided; whether chats should be deletable is still an open question from 15.1.
+    match /Chats/{chatId} {
+      allow create: if signedIn()
+        && request.auth.uid in request.resource.data.participants
+        && request.resource.data.keys().hasOnly([
+             'participants', 'participant_hash', 'chat_origin', 'chat_name'
+           ]);
+
+      allow read: if signedIn() && request.auth.uid in resource.data.participants;
+
+      allow update: if signedIn()
+        && request.auth.uid in resource.data.participants
+        && changedKeys().hasOnly(['chat_name', 'participants'])
+        && (!changedKeys().hasAny(['participants']) || onlyRemovedSelf());
+
+      // Anyone dropped from participants must be the signed-in user.
+      function onlyRemovedSelf() {
+        return resource.data.participants
+          .removeAll(request.resource.data.participants)
+          .hasOnly([request.auth.uid]);
+      }
+
+      // Chat-scoped documents are secured by membership in the parent chat, at the cost of one
+      // get() on Chats/{chatId}.
+      function inChat() {
+        return signedIn() && request.auth.uid
+          in get(/databases/$(database)/documents/Chats/$(chatId)).data.participants;
+      }
+
+      // The only edit is a tombstone: clear the text, stamp the server time. There is no delete
+      // clause because a message is never deleted. deleted_at is absent from the create list,
+      // so a message cannot be born a tombstone.
+      //
+      // "system" is missing from message_type on purpose: nothing writes it yet. The ticket that
+      // writes system messages widens the list. Values only, not shape: a proposal or vote
+      // message pointing at nothing is not rejected, it renders as a broken card.
+      match /Messages/{messageId} {
+        allow read: if inChat();
+
+        // A card message may leave text out; a missing text counts as empty. The 2,000-
+        // character cap is enforced here, not only in the input field.
+        allow create: if inChat()
+          && request.resource.data.sender_id == request.auth.uid
+          && request.resource.data.get('text', '').size() <= 2000
+          && request.resource.data.message_type in ['text', 'activity', 'event_proposal', 'vote']
+          && request.resource.data.keys().hasOnly([
+               'sender_id', 'text', 'timestamp', 'message_type',
+               'activity_id', 'event_title', 'event_id', 'vote_id'
+             ]);
+
+        allow update: if signedIn()
+          && request.auth.uid == resource.data.sender_id
+          && changedKeys().hasOnly(['text', 'deleted_at'])
+          && request.resource.data.text == ''
+          && request.resource.data.deleted_at == request.time;
+      }
+
+      // status "closed", winning_option_id, closed_at, close_reason and final_counts have no
+      // client clause, on create or update. That omission is what makes every result in the
+      // app trustworthy: 17.2's tally writes them with the Admin SDK. No delete clause.
+      match /Votes/{voteId} {
+        allow read: if inChat();
+
+        // Born open, at revision 1, attributed to its creator, with no ballots cast.
+        allow create: if inChat()
+          && request.resource.data.status == 'open'
+          && request.resource.data.options_revision == 1
+          && request.resource.data.created_by == request.auth.uid
+          && request.resource.data.get('normal_votes', {}).size() == 0
+          && request.resource.data.get('ranked_votes', {}).size() == 0
+          && request.resource.data.keys().hasOnly([
+               'created_by', 'linked_event_id', 'vote_scope', 'vote_type', 'status',
+               'created_at', 'resolves_at', 'question', 'options', 'options_revision',
+               'proposed_start_time', 'proposed_end_time', 'normal_votes', 'ranked_votes'
+             ]);
+
+        // A participant may write their own ballot, and only their own, while the vote is open.
+        allow update: if inChat()
+          && resource.data.status == 'open'
+          && changedKeys().hasOnly(['normal_votes'])
+          && onlyOwnKey('normal_votes');
+
+        allow update: if inChat()
+          && resource.data.status == 'open'
+          && changedKeys().hasOnly(['ranked_votes'])
+          && onlyOwnKey('ranked_votes');
+
+        // Options may be appended, one at a time. Never edited, never removed: every option_id
+        // is already referenced by cast ballots.
+        allow update: if inChat()
+          && resource.data.status == 'open'
+          && changedKeys().hasOnly(['options', 'options_revision'])
+          && request.resource.data.options.size() == resource.data.options.size() + 1
+          && request.resource.data.options[0:resource.data.options.size()] == resource.data.options
+          && request.resource.data.options_revision == resource.data.options_revision + 1;
+
+        // status → cancelled, by whoever opened the vote, only while it is open. Whether a cancel
+        // button exists, and what close_reason a cancelled vote holds, are 17.2's to decide.
+        allow update: if inChat()
+          && request.auth.uid == resource.data.created_by
+          && changedKeys().hasOnly(['status'])
+          && request.resource.data.status == 'cancelled'
+          && resource.data.status == 'open';
+      }
+    }
+
+    // Replaces the old Calendars collection, which has no rule and so is closed to every client.
+    // Each update clause requires its own field to actually change: hasOnly alone lets a write
+    // that changes nothing through.
+    // Secured by membership in shared_with, with no owner fallback: an owner absent from their
+    // own shared_with cannot read the event (see events.test.ts).
+    //
+    // "confirmed", "expired", confirmed_participants and applying a winning alternative are
+    // Admin-SDK-only. Losing candidates are deleted by the Admin SDK too. No client deletes an
+    // event: it is cancelled instead.
+    match /Events/{eventId} {
+      // Born undecided: proposed or candidate, with no confirmed_participants and no RSVP but
+      // the owner's own.
+      allow create: if signedIn()
+        && request.resource.data.owner_id == request.auth.uid
+        && request.resource.data.status in ['proposed', 'candidate']
+        && request.resource.data.get('rsvps', {}).keys().hasOnly([request.auth.uid])
+        && request.resource.data.keys().hasOnly([
+             'owner_id', 'shared_with', 'rsvps', 'event_time', 'end_time', 'created_at',
+             'resolves_at', 'activity_id', 'event_title', 'activity_picture_url', 'status',
+             'linked_vote_id', 'linked_chat_id', 'color', 'is_allday', 'location_text', 'source'
+           ]);
+
+      allow read: if signedIn() && request.auth.uid in resource.data.shared_with;
+
+      // RSVPs: your own key only, in three windows.
+      //   event_time has passed          → denied, every time
+      //   "proposed", event still ahead  → write and change your key freely
+      //   resolved, event still ahead    → only while your key holds "pending": answer once
+      // This reads event_time, which is why 16.1 disables drag and resize on proposed events.
+      allow update: if signedIn()
+        && request.auth.uid in resource.data.shared_with
+        && changedKeys().hasOnly(['rsvps'])
+        && changedKeys().hasAny(['rsvps'])
+        && onlyOwnKey('rsvps')
+        && resource.data.event_time > request.time
+        && (
+             resource.data.status == 'proposed'
+             || resource.data.get('rsvps', {}).get(request.auth.uid, null) == 'pending'
+           );
+
+      // shared_with: any participant of the linked chat. Errors, and so denies, when the event
+      // has no linked_chat_id; 17.1's candidate events need one for this to work.
+      allow update: if signedIn()
+        && changedKeys().hasOnly(['shared_with'])
+        && changedKeys().hasAny(['shared_with'])
+        && request.auth.uid in get(
+             /databases/$(database)/documents/Chats/$(resource.data.linked_chat_id)
+           ).data.participants;
+
+      // status → cancelled, by the owner, from a non-terminal state.
+      allow update: if signedIn()
+        && request.auth.uid == resource.data.owner_id
+        && changedKeys().hasOnly(['status'])
+        && request.resource.data.status == 'cancelled'
+        && resource.data.status in ['proposed', 'confirmed'];
+    }
   }
 }
