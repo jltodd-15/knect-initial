@@ -29,6 +29,10 @@ Hand-written and worth respecting: `CreateProfilePage.tsx`, `utils/storage.ts`.
 - `Users/{uid}/Private_info/main` — the document ID is the literal string `main`, never a
   generated ID.
 - `Friends.status` is exactly one of: `request_sent`, `pending`, `friend`, `close_friend`.
+- A user's own `Friends` document proves nothing: the rules let anyone set their own copy to
+  `friend` without the other person agreeing. Anything that grants access because two people are
+  friends (a rule, a Function, a screen) checks the **other** person's document,
+  `Users/{other}/Friends/{me}`, never the requester's own.
 - `name_lowercase` is a **stored** field, computed with `.toLowerCase()` at write time. It is never
   derived at query time. Do not optimize it away.
 - No denormalized names or profile pictures anywhere. A screen showing a person reads the person.
@@ -79,10 +83,9 @@ ticket that hasn't been built yet, even if you know it's coming.
   activities are sample data (Projects 5, 9, 11 and 15).
 - iOS has no Firebase config on this branch stack: `ios/Knect/GoogleService-Info.plist` is only in
   ticket 0.2's PR (#3), not merged yet. Until it is, test on Android. (Ticket 0.2)
-- The live Firestore rules (`firestore.rules`) are Rowy's default rules: only accounts with an
-  `ADMIN`/`OWNER` role can read or write anything, and there is no rule for `Users`. So the signup
-  write from ticket 2.2 is very likely rejected for ordinary accounts. Not yet confirmed on a
-  device. (Ticket 3.2)
+- `firestore.rules` covers the `Users` tree and `Activities` only (ticket 3.2), next to Rowy's
+  default rules, which still give `ADMIN`/`OWNER` role accounts everything. `Chats` and `Events`
+  have no rule yet, so every read or write there by an ordinary account is denied. (Ticket 3.3)
 - `components/ChatEventWidget.tsx` and `utils/votingLogic.ts` are dead — nothing imports either.
   Don't build on them. The live vote UI is inside `SocialDashboard.tsx`.
 
