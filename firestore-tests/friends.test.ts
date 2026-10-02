@@ -165,3 +165,46 @@ describe('denied', () => {
     await assertFails(deleteDoc(doc(as('carol'), ALICES)));
   });
 });
+
+// A user who has been blocked cannot leave a request in the blocker's list. Declining is not
+// blocking: a declined request can be sent again.
+describe('blocked users', () => {
+  const BOBS_PRIVATE = 'Users/bob/Private_info/main';
+
+  const sendRequest = () => {
+    const db = as('alice');
+    const batch = writeBatch(db);
+    batch.set(doc(db, ALICES), { status: 'request_sent' });
+    batch.set(doc(db, BOBS), { status: 'pending' });
+    return batch.commit();
+  };
+
+  test('denied: A leaves a pending request in the list of B, who has blocked A', async () => {
+    await seed(BOBS_PRIVATE, { blocked_users: ['alice'] });
+    await assertFails(setDoc(doc(as('alice'), BOBS), { status: 'pending' }));
+  });
+
+  test('denied: the whole request batch, when B has blocked A', async () => {
+    await seed(BOBS_PRIVATE, { blocked_users: ['alice'] });
+    await assertFails(sendRequest());
+  });
+
+  test('allowed: A requests B, who has blocked someone else', async () => {
+    await seed(BOBS_PRIVATE, { blocked_users: ['carol'] });
+    await assertSucceeds(sendRequest());
+  });
+
+  test('allowed: A requests B, whose Private_info has no blocked_users field', async () => {
+    await seed(BOBS_PRIVATE, { email: 'bob@example.com' });
+    await assertSucceeds(sendRequest());
+  });
+
+  test('allowed: A requests B again after B declined', async () => {
+    await seed(BOBS_PRIVATE, { blocked_users: [] });
+    await assertSucceeds(sendRequest());
+    // Declining deletes both halves; either party may delete.
+    await assertSucceeds(deleteDoc(doc(as('bob'), BOBS)));
+    await assertSucceeds(deleteDoc(doc(as('bob'), ALICES)));
+    await assertSucceeds(sendRequest());
+  });
+});

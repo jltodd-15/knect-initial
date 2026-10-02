@@ -9,6 +9,7 @@ import {
 } from '@firebase/rules-unit-testing';
 import {
   deleteDoc,
+  deleteField,
   doc,
   getDoc,
   increment,
@@ -19,7 +20,8 @@ import {
 
 // Activities/{activityId} (ticket 3.2). Readable by every signed-in user. Write access is gated on
 // source == "user_generated", a field every Activity has, rather than on creator_id, which seeded
-// activities lack. Any signed-in user may change click_count and likes, and nothing else.
+// activities lack. Any signed-in user may move click_count and likes one step at a time, and
+// nothing else.
 
 let testEnv: RulesTestEnvironment;
 
@@ -167,6 +169,133 @@ describe('denied', () => {
       setDoc(doc(as('alice'), OWN), {
         ...aliceActivity,
         updated_at: createdAt,
+      }),
+    );
+  });
+});
+
+// The counters move one step at a time: likes by exactly +1 or -1 and never below zero,
+// click_count by exactly +1. Anything else would let one account reorder Discover.
+describe('counter steps: allowed', () => {
+  test('a user likes an activity: likes moves by +1', async () => {
+    await seed(SEEDED, seededActivity);
+    await assertSucceeds(
+      updateDoc(doc(as('bob'), SEEDED), { likes: increment(1) }),
+    );
+  });
+
+  test('a user unlikes an activity: likes moves by -1', async () => {
+    await seed(SEEDED, { ...seededActivity, likes: 3 });
+    await assertSucceeds(
+      updateDoc(doc(as('bob'), SEEDED), { likes: increment(-1) }),
+    );
+  });
+
+  test('a user opens an activity: click_count moves by +1', async () => {
+    await seed(SEEDED, seededActivity);
+    await assertSucceeds(
+      updateDoc(doc(as('bob'), SEEDED), { click_count: increment(1) }),
+    );
+  });
+
+  test('the first like on an activity that has no likes field yet', async () => {
+    const { likes, ...withoutLikes } = seededActivity;
+    expect(likes).toBe(0);
+    await seed(SEEDED, withoutLikes);
+    await assertSucceeds(
+      updateDoc(doc(as('bob'), SEEDED), { likes: increment(1) }),
+    );
+  });
+
+  test('the creator likes their own activity', async () => {
+    await seed(OWN, aliceActivity);
+    await assertSucceeds(
+      updateDoc(doc(as('alice'), OWN), { likes: increment(1) }),
+    );
+  });
+});
+
+describe('counter steps: denied', () => {
+  test('a user sets likes to an arbitrary number', async () => {
+    await seed(SEEDED, seededActivity);
+    await assertFails(updateDoc(doc(as('bob'), SEEDED), { likes: 1000000 }));
+  });
+
+  test('a user moves likes by more than one', async () => {
+    await seed(SEEDED, seededActivity);
+    await assertFails(
+      updateDoc(doc(as('bob'), SEEDED), { likes: increment(2) }),
+    );
+  });
+
+  test('a user takes likes below zero', async () => {
+    await seed(SEEDED, seededActivity);
+    await assertFails(
+      updateDoc(doc(as('bob'), SEEDED), { likes: increment(-1) }),
+    );
+  });
+
+  test('a user sets likes to something that is not an integer', async () => {
+    await seed(SEEDED, seededActivity);
+    await assertFails(updateDoc(doc(as('bob'), SEEDED), { likes: 'lots' }));
+    await assertFails(updateDoc(doc(as('bob'), SEEDED), { likes: 0.5 }));
+  });
+
+  test('a user deletes the likes field', async () => {
+    await seed(SEEDED, seededActivity);
+    await assertFails(
+      updateDoc(doc(as('bob'), SEEDED), { likes: deleteField() }),
+    );
+  });
+
+  test('a user moves click_count by more than one', async () => {
+    await seed(SEEDED, seededActivity);
+    await assertFails(
+      updateDoc(doc(as('bob'), SEEDED), { click_count: increment(5) }),
+    );
+  });
+
+  test('a user decrements click_count', async () => {
+    await seed(SEEDED, { ...seededActivity, click_count: 4 });
+    await assertFails(
+      updateDoc(doc(as('bob'), SEEDED), { click_count: increment(-1) }),
+    );
+  });
+
+  test('a user deletes the click_count field', async () => {
+    await seed(SEEDED, seededActivity);
+    await assertFails(
+      updateDoc(doc(as('bob'), SEEDED), { click_count: deleteField() }),
+    );
+  });
+});
+
+// The creator may edit their own activity, but not who owns it, where it came from, or how many
+// likes it has.
+describe('creator edits: denied', () => {
+  test('the creator changes creator_id on their own activity', async () => {
+    await seed(OWN, aliceActivity);
+    await assertFails(updateDoc(doc(as('alice'), OWN), { creator_id: 'bob' }));
+  });
+
+  test('the creator changes source on their own activity', async () => {
+    await seed(OWN, aliceActivity);
+    await assertFails(
+      updateDoc(doc(as('alice'), OWN), { source: 'manual_diy' }),
+    );
+  });
+
+  test('the creator sets likes on their own activity', async () => {
+    await seed(OWN, aliceActivity);
+    await assertFails(updateDoc(doc(as('alice'), OWN), { likes: 500 }));
+  });
+
+  test('the creator edits a field and likes in the same write', async () => {
+    await seed(OWN, aliceActivity);
+    await assertFails(
+      updateDoc(doc(as('alice'), OWN), {
+        name: 'Board game afternoon',
+        likes: increment(1),
       }),
     );
   });

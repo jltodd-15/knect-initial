@@ -44,6 +44,20 @@ service cloud.firestore {
     function changedKeys() {
       return request.resource.data.diff(resource.data).affectedKeys();
     }
+    // True when an integer counter moved by exactly `step`. A counter the document does not
+    // have yet counts from zero. Removing the field, or writing a non-integer, is false.
+    function steppedBy(field, step) {
+      return field in request.resource.data
+        && request.resource.data[field] is int
+        && request.resource.data[field] - resource.data.get(field, 0) == step;
+    }
+    // True when `uid` has the signed-in user in their blocked_users. Rules can read
+    // Private_info here even though no other client can.
+    function hasBlockedMe(uid) {
+      return exists(/databases/$(database)/documents/Users/$(uid)/Private_info/main)
+        && request.auth.uid in get(/databases/$(database)/documents/Users/$(uid)/Private_info/main)
+             .data.get('blocked_users', []);
+    }
 
     // Knect: the user tree. The document ID is the Auth UID, so ownership is a string
     // comparison. Every block splits delete from create/update: request.resource is null on a
@@ -92,17 +106,26 @@ service cloud.firestore {
       allow read: if signedIn();
 
       // Creating an entry: in your own doc you may only claim you sent a request.
-      // In someone else's doc you may only claim you are requesting them.
+      // In someone else's doc you may only claim you are requesting them, and not at all if
+      // they have blocked you. A declined request (a deleted entry) can be sent again; only
+      // an active block stops it.
       allow create: if signedIn()
         && request.resource.data.keys().hasOnly(['status'])
         && (
              (request.auth.uid == userId   && request.resource.data.status == 'request_sent')
-          || (request.auth.uid == friendId && request.resource.data.status == 'pending')
+          || (request.auth.uid == friendId && request.resource.data.status == 'pending'
+              && !hasBlockedMe(userId))
            );
 
       // Owner-only by ruling, not by omission: accepting a request runs through the
       // acceptFriendRequest Cloud Function, never through a client write to the other
       // person's document.
+      //
+      // FOR LATER TICKETS: because of this, a user can set their OWN copy to "friend" or
+      // "close_friend" without the other person agreeing. A user's own Friends document
+      // therefore proves nothing. Any rule or Function that grants access because two people
+      // are friends (chats, events, free/busy) must check the OTHER person's document,
+      // Users/{other}/Friends/{requester}, never the requester's own.
       allow update: if isUser(userId)
         && request.resource.data.keys().hasOnly(['status'])
         && request.resource.data.status in ['pending', 'request_sent', 'friend', 'close_friend'];
@@ -144,13 +167,29 @@ service cloud.firestore {
              'click_count', 'likes', 'created_at'
            ]);
 
-      allow update, delete: if signedIn()
+      // The creator may edit their own activity, but not who owns it, where it came from, or
+      // its like count.
+      //
+      // IF `saves` OR `sends` COUNTERS ARE EVER ADDED: add them to the hasAny list here so a
+      // creator cannot set them, and to the counter clause below (its hasOnly list plus a
+      // steppedBy line each) so everyone else can only move them one step at a time.
+      allow update: if signedIn()
+        && resource.data.source == "user_generated"
+        && request.auth.uid == resource.data.creator_id
+        && !changedKeys().hasAny(['creator_id', 'source', 'likes']);
+
+      allow delete: if signedIn()
         && resource.data.source == "user_generated"
         && request.auth.uid == resource.data.creator_id;
 
-      // Any signed-in user may change the engagement counters, and nothing else.
+      // Any signed-in user may move the engagement counters, and nothing else, one step at a
+      // time: click_count by +1; likes by +1 or -1, never below zero.
       allow update: if signedIn()
-        && changedKeys().hasOnly(['click_count', 'likes']);
+        && changedKeys().hasOnly(['click_count', 'likes'])
+        && (!changedKeys().hasAny(['click_count']) || steppedBy('click_count', 1))
+        && (!changedKeys().hasAny(['likes'])
+            || steppedBy('likes', 1)
+            || (steppedBy('likes', -1) && request.resource.data.likes >= 0));
     }
   }
 }

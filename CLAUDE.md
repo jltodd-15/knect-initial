@@ -29,6 +29,10 @@ Hand-written and worth respecting: `CreateProfilePage.tsx`, `utils/storage.ts`.
 - `Users/{uid}/Private_info/main` — the document ID is the literal string `main`, never a
   generated ID.
 - `Friends.status` is exactly one of: `request_sent`, `pending`, `friend`, `close_friend`.
+- A user's own `Friends` document proves nothing: the rules let anyone set their own copy to
+  `friend` without the other person agreeing. Anything that grants access because two people are
+  friends (a rule, a Function, a screen) checks the **other** person's document,
+  `Users/{other}/Friends/{me}`, never the requester's own.
 - `name_lowercase` is a **stored** field, computed with `.toLowerCase()` at write time. It is never
   derived at query time. Do not optimize it away.
 - No denormalized names or profile pictures anywhere. A screen showing a person reads the person.
