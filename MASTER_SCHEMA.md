@@ -92,6 +92,7 @@ kept separately, under [Repo notes](#repo-notes).
       * deleted_at (Timestamp)
 * Subcollection: Votes
    * Document: (Unique Vote ID)
+      * created_by (String) — UID of whoever opened the vote. Written at creation by 17.1; the rules require it to equal the creator, and only this user may cancel the vote. Added 2026-09-09 (ticket 3.3).
       * linked_event_id (String)
       * vote_scope (String) Two values: "alternative" (competing versions of an event), "open" (freeform, no event).
       * vote_type (String) — two values: "normal", "ranked". Ranked requires ≥3 options, normal ≥2.

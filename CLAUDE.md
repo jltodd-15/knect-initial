@@ -33,6 +33,12 @@ Hand-written and worth respecting: `CreateProfilePage.tsx`, `utils/storage.ts`.
   `friend` without the other person agreeing. Anything that grants access because two people are
   friends (a rule, a Function, a screen) checks the **other** person's document,
   `Users/{other}/Friends/{me}`, never the requester's own.
+- Anything a client can write, a client can lie about. Vote results (`status: "closed"`,
+  `winning_option_id`, `closed_at`, `close_reason`, `final_counts`), event `status` other than the
+  owner's cancel, `confirmed_participants`, and the chat `recent_message*` preview fields have no
+  client clause in `firestore.rules`. Only the Admin SDK writes them. Don't add a client clause.
+- Blocking is receive-side only (15.2's filter). No rule stops a blocked user's message being
+  sent. Never describe blocking as enforced.
 - `name_lowercase` is a **stored** field, computed with `.toLowerCase()` at write time. It is never
   derived at query time. Do not optimize it away.
 - No denormalized names or profile pictures anywhere. A screen showing a person reads the person.
@@ -83,9 +89,8 @@ ticket that hasn't been built yet, even if you know it's coming.
   activities are sample data (Projects 5, 9, 11 and 15).
 - iOS has no Firebase config on this branch stack: `ios/Knect/GoogleService-Info.plist` is only in
   ticket 0.2's PR (#3), not merged yet. Until it is, test on Android. (Ticket 0.2)
-- `firestore.rules` covers the `Users` tree and `Activities` only (ticket 3.2), next to Rowy's
-  default rules, which still give `ADMIN`/`OWNER` role accounts everything. `Chats` and `Events`
-  have no rule yet, so every read or write there by an ordinary account is denied. (Ticket 3.3)
+- `firestore.rules` sits next to Rowy's default rules, which still give `ADMIN`/`OWNER` role
+  accounts everything.
 - `components/ChatEventWidget.tsx` and `utils/votingLogic.ts` are dead — nothing imports either.
   Don't build on them. The live vote UI is inside `SocialDashboard.tsx`.
 

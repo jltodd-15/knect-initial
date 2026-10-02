@@ -36,6 +36,17 @@ only the Console and a real signup can show.
 
 ---
 
+## 3.3: Rules for chats, messages, votes and events
+
+Not yet run. The rules themselves are covered by `npm run test:rules`; this check is the part only
+the Console can show. Nothing in the app reads or writes these collections yet.
+
+- [ ] **The new rules are live.** In the Console, **Firestore Database → Rules** shows blocks for
+  `Chats` (with `Messages` and `Votes` inside it) and `Events`, and no `Calendars` block. The
+  timestamp on the newest version matches the last `npm run rules:deploy`.
+
+---
+
 ## 1.4: Onboarding sequence
 
 Not yet run. Sign up from scratch on a real Android device or emulator.
