@@ -22,6 +22,20 @@ part.
 
 ---
 
+## 3.2: Rules for the user tree and activities
+
+Not yet run. The rules themselves are covered by `npm run test:rules`; these checks are the parts
+only the Console and a real signup can show.
+
+- [ ] **The new rules are live.** In the Console, **Firestore Database → Rules** shows blocks for
+  `Users`, `Private_info/main`, `Free_Busy`, `Friends`, `Activity_History`, `Liked_Activities` and
+  `Activities`, below the Rowy rules. The timestamp on the newest version matches the last
+  `npm run rules:deploy`.
+- [ ] **Signup is no longer rejected.** Run **Both documents land** under 2.2 with a new throwaway
+  account. Both documents appear in the Console.
+
+---
+
 ## 1.4: Onboarding sequence
 
 Not yet run. Sign up from scratch on a real Android device or emulator.
@@ -165,9 +179,9 @@ Not yet run.
 
 - [ ] **Both documents land.** After a successful signup, the Console shows `Users/{uid}` and
   `Users/{uid}/Private_info/main` for the new account's UID.
-  *Expected to fail for now (found in ticket 3.1):* the live rules only let `ADMIN`/`OWNER`
-  accounts write, so an ordinary signup should see its write rejected. If this check passes,
-  the live rules differ from `firestore.rules`, and that needs looking into.
+  This needs ticket 3.2's rules to be live (see **The new rules are live** under 3.2). Before
+  that deploy the live rules only let `ADMIN`/`OWNER` accounts write, and an ordinary signup's
+  write is rejected.
 - [ ] **They land together offline.** Covered by the **Offline doesn't hang** and **Retry works**
   checks under 2.3: after an offline attempt, either both documents exist or neither does.
 

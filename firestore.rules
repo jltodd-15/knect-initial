@@ -33,5 +33,124 @@ service cloud.firestore {
     function hasAnyRole(roles) {
       return request.auth != null && request.auth.token.roles.hasAny(roles);
     }
+
+    // Knect: shared helpers
+    function signedIn() {
+      return request.auth != null;
+    }
+    function isUser(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+    function changedKeys() {
+      return request.resource.data.diff(resource.data).affectedKeys();
+    }
+
+    // Knect: the user tree. The document ID is the Auth UID, so ownership is a string
+    // comparison. Every block splits delete from create/update: request.resource is null on a
+    // delete, so a field check there would deny every delete with a null-reference error.
+
+    // Readable by every signed-in user, so nothing private may live on this document.
+    match /Users/{userId} {
+      allow read: if signedIn();
+
+      allow create, update: if isUser(userId)
+        && request.resource.data.keys().hasOnly([
+             'name', 'name_lowercase', 'profile_info', 'profile_picture_url',
+             'interests', 'current_status', 'status_visibility', 'status_expires_at'
+           ]);
+
+      allow delete: if isUser(userId);
+    }
+
+    // The document ID is pinned to the literal `main`: a write to any other ID is denied rather
+    // than creating a second document nothing reads.
+    match /Users/{userId}/Private_info/main {
+      allow read: if isUser(userId);
+
+      allow create, update: if isUser(userId)
+        && request.resource.data.keys().hasOnly([
+             'location', 'geohash', 'email', 'blocked_users', 'fcm_tokens',
+             'external_calendar_tokens', 'tag_affinity_scores',
+             'tag_scores_last_decayed', 'liked_activity_ids'
+           ]);
+
+      allow delete: if isUser(userId);
+    }
+
+    // Read is open to any signed-in user on purpose: a block says only that you are busy. If a
+    // title, a location or a linked event is ever added here, that decision has to be reopened.
+    match /Users/{userId}/Free_Busy/{blockId} {
+      allow read: if signedIn();
+
+      allow create, update: if isUser(userId)
+        && request.resource.data.keys().hasOnly(['start_time', 'end_time']);
+
+      allow delete: if isUser(userId);
+    }
+
+    match /Users/{userId}/Friends/{friendId} {
+      allow read: if signedIn();
+
+      // Creating an entry: in your own doc you may only claim you sent a request.
+      // In someone else's doc you may only claim you are requesting them.
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['status'])
+        && (
+             (request.auth.uid == userId   && request.resource.data.status == 'request_sent')
+          || (request.auth.uid == friendId && request.resource.data.status == 'pending')
+           );
+
+      // Owner-only by ruling, not by omission: accepting a request runs through the
+      // acceptFriendRequest Cloud Function, never through a client write to the other
+      // person's document.
+      allow update: if isUser(userId)
+        && request.resource.data.keys().hasOnly(['status'])
+        && request.resource.data.status in ['pending', 'request_sent', 'friend', 'close_friend'];
+
+      allow delete: if signedIn()
+        && (request.auth.uid == userId || request.auth.uid == friendId);
+    }
+
+    match /Users/{userId}/Activity_History/{historyId} {
+      allow read: if isUser(userId);
+
+      allow create, update: if isUser(userId)
+        && request.resource.data.keys().hasOnly(['activity_reference', 'tapped_ads']);
+
+      allow delete: if isUser(userId);
+    }
+
+    match /Users/{userId}/Liked_Activities/{activityId} {
+      allow read: if isUser(userId);
+
+      allow create, update: if isUser(userId)
+        && request.resource.data.keys().hasOnly(['saved_at']);
+
+      allow delete: if isUser(userId);
+    }
+
+    // Knect: Activities. Write access is gated on `source`, which every Activity has, rather
+    // than on `creator_id`, which seeded activities lack. Seeded activities cannot be edited
+    // from inside the app at all.
+    match /Activities/{activityId} {
+      allow read: if signedIn();
+
+      allow create: if signedIn()
+        && request.resource.data.source == "user_generated"
+        && request.auth.uid == request.resource.data.creator_id
+        && request.resource.data.keys().hasOnly([
+             'name', 'description', 'cost', 'source', 'creator_id', 'category',
+             'tags', 'pictures', 'location', 'geohash', 'is_location_based',
+             'click_count', 'likes', 'created_at'
+           ]);
+
+      allow update, delete: if signedIn()
+        && resource.data.source == "user_generated"
+        && request.auth.uid == resource.data.creator_id;
+
+      // Any signed-in user may change the engagement counters, and nothing else.
+      allow update: if signedIn()
+        && changedKeys().hasOnly(['click_count', 'likes']);
+    }
   }
 }
