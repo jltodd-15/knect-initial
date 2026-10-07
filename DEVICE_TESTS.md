@@ -22,6 +22,64 @@ part.
 
 ---
 
+## 4.1: React Navigation migration
+
+Not yet run. The tabs now run on React Navigation. `npm test` proves which tab shows which screen
+against a stand-in for that library; everything below is what only the real library on a real
+device can show.
+
+**When to do this.** Nothing here is needed until the app can be built onto a phone or emulator.
+There is no step to do before then, and the code doesn't wait on any of it. All of it, including
+the install step below, is done in one sitting once a device is available.
+
+**First, a fresh build.** The new libraries have native parts, so reloading the JavaScript is not
+enough. On iOS run `cd ios && pod install`, then do a fresh build. On Android do a fresh
+`npm run android`. `pod install` will change `ios/Podfile.lock`; commit that change with this
+ticket.
+
+**Screenshots wanted.** Kyson can't run the app, so this ticket's look is judged from your
+screenshots. Please send one of each: the Planner tab (whole screen, bar included), the Discover
+tab, the Search tab, the Circle tab, the Profile tab, and an open chat in Circle. If you have a
+screenshot of any tab from before this ticket, send it alongside for comparison.
+
+- [ ] **The app builds and opens.** After the fresh build, sign in. You should see the Planner tab
+  with the tab bar at the bottom, and no pink "Something went wrong" screen.
+- [ ] **Five tabs, in order.** The bar reads Planner, Discover, Search, Circle, Profile, left to
+  right. All five labels fit on one line each, none cut off.
+- [ ] **The icons.** Planner is a calendar. Discover is a compass (a circle with a diamond-shaped
+  needle). Search is a magnifying glass. Circle is two people. Profile is one person. The tab you
+  are on is green and slightly larger; the others are gray.
+- [ ] **The bar looks the way it did.** Same height, same white background with a thin line above
+  it, same small capital labels. The only differences from before are the fifth tab, the compass,
+  and each tab being a little narrower.
+- [ ] **Nothing new around the screens.** No title bar has appeared at the top of any tab, and no
+  gray strip or gap has appeared above the tab bar or at the edges. The background behind each
+  screen is the same off-white as before.
+- [ ] **Planner, Discover, Circle and Profile show what they showed before.** Open each. The
+  content is the same sample data as before this ticket, and the last items in each list can be
+  scrolled clear of the tab bar.
+- [ ] **Search is a placeholder.** The Search tab shows the word "Search" in large green text at
+  the top left, on a white background, and nothing else.
+- [ ] **A chat hides the bar.** In Circle, open any chat. The tab bar disappears. Go back to the
+  chat list. The bar comes back.
+- [ ] **"Plan this" from Discover.** In Discover, open an activity and tap the button that plans
+  it. You land on Planner with the create-event sheet open and the activity's title filled in. The
+  Planner tab is the green one.
+- [ ] **Planning from a chat.** In Circle, open a chat and start a plan from it. You land on
+  Planner with the create-event sheet open, and the tab bar is showing.
+- [ ] **Circle after planning from a chat.** After the step above, tap Circle. You should see the
+  chat list with the tab bar showing, not the chat you left.
+- [ ] **A fresh signup lands on Planner.** Go to Profile and sign out. Create a new account. When
+  signup finishes you are on Planner, not Profile.
+- [ ] **Sign out and back in.** From Profile, sign out. You see the sign-in screen with no tab bar.
+  Sign in again. The tabs are back, on Planner.
+- [ ] **Android back button.** On any tab other than Planner, press the system back button. The app
+  closes, as it did before; it does not jump to another tab.
+- [ ] **Android, returning from the background.** With the app open on Circle, press home, open a
+  few other apps, then come back to Knect. It opens without crashing.
+
+---
+
 ## 3.2: Rules for the user tree and activities
 
 Not yet run. The rules themselves are covered by `npm run test:rules`; these checks are the parts

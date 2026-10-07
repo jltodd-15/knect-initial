@@ -16,10 +16,11 @@ an Auth account with no profile document behind it.
   two-step onboarding sequence that creates the account and writes the `Users` documents). A
   signed-in user with no profile is sent back to finish signup.
 - **Hidden:** Google and Apple sign-in, until ticket 1.3 (needs a paid Apple Developer account).
-- **Reachable but not real yet:** the Planner, Feed, Social and Profile tabs. They open without
+- **Reachable but not real yet:** the Planner, Discover, Circle and Profile tabs. They open without
   crashing, but show sample data. Anything changed there is saved only on that phone, never to
-  Firebase. The Profile tab shows "Alex Rivera", not the profile created at signup.
-- **Not verified on a device:** tickets 2.3 and 1.4. Their checks are in `DEVICE_TESTS.md`. Test on Android for now: iOS is missing its Firebase config on this branch (see below).
+  Firebase. The Profile tab shows "Alex Rivera", not the profile created at signup. The Search tab
+  is a placeholder: a title and nothing else.
+- **Not verified on a device:** tickets 2.3, 1.4 and 4.1 (the move to React Navigation). Their checks are in `DEVICE_TESTS.md`. Test on Android for now: iOS is missing its Firebase config on this branch (see below).
 - **Known bugs** that belong to other tickets are listed in [`CLAUDE.md`](CLAUDE.md), under
   "Known bugs that are somebody else's ticket".
 
@@ -68,7 +69,9 @@ New behavior should have a failing test written before the implementation — se
 ## Structure
 
 - `App.tsx` — root component: the sign-in screen (Firebase Auth), the signup/onboarding screen, the
-  missing-profile check, and tab switching.
+  missing-profile check, and the signed-in navigator (React Navigation: a root stack holding the five
+  tabs). The sign-in and signup screens sit outside the navigator.
+- `components/Navigation.tsx` — the tab bar the navigator draws.
 - `components/CreateProfilePage.tsx` — the onboarding sequence: an email/password step, then a
   profile step (name, optional bio, interests from a fixed list of 35, initials avatar).
 - `components/InitialsAvatar.tsx` — the picture every user has until they upload one, drawn from

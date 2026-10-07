@@ -1,8 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, StatusBar, ActivityIndicator } from 'react-native';
 import {  SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
-import { AppTab } from './types';
+import { NavigationContainer, DefaultTheme, useIsFocused } from '@react-navigation/native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Navigation from './components/Navigation';
+import SearchTab from './components/SearchTab';
 import DiscoveryFeed from './components/DiscoveryFeed';
 import EventPlanner from './components/EventPlanner';
 import SocialDashboard from './components/SocialDashboard';
@@ -64,9 +67,31 @@ const signupErrorFor = (code: string): SignupError => {
   }
 };
 
+// Ticket 4.1: the signed-in app is a root stack whose only screen is the five-tab navigator, so a
+// later ticket can push a screen over the tabs. The tab order here is the order in the bar.
+type TabParamList = {
+  Planner: undefined;
+  Discover: undefined;
+  Search: undefined;
+  Circle: undefined;
+  Profile: undefined;
+};
+
+type RootStackParamList = {
+  Tabs: undefined;
+};
+
+const RootStack = createNativeStackNavigator<RootStackParamList>();
+const Tab = createBottomTabNavigator<TabParamList>();
+
+// A tab's screen exists only while its tab is in front, as it did before the navigator: leaving a
+// tab discards the screen, and coming back builds a fresh one. The navigator alone would keep
+// every visited screen alive (an open chat would still be open on returning to Circle).
+const FocusedOnly: React.FC<{ children: React.ReactNode }> = ({ children }) =>
+  useIsFocused() ? <>{children}</> : null;
+
 const App: React.FC = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [activeTab, setActiveTab] = useState<AppTab>(AppTab.PLANNER);
   const [isAuth, setIsAuth] = useState(false);
   const [showCreateProfile, setShowCreateProfile] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -246,8 +271,8 @@ const App: React.FC = () => {
     checkSeqRef.current += 1; // pre-empts a stale missing-profile read racing this same uid
     setProfileCheckStatus('present');
     setSubmitState('idle');
-    // Always land on Planner, even if the previous user this session logged out from another tab.
-    setActiveTab(AppTab.PLANNER);
+    // The tab navigator isn't mounted during signup, so it starts fresh on its initial route:
+    // Planner, even if the previous user this session logged out from another tab.
     setShowCreateProfile(false); // only now is the tab tree reachable
   };
 
@@ -274,11 +299,11 @@ const App: React.FC = () => {
     setIsDarkMode(newVal);
   };
 
-  const handlePlanActivity = (item: DiscoveryItem | null, participants?: string[]) => {
+  const handlePlanActivity = (goToPlanner: () => void, item: DiscoveryItem | null, participants?: string[]) => {
       if (item) setPendingDiscoveryItem(item);
       if (participants) setPendingParticipants(participants);
       setIsChatOpen(false); // Close chat to show nav bar
-      setActiveTab(AppTab.PLANNER);
+      goToPlanner();
   };
 
   const styles = getStyles(isDarkMode);
@@ -440,41 +465,83 @@ const App: React.FC = () => {
     );
   }
 
+  // The navigator paints its own background behind every screen; keep it the app's.
+  const navigationTheme = {
+    ...DefaultTheme,
+    colors: { ...DefaultTheme.colors, background: isDarkMode ? '#121212' : '#FDFCFB' },
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <View style={styles.content}>
-        {activeTab === AppTab.PLANNER && (
-            <EventPlanner
-                isDarkMode={isDarkMode}
-                initialProposal={pendingDiscoveryItem}
-                initialParticipants={pendingParticipants}
-            />
-        )}
-        {activeTab === AppTab.FEED && (
-            <DiscoveryFeed
-                isDarkMode={isDarkMode}
-                onPlanActivity={(item) => handlePlanActivity(item)}
-            />
-        )}
-        {activeTab === AppTab.SOCIAL && (
-            <SocialDashboard
-                isDarkMode={isDarkMode}
-                onChatOpen={() => setIsChatOpen(true)}
-                onChatClose={() => setIsChatOpen(false)}
-                onPlanActivity={(item, participants) => handlePlanActivity(item, participants)}
-            />
-        )}
-        {activeTab === AppTab.PROFILE && <ProfilePage isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} onLogout={handleLogout} />}
-      </View>
-      {!isChatOpen && <Navigation activeTab={activeTab} setActiveTab={setActiveTab} isDarkMode={isDarkMode} />}
+      <NavigationContainer theme={navigationTheme}>
+        <RootStack.Navigator screenOptions={{ headerShown: false }}>
+          <RootStack.Screen name="Tabs">
+            {() => (
+              <Tab.Navigator
+                initialRouteName="Planner"
+                backBehavior="none"
+                screenOptions={{ headerShown: false }}
+                tabBar={(props) => (isChatOpen ? null : <Navigation {...props} isDarkMode={isDarkMode} />)}
+              >
+                <Tab.Screen name="Planner">
+                  {() => (
+                    <FocusedOnly>
+                      <EventPlanner
+                          isDarkMode={isDarkMode}
+                          initialProposal={pendingDiscoveryItem}
+                          initialParticipants={pendingParticipants}
+                      />
+                    </FocusedOnly>
+                  )}
+                </Tab.Screen>
+                <Tab.Screen name="Discover">
+                  {({ navigation }) => (
+                    <FocusedOnly>
+                      <DiscoveryFeed
+                          isDarkMode={isDarkMode}
+                          onPlanActivity={(item) => handlePlanActivity(() => navigation.navigate('Planner'), item)}
+                      />
+                    </FocusedOnly>
+                  )}
+                </Tab.Screen>
+                <Tab.Screen name="Search">
+                  {() => (
+                    <FocusedOnly>
+                      <SearchTab isDarkMode={isDarkMode} />
+                    </FocusedOnly>
+                  )}
+                </Tab.Screen>
+                <Tab.Screen name="Circle">
+                  {({ navigation }) => (
+                    <FocusedOnly>
+                      <SocialDashboard
+                          isDarkMode={isDarkMode}
+                          onChatOpen={() => setIsChatOpen(true)}
+                          onChatClose={() => setIsChatOpen(false)}
+                          onPlanActivity={(item, participants) => handlePlanActivity(() => navigation.navigate('Planner'), item, participants)}
+                      />
+                    </FocusedOnly>
+                  )}
+                </Tab.Screen>
+                <Tab.Screen name="Profile">
+                  {() => (
+                    <FocusedOnly>
+                      <ProfilePage isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} onLogout={handleLogout} />
+                    </FocusedOnly>
+                  )}
+                </Tab.Screen>
+              </Tab.Navigator>
+            )}
+          </RootStack.Screen>
+        </RootStack.Navigator>
+      </NavigationContainer>
     </SafeAreaView>
   );
 };
 
 const getStyles = (isDark: boolean) => StyleSheet.create({
   container: { flex: 1, backgroundColor: isDark ? '#121212' : '#FDFCFB' },
-  content: { flex: 1 },
   authContainer: { flex: 1, justifyContent: 'center', padding: 24 },
 
   logoBox: {

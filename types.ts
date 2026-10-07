@@ -149,10 +149,3 @@ export interface EventProposal {
     isTie?: boolean;
   };
 }
-
-export enum AppTab {
-  PLANNER = 'planner',
-  FEED = 'discover',
-  SOCIAL = 'circle',
-  PROFILE = 'profile'
-}
