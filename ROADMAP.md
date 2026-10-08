@@ -50,6 +50,7 @@ is fine well ahead of time, invented implementation detail isn't.
   - *Built (4.1), not yet device-tested:* the signed-in app is a root stack holding five tabs (Planner, Discover, Search, Circle, Profile). Search is a placeholder. Checks are in `DEVICE_TESTS.md`.
   - *Tests run against a stand-in* for React Navigation (`jest.setup.js`), not the library itself: it ships in a format this Jest config doesn't load, and `jest.config.js` wasn't 4.1's to change. ❓ no ticket owns loading the real library in tests.
 - [ ] 4.2 — Styling, theming & dark mode
+  - *Session A of six built (4.2):* `theme/tokens.ts`, `ThemeProvider` and `useTheme()` exist with tests. No screen uses them yet; the app looks exactly as before. The color and size mapping is waiting on approval before any screen is swept.
 - [ ] 4.3 — Search tab contents
   - *Uses `components/InitialsAvatar.tsx`* (from 1.4) for any person with no uploaded picture, or who no longer exists ("Deleted user"). Don't build a second placeholder.
 - [ ] 4.4 — Friends widgets
