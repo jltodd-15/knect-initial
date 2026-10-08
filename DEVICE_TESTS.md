@@ -24,8 +24,8 @@ part.
 
 ## 4.2: Theme, tokens, shared components and the full sweep
 
-Not yet run, and not finished: the sweep lands a few screens at a time. Each group below says
-which session of the ticket it belongs to. Only the groups marked **ready** can be checked yet.
+Not yet run. The code is finished; every group below is ready to check. The groups follow the
+order the screens were moved onto the theme.
 
 **Screenshots wanted.** Kyson can't run the app, so this ticket's look is judged from your
 screenshots. For every line marked 📸, take one with the phone in light mode and one in dark mode.
@@ -156,7 +156,49 @@ moved by a point or two.
 - [ ] **Time step.** Hour rows; the open one is green with white text and shows the minute
   buttons under it; a clashing hour is pale/deep red with a small red "conflict" badge. 📸
 
-### Session F: Circle and the chat thread — not built yet
+### Session F: Circle and the chat thread — ready
+
+**Circle tab**
+- [ ] **The list.** Green "Circle"-style title (now in the heaviest weight), the status box, the
+  search box, and the conversation rows with thin dividers. Names in the main text color, the
+  last message and time in gray. 📸
+- [ ] **No iOS-gray leftovers.** In dark mode nothing on this tab looks bluish-gray against the
+  rest of the app; the search box and rows use the same grays as the other tabs.
+
+**Chat thread (tap a conversation)**
+- [ ] **The thread.** A solid header bar with the avatar, name and gray subtitle. Your messages are
+  green with white text; other people's are light gray (light) or dark gray (dark) with normal
+  text. The input bar at the bottom is solid, with a rounded outlined field and the green round
+  send button. The tab bar is hidden. 📸
+- [ ] **Grouped bubbles.** Two messages in a row from the same person sit close together, with
+  the touching corners slightly less round.
+- [ ] **Event card in a chat.** A card in the event's own color with white text and avatars;
+  **GOING** turns green with a **white** tick and white text when picked (it was black text on
+  light green before); **NO** turns red. 📸 with GOING picked.
+- [ ] **Manage Event.** Open an event's menu: a card over a dimmed screen with two pale-green
+  (light) or deep-green (dark) buttons outlined in green. 📸
+- [ ] **A normal vote.** A gray card with the question, option rows, and the picked option tinted
+  green with its percentage in green. 📸
+- [ ] **A ranked vote.** The draggable rows from Session C inside the gray card, and after voting,
+  the results with the winner tinted green and ticked. 📸
+- [ ] **The + menu.** Tap **+** next to the input: a sheet with outlined round icons (Vote, Ranked
+  Vote, Plan Activity, Photos…) and labels in the main text color. 📸
+- [ ] **Create Vote.** From the + menu: a card with a green header band and white title, the
+  Normal / Ranked toggle (the picked side is a raised lighter pill), the question and option
+  fields, the dashed green **Add Option** row, and the create button. 📸
+- [ ] **Toast.** "Full results breakdown coming soon!" (tap **View Full Results** on a finished
+  ranked vote) shows as a small dark message with white text. Same note as the Planner toast: say
+  if it is hard to read.
+
+### Whole-app pass, once every group above is ticked
+
+- [ ] **Light mode, every tab in turn.** Planner, Discover, Search, Circle, Profile: the same
+  off-white background, the same white cards, the same green, the same grays. Nothing looks like
+  it belongs to a different app.
+- [ ] **Dark mode, every tab in turn.** Same check: one near-black background, one dark-gray card
+  color, no pure-white or pure-black panels.
+- [ ] **Nothing unreadable.** In either mode, no text disappears into its background. Screenshot
+  anything that does and say which screen and mode.
 
 ---
 

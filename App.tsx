@@ -95,8 +95,6 @@ const FocusedOnly: React.FC<{ children: React.ReactNode }> = ({ children }) =>
 const AppContent: React.FC = () => {
   const theme = useTheme();
   const { colors } = theme;
-  // Ticket 4.2: the screens not yet moved onto the theme still take this as a prop.
-  const isDarkMode = theme.mode === 'dark';
   const [isAuth, setIsAuth] = useState(false);
   const [showCreateProfile, setShowCreateProfile] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -510,7 +508,6 @@ const AppContent: React.FC = () => {
                   {({ navigation }) => (
                     <FocusedOnly>
                       <SocialDashboard
-                          isDarkMode={isDarkMode}
                           onChatOpen={() => setIsChatOpen(true)}
                           onChatClose={() => setIsChatOpen(false)}
                           onPlanActivity={(item, participants) => handlePlanActivity(() => navigation.navigate('Planner'), item, participants)}
