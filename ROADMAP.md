@@ -45,9 +45,14 @@ is fine well ahead of time, invented implementation detail isn't.
 - [ ] 3.3 — Rules: chats, messages, votes & events 📄
 - [ ] 3.4 — Rules realignment & deny-case audit 📄
 
-## Project 4 — User search
-- [ ] 4 — User search tab 📄
+## Project 4 — User search *(split into four tickets; was one "4 — User search tab")*
+- [ ] 4.1 — React Navigation migration 📄
+  - *Built (4.1), not yet device-tested:* the signed-in app is a root stack holding five tabs (Planner, Discover, Search, Circle, Profile). Search is a placeholder. Checks are in `DEVICE_TESTS.md`.
+  - *Tests run against a stand-in* for React Navigation (`jest.setup.js`), not the library itself: it ships in a format this Jest config doesn't load, and `jest.config.js` wasn't 4.1's to change. ❓ no ticket owns loading the real library in tests.
+- [ ] 4.2 — Styling, theming & dark mode
+- [ ] 4.3 — Search tab contents
   - *Uses `components/InitialsAvatar.tsx`* (from 1.4) for any person with no uploaded picture, or who no longer exists ("Deleted user"). Don't build a second placeholder.
+- [ ] 4.4 — Friends widgets
 
 ## Project 5 — Friend requests
 - [ ] 5 — Friend request logic 📄 *depends on D2 and 15.1 — see Running Order F1*

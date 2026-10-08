@@ -75,3 +75,76 @@ jest.mock('@react-native-firebase/auth', () => {
     },
   };
 });
+
+// Ticket 4.1: React Navigation ships as untranspiled ES modules, which this Jest config doesn't
+// transform, and its native screen containers have nothing to bind to here. These stand-ins keep
+// the parts App.tsx wires up: a tab navigator that tracks the focused route, hands the custom bar
+// the same props the real one does, and - like the real one - keeps every visited screen mounted,
+// telling each whether it is focused. Tests prove App's wiring against them, not the real
+// library's rendering; that is checked on a device (DEVICE_TESTS.md, 4.1).
+jest.mock('@react-navigation/native', () => {
+  const mockReact = require('react');
+  const FocusContext = mockReact.createContext(true);
+  return {
+    NavigationContainer: ({children}) => children,
+    DefaultTheme: {dark: false, colors: {}, fonts: {}},
+    useIsFocused: () => mockReact.useContext(FocusContext),
+    __FocusContext: FocusContext,
+  };
+});
+
+jest.mock('@react-navigation/bottom-tabs', () => {
+  const mockReact = require('react');
+  const {__FocusContext: FocusContext} = require('@react-navigation/native');
+
+  const Screen = () => null;
+
+  const Navigator = ({initialRouteName, tabBar, children}) => {
+    const screens = mockReact.Children.toArray(children).map(child => child.props);
+    const routes = screens.map(({name}) => ({key: `${name}-key`, name}));
+    const initialIndex = Math.max(0, routes.findIndex(route => route.name === initialRouteName));
+    const [index, setIndex] = mockReact.useState(initialIndex);
+    const [visited, setVisited] = mockReact.useState([initialIndex]);
+
+    const navigation = {
+      navigate: name => {
+        const next = routes.findIndex(route => route.name === name);
+        if (next === -1) throw new Error(`No tab named "${name}"`);
+        setIndex(next);
+        setVisited(seen => (seen.includes(next) ? seen : [...seen, next]));
+      },
+      emit: () => ({defaultPrevented: false}),
+    };
+
+    return mockReact.createElement(
+      mockReact.Fragment,
+      null,
+      ...screens.map((screen, i) =>
+        visited.includes(i)
+          ? mockReact.createElement(
+              FocusContext.Provider,
+              {key: routes[i].key, value: i === index},
+              screen.component
+                ? mockReact.createElement(screen.component, {navigation, route: routes[i]})
+                : screen.children({navigation, route: routes[i]}),
+            )
+          : null,
+      ),
+      tabBar ? tabBar({state: {index, routes}, descriptors: {}, navigation}) : null,
+    );
+  };
+
+  return {createBottomTabNavigator: () => ({Navigator, Screen})};
+});
+
+// Only the first screen of a stack is ever on top in these tests; nothing pushes yet.
+jest.mock('@react-navigation/native-stack', () => {
+  const mockReact = require('react');
+  const Screen = () => null;
+  const Navigator = ({children}) => {
+    const first = mockReact.Children.toArray(children)[0].props;
+    const props = {navigation: {navigate: () => {}}, route: {key: `${first.name}-key`, name: first.name}};
+    return first.component ? mockReact.createElement(first.component, props) : first.children(props);
+  };
+  return {createNativeStackNavigator: () => ({Navigator, Screen})};
+});

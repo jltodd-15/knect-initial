@@ -89,13 +89,12 @@ const stubComponent = (label: string) => () => {
 };
 jest.mock('../components/Navigation', () => ({
   __esModule: true,
-  default: ({setActiveTab}: {setActiveTab: (tab: string) => void}) => {
+  default: ({navigation}: {navigation: {navigate: (tab: string) => void}}) => {
     const mockReact = require('react');
     const {TouchableOpacity, Text} = require('react-native');
-    const {AppTab} = require('../types');
     return mockReact.createElement(
       TouchableOpacity,
-      {onPress: () => setActiveTab(AppTab.PROFILE)},
+      {onPress: () => navigation.navigate('Profile')},
       mockReact.createElement(Text, null, 'GO TO PROFILE TAB'),
     );
   },
