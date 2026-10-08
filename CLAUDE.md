@@ -61,9 +61,11 @@ call, is awaited.
 ## Styling
 
 - Colors, type sizes, spacing and radius are defined once, in `theme/tokens.ts`, and read through
-  `useTheme()`. The three shared states (skeleton, empty, error) are in `components/shared/`. Planner,
-  the create-event modal and Circle have not been moved onto them yet and still take an
-  `isDarkMode` prop (ticket 4.2 is in progress).
+  `useTheme()`. The three shared states (skeleton, empty, error) are in `components/shared/`. Circle
+  (`SocialDashboard.tsx`) has not been moved onto them yet and still takes an `isDarkMode` prop
+  (ticket 4.2 is in progress).
+- The six colors a user can pick for an event are `eventColors` in `theme/tokens.ts`. The picked
+  value is stored on the event, so they are not theme tokens and are the same in light and dark.
 - Primary green is `#10b981` (emerald-500). `emerald-600` / `#059669` exists only as the
   `primaryPressed` token, for a pressed state — never as a button's resting color.
 - Grays are Tailwind zinc. The iOS system grays (`#8e8e93`, `#1c1c1e`, `#2c2c2e`, `#f2f2f7`) are

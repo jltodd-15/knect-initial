@@ -1,13 +1,16 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, LayoutAnimation, Platform, UIManager, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Platform, UIManager, TouchableWithoutFeedback } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
-import { CalendarEvent, Friend, DiscoveryItem } from '../types';
+import { CalendarEvent, DiscoveryItem } from '../types';
 import CreateEventModal from './CreateEventModal';
 import { calculateEventLayouts } from '../utils/calendarLayout';
 import DraggableEvent from './DraggableEvent';
 import { ChatService } from '../services/ChatService';
 import { statusService } from '../services/StatusService';
 import { MOCK_FRIENDS } from '../constants';
+import { Theme } from '../theme/ThemeProvider';
+import { useTheme } from '../theme/useTheme';
+import { eventColors } from '../theme/tokens';
 
 // Enable LayoutAnimation on Android
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -15,7 +18,6 @@ if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental
 }
 
 interface Props { 
-    isDarkMode: boolean;
     initialProposal?: DiscoveryItem | null;
     initialParticipants?: string[];
 }
@@ -24,8 +26,10 @@ const HOURS = Array.from({ length: 25 }, (_, i) => i);
 const SLOT_HEIGHT = 80; 
 const INITIAL_NOW = new Date();
 
-const EventPlanner: React.FC<Props> = ({ isDarkMode, initialProposal, initialParticipants }) => {
-  const styles = getStyles(isDarkMode);
+const EventPlanner: React.FC<Props> = ({ initialProposal, initialParticipants }) => {
+  const theme = useTheme();
+  const { colors, spacing } = theme;
+  const styles = useMemo(() => getStyles(theme), [theme]);
   const [viewMode, setViewMode] = useState<'week' | 'month'>('week');
   const [showViewDropdown, setShowViewDropdown] = useState(false);
   const [showCreate, setShowCreate] = useState(false);
@@ -60,7 +64,7 @@ const EventPlanner: React.FC<Props> = ({ isDarkMode, initialProposal, initialPar
               endTime: now.getTime() + (2 * 60 * 60 * 1000), // 2 hours default
               type: 'group',
               participants: [],
-              color: '#10b981',
+              color: eventColors[0],
               status: 'proposed',
               isAllDay: false
           };
@@ -83,7 +87,7 @@ const EventPlanner: React.FC<Props> = ({ isDarkMode, initialProposal, initialPar
         type: 'personal', // Changed to personal since no participants
         location: 'TBD', 
         participants: [], 
-        color: '#10b981',
+        color: eventColors[0],
         status: 'confirmed', // Changed to confirmed
         isAllDay: false
     }];
@@ -249,7 +253,7 @@ const EventPlanner: React.FC<Props> = ({ isDarkMode, initialProposal, initialPar
                             style={[styles.monthCell, isSelected && styles.monthCellSelected]}
                             onPress={() => setSelectedDate(d)}
                         >
-                            <Text style={[styles.monthDateText, isSelected && {color: 'white'}]}>{d.getDate()}</Text>
+                            <Text style={[styles.monthDateText, isSelected && {color: colors.onPrimary}]}>{d.getDate()}</Text>
                             {hasEvent && !isSelected && <View style={styles.monthDot} />}
                         </TouchableOpacity>
                     )
@@ -367,7 +371,7 @@ const EventPlanner: React.FC<Props> = ({ isDarkMode, initialProposal, initialPar
                 <TouchableOpacity key={i} onPress={() => setSelectedDate(d)} style={styles.dayItem}>
                     <Text style={styles.dayName}>{['S','M','T','W','T','F','S'][d.getDay()]}</Text>
                     <View style={[styles.dayNumberContainer, active && styles.activeDayNumberContainer]}>
-                    <Text style={[styles.dayNumber, active && { color: 'white' }]}>{d.getDate()}</Text>
+                    <Text style={[styles.dayNumber, active && { color: colors.onPrimary }]}>{d.getDate()}</Text>
                     {active && <View style={styles.activeDot} />}
                     </View>
                 </TouchableOpacity>
@@ -384,7 +388,7 @@ const EventPlanner: React.FC<Props> = ({ isDarkMode, initialProposal, initialPar
                     {allDayRenderList.map(ev => (
                         <TouchableOpacity 
                             key={ev.id} 
-                            style={[styles.allDayEventRow, { backgroundColor: ev.color || '#10b981' }]}
+                            style={[styles.allDayEventRow, { backgroundColor: ev.color || colors.primary }]}
                             onPress={() => handleEventPress(ev)}
                         >
                             <Text style={styles.allDayEventText}>{ev.title}</Text>
@@ -465,27 +469,27 @@ const EventPlanner: React.FC<Props> = ({ isDarkMode, initialProposal, initialPar
             <Text style={styles.headerSubtitle}>{selectedDate.toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' }).toUpperCase()}</Text>
         </View>
 
-        <View style={{flexDirection:'row', alignItems:'center', gap: 12}}>
+        <View style={{flexDirection:'row', alignItems:'center', gap: spacing.md}}>
              <TouchableOpacity 
                 style={styles.viewSelectorBtn} 
                 onPress={() => setShowViewDropdown(!showViewDropdown)}
              >
                 <Text style={styles.viewSelectorText}>{viewMode === 'week' ? 'WEEK' : 'MONTH'}</Text>
-                <Svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={isDarkMode?'white':'black'} strokeWidth="3"><Path d="M6 9l6 6 6-6"/></Svg>
+                <Svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={colors.textPrimary} strokeWidth="3"><Path d="M6 9l6 6 6-6"/></Svg>
              </TouchableOpacity>
 
              <TouchableOpacity style={styles.addButton} onPress={() => { setEditingEvent(null); setShowCreate(true); }}>
-                <Svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3"><Path d="M12 5v14m-7-7h14" /></Svg>
+                <Svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke={colors.onPrimary} strokeWidth="3"><Path d="M12 5v14m-7-7h14" /></Svg>
              </TouchableOpacity>
         </View>
 
         {showViewDropdown && (
             <View style={styles.dropdown}>
                 <TouchableOpacity style={styles.dropdownItem} onPress={() => { setViewMode('week'); setShowViewDropdown(false); }}>
-                    <Text style={[styles.dropdownText, viewMode==='week' && {color:'#10b981'}]}>WEEKLY VIEW</Text>
+                    <Text style={[styles.dropdownText, viewMode==='week' && {color:colors.primary}]}>WEEKLY VIEW</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.dropdownItem} onPress={() => { setViewMode('month'); setShowViewDropdown(false); }}>
-                    <Text style={[styles.dropdownText, viewMode==='month' && {color:'#10b981'}]}>MONTHLY VIEW</Text>
+                    <Text style={[styles.dropdownText, viewMode==='month' && {color:colors.primary}]}>MONTHLY VIEW</Text>
                 </TouchableOpacity>
             </View>
         )}
@@ -497,34 +501,34 @@ const EventPlanner: React.FC<Props> = ({ isDarkMode, initialProposal, initialPar
       {popupEvent && (
         <View style={styles.popupOverlay}>
             <TouchableOpacity style={StyleSheet.absoluteFill} onPress={() => setPopupEvent(null)} />
-            <View style={[styles.popupCard, { backgroundColor: isDarkMode ? '#1E1E1E' : 'white' }]}>
+            <View style={[styles.popupCard, { backgroundColor: colors.surface }]}>
                 {/* Header with Color and Actions */}
-                <View style={[styles.popupHeader, { backgroundColor: popupEvent.event.color || '#10b981' }]}>
+                <View style={[styles.popupHeader, { backgroundColor: popupEvent.event.color || colors.primary }]}>
                     <View style={styles.popupHeaderActions}>
                          <TouchableOpacity onPress={() => {
                              handlePopupAction(); // Edit/Propose
                          }} style={styles.popupHeaderBtn}>
-                             <Svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><Path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><Path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></Svg>
+                             <Svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={colors.onPrimary} strokeWidth="2"><Path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><Path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></Svg>
                          </TouchableOpacity>
                          <TouchableOpacity onPress={() => handleDeleteEvent(popupEvent.event.id)} style={styles.popupHeaderBtn}>
-                             <Svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><Path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></Svg>
+                             <Svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={colors.onPrimary} strokeWidth="2"><Path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></Svg>
                          </TouchableOpacity>
                          <TouchableOpacity onPress={() => setPopupEvent(null)} style={styles.popupHeaderBtn}>
-                             <Svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><Path d="M18 6L6 18M6 6l12 12"/></Svg>
+                             <Svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={colors.onPrimary} strokeWidth="2"><Path d="M18 6L6 18M6 6l12 12"/></Svg>
                          </TouchableOpacity>
                     </View>
                 </View>
 
                 <View style={styles.popupContent}>
-                    <Text style={[styles.popupTitle, { color: isDarkMode ? 'white' : '#333' }]}>{popupEvent.event.title}</Text>
+                    <Text style={[styles.popupTitle, { color: colors.textPrimary }]}>{popupEvent.event.title}</Text>
                     
                     {/* Time */}
                     <View style={styles.popupRow}>
-                        <Svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={isDarkMode ? '#ccc' : '#555'} strokeWidth="2" style={{marginRight: 12, marginTop: 2}}>
+                        <Svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={colors.textSecondary} strokeWidth="2" style={{marginRight: spacing.md, marginTop: spacing.xs}}>
                             <Path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" />
                             <Path d="M12 6v6l4 2" />
                         </Svg>
-                        <Text style={[styles.popupTime, { color: isDarkMode ? '#ccc' : '#555' }]}>
+                        <Text style={[styles.popupTime, { color: colors.textSecondary }]}>
                             {new Date(popupEvent.event.timestamp).toLocaleDateString(undefined, {weekday: 'long', month: 'long', day: 'numeric'})} ⋅ {new Date(popupEvent.event.timestamp).toLocaleTimeString([], {hour:'numeric', minute:'2-digit'})} - {new Date(popupEvent.event.endTime).toLocaleTimeString([], {hour:'numeric', minute:'2-digit'})}
                         </Text>
                     </View>
@@ -532,24 +536,24 @@ const EventPlanner: React.FC<Props> = ({ isDarkMode, initialProposal, initialPar
                     {/* Location */}
                     {popupEvent.event.location ? (
                         <View style={styles.popupRow}>
-                            <Svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={isDarkMode ? '#aaa' : '#777'} strokeWidth="2" style={{marginRight: 12, marginTop: 2}}>
+                            <Svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={colors.textSecondary} strokeWidth="2" style={{marginRight: spacing.md, marginTop: spacing.xs}}>
                                 <Path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
                                 <Path d="M12 10a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" />
                             </Svg>
-                            <Text style={[styles.popupLocation, { color: isDarkMode ? '#aaa' : '#777' }]}>{popupEvent.event.location}</Text>
+                            <Text style={[styles.popupLocation, { color: colors.textSecondary }]}>{popupEvent.event.location}</Text>
                         </View>
                     ) : null}
 
                     {/* Participants */}
                     <View style={styles.popupRow}>
-                        <Svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={isDarkMode ? '#aaa' : '#777'} strokeWidth="2" style={{marginRight: 12, marginTop: 2}}>
+                        <Svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={colors.textSecondary} strokeWidth="2" style={{marginRight: spacing.md, marginTop: spacing.xs}}>
                             <Path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
                             <Path d="M9 7a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" />
                             <Path d="M23 21v-2a4 4 0 0 0-3-3.87" />
                             <Path d="M16 3.13a4 4 0 0 1 0 7.75" />
                         </Svg>
                         <View>
-                            <Text style={[styles.popupSectionTitle, { color: isDarkMode ? '#aaa' : '#777' }]}>
+                            <Text style={[styles.popupSectionTitle, { color: colors.textSecondary }]}>
                                 {popupEvent.event.participants?.length || 0} guests
                             </Text>
                             <View style={styles.popupAttendees}>
@@ -559,15 +563,15 @@ const EventPlanner: React.FC<Props> = ({ isDarkMode, initialProposal, initialPar
                                     return (
                                         <View key={idx} style={styles.popupAttendeeRow}>
                                             <View style={styles.popupAttendeeDot} />
-                                            <Text style={[styles.popupAttendeeName, { color: isDarkMode ? '#ccc' : '#555' }]}>
+                                            <Text style={[styles.popupAttendeeName, { color: colors.textSecondary }]}>
                                                 {friend ? friend.name : `User ${pid}`}
                                             </Text>
                                         </View>
                                     );
                                 })}
                                 <View style={styles.popupAttendeeRow}>
-                                    <View style={[styles.popupAttendeeDot, { backgroundColor: '#10b981' }]} />
-                                    <Text style={[styles.popupAttendeeName, { color: isDarkMode ? '#ccc' : '#555' }]}>You (Organizer)</Text>
+                                    <View style={[styles.popupAttendeeDot, { backgroundColor: colors.primary }]} />
+                                    <Text style={[styles.popupAttendeeName, { color: colors.textSecondary }]}>You (Organizer)</Text>
                                 </View>
                             </View>
                         </View>
@@ -575,13 +579,13 @@ const EventPlanner: React.FC<Props> = ({ isDarkMode, initialProposal, initialPar
                     
                     {/* Description (Mock) */}
                     <View style={styles.popupRow}>
-                         <Svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={isDarkMode ? '#ccc' : '#555'} strokeWidth="2" style={{marginRight: 12, marginTop: 2}}>
+                         <Svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={colors.textSecondary} strokeWidth="2" style={{marginRight: spacing.md, marginTop: spacing.xs}}>
                              <Path d="M17 10H7" />
                              <Path d="M21 6H3" />
                              <Path d="M21 14H3" />
                              <Path d="M17 18H7" />
                          </Svg>
-                         <Text style={[styles.popupDescription, { color: isDarkMode ? '#ccc' : '#555' }]}>
+                         <Text style={[styles.popupDescription, { color: colors.textSecondary }]}>
                              No description provided.
                          </Text>
                     </View>
@@ -607,7 +611,6 @@ const EventPlanner: React.FC<Props> = ({ isDarkMode, initialProposal, initialPar
             setPopupEvent(null);
         }}
         onSave={handleCreateEvent}
-        isDarkMode={isDarkMode} 
         friends={MOCK_FRIENDS}
         initialStartTime={preselectedTime}
         initialEvent={editingEvent}
@@ -617,95 +620,95 @@ const EventPlanner: React.FC<Props> = ({ isDarkMode, initialProposal, initialPar
   );
 };
 
-const getStyles = (isDark: boolean) => StyleSheet.create({
-  container: { flex: 1, backgroundColor: isDark ? '#121212' : '#FDFCFB' },
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 24, paddingVertical: 12, zIndex: 10, backgroundColor: isDark ? '#121212' : '#FDFCFB' },
-  headerTitle: { fontSize: 32, fontWeight: '900', color: '#10b981', fontFamily: 'Inter' },
-  headerSubtitle: { fontSize: 10, fontWeight: '900', color: '#71717a', letterSpacing: 2, fontFamily: 'Inter', marginTop: 4 },
+const getStyles = ({ colors, typography, spacing, radius }: Theme) => StyleSheet.create({
+  container: { flex: 1, backgroundColor: colors.background },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: spacing.xl, paddingVertical: spacing.md, zIndex: 10, backgroundColor: colors.background },
+  headerTitle: { fontSize: typography.display.fontSize, fontWeight: '900', color: colors.primary, fontFamily: 'Inter' },
+  headerSubtitle: { fontSize: typography.micro.fontSize, fontWeight: '700', color: colors.textSecondary, letterSpacing: 2, fontFamily: 'Inter', marginTop: spacing.xs },
   
-  viewSelectorBtn: { flexDirection: 'row', alignItems: 'center', backgroundColor: isDark ? '#1E1E1E' : '#eee', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 24, gap: 8 },
-  viewSelectorText: { color: isDark ? 'white' : 'black', fontSize: 10, fontWeight: '900', letterSpacing: 0.5 },
+  viewSelectorBtn: { flexDirection: 'row', alignItems: 'center', backgroundColor: colors.surfaceAlt, paddingHorizontal: spacing.base, paddingVertical: spacing.md, borderRadius: radius.xl, gap: spacing.sm },
+  viewSelectorText: { color: colors.textPrimary, fontSize: typography.micro.fontSize, fontWeight: '700', letterSpacing: 0.5 },
   
-  addButton: { width: 48, height: 48, borderRadius: 16, backgroundColor: '#10b981', justifyContent: 'center', alignItems: 'center', shadowColor: 'black', shadowOpacity: 0.1, shadowRadius: 5, shadowOffset: { width: 0, height: 2 }, elevation: 2 },
+  addButton: { width: 48, height: 48, borderRadius: radius.lg, backgroundColor: colors.primary, justifyContent: 'center', alignItems: 'center', shadowColor: colors.shadow, shadowOpacity: 0.1, shadowRadius: 5, shadowOffset: { width: 0, height: 2 }, elevation: 2 },
 
-  dropdown: { position: 'absolute', top: 70, right: 24, backgroundColor: isDark ? '#1E1E1E' : '#FFFFFF', borderRadius: 24, padding: 8, shadowColor:'#000', shadowOpacity: 0.2, shadowRadius: 10, zIndex: 100, width: 160 },
-  dropdownItem: { padding: 16 },
-  dropdownText: { fontWeight: '900', color: isDark ? 'white' : 'black', fontFamily: 'Inter', fontSize: 12 },
+  dropdown: { position: 'absolute', top: 70, right: 24, backgroundColor: colors.surface, borderRadius: radius.xl, padding: spacing.sm, shadowColor:colors.shadow, shadowOpacity: 0.2, shadowRadius: 10, zIndex: 100, width: 160 },
+  dropdownItem: { padding: spacing.base },
+  dropdownText: { fontWeight: '700', color: colors.textPrimary, fontFamily: 'Inter', fontSize: typography.caption.fontSize },
 
-  weekStripContainer: { marginBottom: 20 },
-  weekStripContent: { flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 24 },
+  weekStripContainer: { marginBottom: spacing.lg },
+  weekStripContent: { flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: spacing.xl },
   dayItem: { alignItems: 'center', width: 44 },
-  dayName: { fontSize: 9, fontWeight: '900', color: '#71717a', marginBottom: 8, fontFamily: 'Inter' },
-  dayNumberContainer: { width: 44, height: 44, borderRadius: 16, backgroundColor: isDark ? '#1E1E1E' : '#FFFFFF', justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: isDark ? '#27272a' : '#e4e4e7' },
-  activeDayNumberContainer: { backgroundColor: '#10b981', borderColor: '#10b981' },
-  dayNumber: { fontSize: 16, fontWeight: '900', color: '#71717a', fontFamily: 'Inter' },
-  activeDot: { width: 4, height: 4, backgroundColor: 'white', borderRadius: 2, marginTop: 2 },
+  dayName: { fontSize: typography.micro.fontSize, fontWeight: '700', color: colors.textSecondary, marginBottom: spacing.sm, fontFamily: 'Inter' },
+  dayNumberContainer: { width: 44, height: 44, borderRadius: radius.lg, backgroundColor: colors.surface, justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: colors.border },
+  activeDayNumberContainer: { backgroundColor: colors.primary, borderColor: colors.primary },
+  dayNumber: { fontSize: typography.body.fontSize, fontWeight: '700', color: colors.textSecondary, fontFamily: 'Inter' },
+  activeDot: { width: 4, height: 4, backgroundColor: colors.onPrimary, borderRadius: radius.pill, marginTop: spacing.xs },
   
-  allDayContainer: { paddingHorizontal: 24, marginBottom: 16, flexDirection: 'column' },
-  allDayLabel: { fontSize: 10, fontWeight: '900', color: '#52525b', fontFamily: 'Inter', marginBottom: 8 },
-  allDayEventsList: { gap: 4 },
-  allDayEventRow: { width: '100%', paddingHorizontal: 12, paddingVertical: 12, borderRadius: 12 },
-  allDayEventText: { color: 'white', fontSize: 13, fontWeight: 'bold', fontFamily: 'Inter' },
+  allDayContainer: { paddingHorizontal: spacing.xl, marginBottom: spacing.base, flexDirection: 'column' },
+  allDayLabel: { fontSize: typography.micro.fontSize, fontWeight: '700', color: colors.textSecondary, fontFamily: 'Inter', marginBottom: spacing.sm },
+  allDayEventsList: { gap: spacing.xs },
+  allDayEventRow: { width: '100%', paddingHorizontal: spacing.md, paddingVertical: spacing.md, borderRadius: radius.md },
+  allDayEventText: { color: colors.onPrimary, fontSize: typography.label.fontSize, fontWeight: '700', fontFamily: 'Inter' },
 
   agenda: { flex: 1 },
   gridContainer: { flexDirection: 'row' },
-  timeColumn: { width: 60, borderRightWidth: 1, borderColor: isDark ? '#27272a' : '#f4f4f5' },
+  timeColumn: { width: 60, borderRightWidth: 1, borderColor: colors.border },
   timeLabelContainer: { height: SLOT_HEIGHT, justifyContent: 'flex-start', alignItems: 'center', paddingTop: 0, transform: [{translateY: -6}] },
-  timeLabel: { fontSize: 10, fontWeight: '900', color: '#52525b', fontFamily: 'Inter' },
+  timeLabel: { fontSize: typography.micro.fontSize, fontWeight: '700', color: colors.textSecondary, fontFamily: 'Inter' },
   eventsColumn: { flex: 1, position: 'relative' },
-  gridSlot: { height: SLOT_HEIGHT, borderBottomWidth: 1, borderColor: isDark ? '#1E1E1E' : '#fafafa' },
+  gridSlot: { height: SLOT_HEIGHT, borderBottomWidth: 1, borderColor: colors.surfaceAlt },
   
-  nowLine: { position: 'absolute', left: 0, right: 0, height: 2, backgroundColor: '#10b981', zIndex: 10 },
-  nowDot: { position: 'absolute', left: -4, top: -3, width: 8, height: 8, borderRadius: 4, backgroundColor: '#10b981' },
+  nowLine: { position: 'absolute', left: 0, right: 0, height: 2, backgroundColor: colors.primary, zIndex: 10 },
+  nowDot: { position: 'absolute', left: -4, top: -3, width: 8, height: 8, borderRadius: radius.pill, backgroundColor: colors.primary },
   
-  eventCard: { position: 'absolute', left: 10, right: 10, borderRadius: 24, padding: 20, borderWidth: 2, borderColor: '#10b981', borderStyle: 'dashed', backgroundColor: isDark ? '#121212' : '#f0fdf4', height: 160 },
-  eventTitle: { color: '#10b981', fontWeight: '900', fontSize: 14, fontFamily: 'Inter' },
-  eventStatus: { color: '#10b981', fontSize: 9, fontWeight: '900' },
-  eventTime: { color: '#34d399', fontSize: 10, fontWeight: 'bold', marginTop: 4 },
+  eventCard: { position: 'absolute', left: 10, right: 10, borderRadius: radius.xl, padding: spacing.lg, borderWidth: 2, borderColor: colors.primary, borderStyle: 'dashed', backgroundColor: colors.primarySurface, height: 160 },
+  eventTitle: { color: colors.primary, fontWeight: '700', fontSize: typography.label.fontSize, fontFamily: 'Inter' },
+  eventStatus: { color: colors.primary, fontSize: typography.micro.fontSize, fontWeight: '700' },
+  eventTime: { color: colors.primary, fontSize: typography.micro.fontSize, fontWeight: '700', marginTop: spacing.xs },
 
   // Month View Styles
   monthContainer: { flex: 1 },
-  monthBlock: { marginBottom: 32, paddingHorizontal: 24 },
-  monthBlockTitle: { fontSize: 14, fontWeight: '900', color: isDark ? 'white' : 'black', marginBottom: 16, fontFamily: 'Inter', letterSpacing: 1 },
-  monthHeaderRow: { flexDirection: 'row', marginBottom: 12 },
-  monthHeaderDay: { width: '14.28%', textAlign: 'center', fontSize: 10, fontWeight: '900', color: '#71717a', fontFamily: 'Inter' },
+  monthBlock: { marginBottom: spacing['2xl'], paddingHorizontal: spacing.xl },
+  monthBlockTitle: { fontSize: typography.label.fontSize, fontWeight: '700', color: colors.textPrimary, marginBottom: spacing.base, fontFamily: 'Inter', letterSpacing: 1 },
+  monthHeaderRow: { flexDirection: 'row', marginBottom: spacing.md },
+  monthHeaderDay: { width: '14.28%', textAlign: 'center', fontSize: typography.micro.fontSize, fontWeight: '700', color: colors.textSecondary, fontFamily: 'Inter' },
   monthGrid: { flexDirection: 'row', flexWrap: 'wrap' },
-  monthCell: { width: '14.28%', aspectRatio: 1, justifyContent: 'center', alignItems: 'center', marginBottom: 8, borderRadius: 12 },
-  monthCellSelected: { backgroundColor: '#10b981' },
-  monthDateText: { fontSize: 14, fontWeight: 'bold', color: isDark ? '#ccc' : '#333', fontFamily: 'Inter' },
-  monthDot: { width: 4, height: 4, borderRadius: 2, backgroundColor: '#10b981', marginTop: 4 },
+  monthCell: { width: '14.28%', aspectRatio: 1, justifyContent: 'center', alignItems: 'center', marginBottom: spacing.sm, borderRadius: radius.md },
+  monthCellSelected: { backgroundColor: colors.primary },
+  monthDateText: { fontSize: typography.label.fontSize, fontWeight: '700', color: colors.textPrimary, fontFamily: 'Inter' },
+  monthDot: { width: 4, height: 4, borderRadius: radius.pill, backgroundColor: colors.primary, marginTop: spacing.xs },
 
   // Popup Styles
-  popupOverlay: { ...StyleSheet.absoluteFillObject, justifyContent: 'center', alignItems: 'center', zIndex: 200, backgroundColor: 'rgba(0,0,0,0.4)' },
-  popupCard: { width: '85%', borderRadius: 16, overflow: 'hidden', shadowColor: "#000", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 10 },
-  popupHeader: { padding: 16, height: 60, justifyContent: 'center' },
-  popupHeaderActions: { flexDirection: 'row', justifyContent: 'flex-end', gap: 16 },
-  popupHeaderBtn: { padding: 4 },
+  popupOverlay: { ...StyleSheet.absoluteFillObject, justifyContent: 'center', alignItems: 'center', zIndex: 200, backgroundColor: colors.scrim },
+  popupCard: { width: '85%', borderRadius: radius.lg, overflow: 'hidden', shadowColor: colors.shadow, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 10 },
+  popupHeader: { padding: spacing.base, height: 60, justifyContent: 'center' },
+  popupHeaderActions: { flexDirection: 'row', justifyContent: 'flex-end', gap: spacing.base },
+  popupHeaderBtn: { padding: spacing.xs },
   
-  popupContent: { padding: 24 },
-  popupTitle: { fontSize: 22, fontWeight: 'bold', fontFamily: 'Inter', marginBottom: 16 },
+  popupContent: { padding: spacing.xl },
+  popupTitle: { fontSize: typography.title.fontSize, fontWeight: '700', fontFamily: 'Inter', marginBottom: spacing.base },
   
-  popupRow: { flexDirection: 'row', marginBottom: 16, alignItems: 'flex-start' },
-  popupIconPlaceholder: { width: 24, marginRight: 12 }, // For alignment if needed
-  popupRowIcon: { fontSize: 16, width: 24, marginRight: 12, textAlign: 'center' },
+  popupRow: { flexDirection: 'row', marginBottom: spacing.base, alignItems: 'flex-start' },
+  popupIconPlaceholder: { width: 24, marginRight: spacing.md }, // For alignment if needed
+  popupRowIcon: { fontSize: typography.body.fontSize, width: 24, marginRight: spacing.md, textAlign: 'center' },
   
-  popupTime: { fontSize: 14, fontFamily: 'Inter', flex: 1, lineHeight: 20 },
-  popupLocation: { fontSize: 14, fontFamily: 'Inter', flex: 1, lineHeight: 20 },
+  popupTime: { fontSize: typography.label.fontSize, fontFamily: 'Inter', flex: 1, lineHeight: 20 },
+  popupLocation: { fontSize: typography.label.fontSize, fontFamily: 'Inter', flex: 1, lineHeight: 20 },
   
-  popupSectionTitle: { fontSize: 12, fontWeight: '600', marginBottom: 8, fontFamily: 'Inter' },
-  popupAttendees: { gap: 8 },
-  popupAttendeeRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  popupAttendeeDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: '#ccc' },
-  popupAttendeeName: { fontSize: 13, fontFamily: 'Inter' },
+  popupSectionTitle: { fontSize: typography.caption.fontSize, fontWeight: '600', marginBottom: spacing.sm, fontFamily: 'Inter' },
+  popupAttendees: { gap: spacing.sm },
+  popupAttendeeRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
+  popupAttendeeDot: { width: 8, height: 8, borderRadius: radius.pill, backgroundColor: colors.border },
+  popupAttendeeName: { fontSize: typography.label.fontSize, fontFamily: 'Inter' },
   
-  popupDescription: { fontSize: 14, fontFamily: 'Inter', lineHeight: 20, flex: 1 },
+  popupDescription: { fontSize: typography.label.fontSize, fontFamily: 'Inter', lineHeight: 20, flex: 1 },
   
-  popupButton: { paddingVertical: 12, borderRadius: 8, alignItems: 'center', marginTop: 24 },
-  popupButtonText: { color: 'white', fontWeight: 'bold', fontSize: 14, fontFamily: 'Inter' },
+  popupButton: { paddingVertical: spacing.md, borderRadius: radius.sm, alignItems: 'center', marginTop: spacing.xl },
+  popupButtonText: { color: colors.onPrimary, fontWeight: '700', fontSize: typography.label.fontSize, fontFamily: 'Inter' },
 
   // Toast
-  toastContainer: { position: 'absolute', bottom: 100, left: '20%', right: '20%', backgroundColor: 'rgba(0,0,0,0.8)', padding: 12, borderRadius: 24, alignItems: 'center', zIndex: 300 },
-  toastText: { color: 'white', fontSize: 12, fontWeight: '600', fontFamily: 'Inter', textAlign: 'center' },
+  toastContainer: { position: 'absolute', bottom: 100, left: '20%', right: '20%', backgroundColor: colors.scrim, padding: spacing.md, borderRadius: radius.xl, alignItems: 'center', zIndex: 300 },
+  toastText: { color: colors.onPrimary, fontSize: typography.caption.fontSize, fontWeight: '600', fontFamily: 'Inter', textAlign: 'center' },
 });
 
 export default EventPlanner;

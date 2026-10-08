@@ -121,7 +121,40 @@ moved by a point or two.
 - [ ] **A spot's detail sheet.** Tap VIEW SPOT: photo, round dark ✕ button, title, description,
   LOCATION and PRICE rows, and the green PLAN THIS ACTIVITY button. 📸
 
-### Session E: Planner, create-event modal — not built yet
+### Session E: Planner, create-event modal — ready
+
+**Planner tab**
+- [ ] **Week view.** Green "Planner"-style title, the gray line under it, the view button and the
+  green **+** square. The week strip: today's number in a green square with white text, the rest
+  in outlined squares. The hour grid with faint lines and gray hour labels, and the green "now"
+  line. 📸
+- [ ] **Events on the grid.** A confirmed event is a solid block in its own color with white text. A
+  proposed one is a dashed outline in its color. 📸 with at least one of each if you can.
+- [ ] **View menu.** Tap the view button: a small card drops down with WEEKLY VIEW / MONTHLY VIEW,
+  the current one in green. 📸
+- [ ] **Month view.** Month titles, weekday letters, dates; the selected date in a green rounded
+  square with white text; green dots under days that have events. 📸
+- [ ] **Event popup.** Tap an event: a card over a dimmed screen, with a header band in the
+  event's color (white icons), the title, time, location, attendees and description in gray. 📸
+- [ ] **Toast.** Try to drag a multi-day event: a small dark message appears near the bottom. It
+  is **more see-through than before** (50% black instead of 80%). Say if the white text is hard
+  to read over the screen behind it. 📸
+
+**Create-event modal (tap +)**
+- [ ] **Main step.** Big title field, then cards for friends, all-day, start/end, location and
+  color. Cards are white on off-white (light) or dark gray on near-black (dark). 📸
+- [ ] **The six colors.** The color row shows the same six as before, in the same order: green,
+  blue, purple, pink, orange, yellow. The picked one has a ring and a white tick. Pick blue, save,
+  and the event on the Planner is blue. 📸
+- [ ] **All-day switch.** Off: gray track. On: the track takes the event's color. White thumb.
+- [ ] **Save button.** With no title it is gray with dim text; with a title and a time it takes
+  the event's color with white text. 📸 of both.
+- [ ] **Friends step.** Search box, friend rows; a picked friend's row is green with white text
+  and a white tick circle; a busy friend's row is pale red (light) or deep red (dark) with red
+  text. 📸
+- [ ] **Date step.** Month header with arrows, the grid of dates, the picked date in green. 📸
+- [ ] **Time step.** Hour rows; the open one is green with white text and shows the minute
+  buttons under it; a clashing hour is pale/deep red with a small red "conflict" badge. 📸
 
 ### Session F: Circle and the chat thread — not built yet
 

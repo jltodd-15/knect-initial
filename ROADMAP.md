@@ -50,7 +50,7 @@ is fine well ahead of time, invented implementation detail isn't.
   - *Built (4.1), not yet device-tested:* the signed-in app is a root stack holding five tabs (Planner, Discover, Search, Circle, Profile). Search is a placeholder. Checks are in `DEVICE_TESTS.md`.
   - *Tests run against a stand-in* for React Navigation (`jest.setup.js`), not the library itself: it ships in a format this Jest config doesn't load, and `jest.config.js` wasn't 4.1's to change. ❓ no ticket owns loading the real library in tests.
 - [ ] 4.2 — Styling, theming & dark mode
-  - *Sessions A–D of six built (4.2), not yet device-tested:* the theme (`theme/`), the three shared states (`components/shared/`), and the sweep of `App.tsx`, the tab bar, Search, the small components, onboarding, Profile and Discover. The app follows the phone's dark mode, the two launch waits show the "Kn" logo, and Discover loads with skeleton cards. Still to sweep: Planner and the create-event modal (E), Circle (F). Checks are in `DEVICE_TESTS.md`.
+  - *Sessions A–E of six built (4.2), not yet device-tested:* the theme (`theme/`), the three shared states (`components/shared/`), and the sweep of every screen except Circle (`SocialDashboard.tsx`, session F). The app follows the phone's dark mode, the two launch waits show the "Kn" logo, Discover loads with skeleton cards, and the six event colors live in `theme/tokens.ts` as `eventColors`. Checks are in `DEVICE_TESTS.md`.
 - [ ] 4.3 — Search tab contents
   - *Uses `components/InitialsAvatar.tsx`* (from 1.4) for any person with no uploaded picture, or who no longer exists ("Deleted user"). Don't build a second placeholder.
 - [ ] 4.4 — Friends widgets

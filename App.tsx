@@ -484,7 +484,6 @@ const AppContent: React.FC = () => {
                   {() => (
                     <FocusedOnly>
                       <EventPlanner
-                          isDarkMode={isDarkMode}
                           initialProposal={pendingDiscoveryItem}
                           initialParticipants={pendingParticipants}
                       />

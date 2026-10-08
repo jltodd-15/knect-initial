@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { View, Text, Modal, TextInput, TouchableOpacity, StyleSheet, Switch, Image, ScrollView, LayoutAnimation, Platform, UIManager } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import { useEventCreation } from '../hooks/useEventCreation';
 import { Friend, CalendarEvent } from '../types';
-import { ChatService } from '../services/ChatService';
+import { Theme } from '../theme/ThemeProvider';
+import { useTheme } from '../theme/useTheme';
+import { eventColors } from '../theme/tokens';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -13,18 +15,20 @@ interface Props {
   visible: boolean;
   onClose: () => void;
   onSave: (event: CalendarEvent) => void;
-  isDarkMode: boolean;
   friends: Friend[];
   initialStartTime?: number | null;
   initialEvent?: CalendarEvent | null;
   initialParticipants?: string[];
 }
 
-const COLORS = ['#10b981', '#3b82f6', '#8b5cf6', '#ec4899', '#f97316', '#eab308'];
+// A new event starts on the first of the event colors.
+const DEFAULT_EVENT_COLOR = eventColors[0];
 const HOURS = Array.from({ length: 24 }, (_, i) => i);
 
-const CreateEventModal: React.FC<Props> = ({ visible, onClose, onSave, isDarkMode, friends, initialStartTime, initialEvent, initialParticipants }) => {
-  const styles = getStyles(isDarkMode);
+const CreateEventModal: React.FC<Props> = ({ visible, onClose, onSave, friends, initialStartTime, initialEvent, initialParticipants }) => {
+  const theme = useTheme();
+  const { colors, spacing } = theme;
+  const styles = useMemo(() => getStyles(theme), [theme]);
   
   // Local state for calendar navigation and accordion
   const [viewingDate, setViewingDate] = useState(new Date());
@@ -56,7 +60,7 @@ const CreateEventModal: React.FC<Props> = ({ visible, onClose, onSave, isDarkMod
             setSelectedFriends(initialEvent.participants || []);
             setPickedStartTime(initialEvent.timestamp);
             setPickedEndTime(initialEvent.endTime);
-            setColor(initialEvent.color || '#10b981');
+            setColor(initialEvent.color || DEFAULT_EVENT_COLOR);
             setViewingDate(new Date(initialEvent.timestamp));
         } else if (initialStartTime) {
             // Reset fields for new event
@@ -64,7 +68,7 @@ const CreateEventModal: React.FC<Props> = ({ visible, onClose, onSave, isDarkMod
             setLocation('');
             setIsAllDay(false);
             setSelectedFriends(initialParticipants || []);
-            setColor('#10b981');
+            setColor(DEFAULT_EVENT_COLOR);
             
             setPickedStartTime(initialStartTime);
             setPickedEndTime(initialStartTime + 3600000); // 1 hour default
@@ -75,7 +79,7 @@ const CreateEventModal: React.FC<Props> = ({ visible, onClose, onSave, isDarkMod
             setLocation('');
             setIsAllDay(false);
             setSelectedFriends(initialParticipants || []);
-            setColor('#10b981');
+            setColor(DEFAULT_EVENT_COLOR);
             setPickedStartTime(null);
             setPickedEndTime(null);
             setViewingDate(new Date());
@@ -184,7 +188,7 @@ const CreateEventModal: React.FC<Props> = ({ visible, onClose, onSave, isDarkMod
         <TextInput 
             style={styles.titleInput}
             placeholder="Name your plan..."
-            placeholderTextColor={isDarkMode ? '#666' : '#999'}
+            placeholderTextColor={colors.placeholder}
             value={title}
             onChangeText={setTitle}
             multiline
@@ -208,27 +212,27 @@ const CreateEventModal: React.FC<Props> = ({ visible, onClose, onSave, isDarkMod
                         </View>
                     )}
                 </View>
-                <Svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={isDarkMode ? '#666' : '#ccc'} strokeWidth="2">
+                <Svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={colors.textSecondary} strokeWidth="2">
                     <Path d="M9 18l6-6-6-6" />
                 </Svg>
             </View>
         </TouchableOpacity>
 
-        <View style={[styles.card, { marginTop: 16 }]}>
+        <View style={[styles.card, { marginTop: spacing.base }]}>
             <View style={styles.cardRow}>
                 <Text style={styles.cardLabel}>ALL DAY</Text>
                 <Switch 
                     value={isAllDay} 
                     onValueChange={setIsAllDay}
-                    trackColor={{ false: isDarkMode ? '#333' : '#e4e4e7', true: color }}
-                    thumbColor={'white'}
+                    trackColor={{ false: colors.border, true: color }}
+                    thumbColor={colors.onPrimary}
                 />
             </View>
         </View>
 
         <View style={styles.timeRow}>
             <TouchableOpacity 
-                style={[styles.timeCard, { marginRight: 8 }]} 
+                style={[styles.timeCard, { marginRight: spacing.sm }]} 
                 onPress={() => {
                     setSelectionMode('start');
                     setStep('calendar');
@@ -240,7 +244,7 @@ const CreateEventModal: React.FC<Props> = ({ visible, onClose, onSave, isDarkMod
             </TouchableOpacity>
 
             <TouchableOpacity 
-                style={[styles.timeCard, { marginLeft: 8 }]}
+                style={[styles.timeCard, { marginLeft: spacing.sm }]}
                 onPress={() => {
                     setSelectionMode('end');
                     setStep('calendar');
@@ -252,28 +256,28 @@ const CreateEventModal: React.FC<Props> = ({ visible, onClose, onSave, isDarkMod
             </TouchableOpacity>
         </View>
 
-        <View style={[styles.card, { marginTop: 16 }]}>
+        <View style={[styles.card, { marginTop: spacing.base }]}>
             <Text style={styles.cardLabel}>LOCATION</Text>
             <TextInput 
                 style={styles.plainInput}
                 placeholder="Add location"
-                placeholderTextColor={isDarkMode ? '#666' : '#999'}
+                placeholderTextColor={colors.placeholder}
                 value={location}
                 onChangeText={setLocation}
             />
         </View>
 
-        <View style={[styles.card, { marginTop: 16 }]}>
-            <Text style={[styles.cardLabel, { marginBottom: 12 }]}>COLOR</Text>
+        <View style={[styles.card, { marginTop: spacing.base }]}>
+            <Text style={[styles.cardLabel, { marginBottom: spacing.md }]}>COLOR</Text>
             <View style={styles.colorRow}>
-                {COLORS.map(c => (
+                {eventColors.map(c => (
                     <TouchableOpacity 
                         key={c} 
                         style={[styles.colorCircle, { backgroundColor: c }, color === c && styles.colorSelected]}
                         onPress={() => setColor(c)}
                     >
                         {color === c && (
-                            <Svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="4">
+                            <Svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={colors.onPrimary} strokeWidth="4">
                                 <Path d="M20 6L9 17l-5-5" />
                             </Svg>
                         )}
@@ -292,13 +296,13 @@ const CreateEventModal: React.FC<Props> = ({ visible, onClose, onSave, isDarkMod
     return (
     <ScrollView style={styles.scrollContent} contentContainerStyle={{ paddingBottom: 100 }}>
         <View style={styles.searchContainer}>
-            <Svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={isDarkMode ? '#999' : '#666'} strokeWidth="2" style={{marginRight: 12}}>
+            <Svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={colors.textSecondary} strokeWidth="2" style={{marginRight: spacing.md}}>
                 <Path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </Svg>
             <TextInput
                 style={styles.searchInput}
                 placeholder="Search friends..."
-                placeholderTextColor={isDarkMode ? '#666' : '#999'}
+                placeholderTextColor={colors.placeholder}
                 value={friendSearch}
                 onChangeText={setFriendSearch}
             />
@@ -319,10 +323,10 @@ const CreateEventModal: React.FC<Props> = ({ visible, onClose, onSave, isDarkMod
             
             if (isSelected) {
                 rowStyle = [styles.friendRow, styles.friendRowSelected];
-                textStyle = [styles.friendName, { color: 'white' }];
+                textStyle = [styles.friendName, { color: colors.onPrimary }];
             } else if (isBusy) {
                 rowStyle = [styles.friendRow, styles.friendRowBusy];
-                textStyle = [styles.friendName, { color: isDarkMode ? '#fca5a5' : '#dc2626' }];
+                textStyle = [styles.friendName, { color: colors.danger }];
             }
 
             return (
@@ -343,7 +347,7 @@ const CreateEventModal: React.FC<Props> = ({ visible, onClose, onSave, isDarkMod
                     
                     {isSelected && (
                         <View style={styles.checkCircle}>
-                             <Svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="4">
+                             <Svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={colors.primary} strokeWidth="4">
                                 <Path d="M20 6L9 17l-5-5" />
                             </Svg>
                         </View>
@@ -376,13 +380,13 @@ const CreateEventModal: React.FC<Props> = ({ visible, onClose, onSave, isDarkMod
             {/* Calendar Header */}
             <View style={styles.calendarHeader}>
                 <TouchableOpacity onPress={() => changeMonth(-1)} style={styles.calNavBtn}>
-                     <Svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={isDarkMode ? "white" : "black"} strokeWidth="2"><Path d="M15 18l-6-6 6-6" /></Svg>
+                     <Svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={colors.textPrimary} strokeWidth="2"><Path d="M15 18l-6-6 6-6" /></Svg>
                 </TouchableOpacity>
                 <Text style={styles.calMonthTitle}>
                     {viewingDate.toLocaleDateString(undefined, { month: 'long', year: 'numeric' }).toUpperCase()}
                 </Text>
                 <TouchableOpacity onPress={() => changeMonth(1)} style={styles.calNavBtn}>
-                    <Svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={isDarkMode ? "white" : "black"} strokeWidth="2"><Path d="M9 18l6-6-6-6" /></Svg>
+                    <Svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={colors.textPrimary} strokeWidth="2"><Path d="M9 18l6-6-6-6" /></Svg>
                 </TouchableOpacity>
             </View>
 
@@ -409,7 +413,7 @@ const CreateEventModal: React.FC<Props> = ({ visible, onClose, onSave, isDarkMod
                             style={[styles.calCell, isSelected && styles.calCellSelected, { backgroundColor: isSelected ? color : 'transparent' }]}
                             onPress={() => handleDateSelect(d)}
                         >
-                            <Text style={[styles.calDateText, isSelected && { color: 'white' }]}>{d}</Text>
+                            <Text style={[styles.calDateText, isSelected && { color: colors.onPrimary }]}>{d}</Text>
                         </TouchableOpacity>
                     );
                 })}
@@ -446,9 +450,9 @@ const CreateEventModal: React.FC<Props> = ({ visible, onClose, onSave, isDarkMod
                             style={[styles.hourRow, isExpanded && styles.hourRowExpanded]}
                             onPress={() => toggleHourAccordion(h)}
                         >
-                             <Text style={[styles.hourText, isExpanded && { color: 'white' }]}>{hour12} {ampm}</Text>
+                             <Text style={[styles.hourText, isExpanded && { color: colors.onPrimary }]}>{hour12} {ampm}</Text>
                              {isExpanded && (
-                                 <Svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3">
+                                 <Svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={colors.onPrimary} strokeWidth="3">
                                      <Path d="M19 9l-7 7-7-7" />
                                  </Svg>
                              )}
@@ -486,11 +490,11 @@ const CreateEventModal: React.FC<Props> = ({ visible, onClose, onSave, isDarkMod
             <View style={styles.header}>
                 <TouchableOpacity onPress={handleHeaderBack} style={styles.closeBtn}>
                    {step === 'info' ? (
-                        <Svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={isDarkMode ? "white" : "black"} strokeWidth="2">
+                        <Svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={colors.textPrimary} strokeWidth="2">
                             <Path d="M18 6L6 18M6 6l12 12" />
                         </Svg>
                    ) : (
-                        <Svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={isDarkMode ? "white" : "black"} strokeWidth="2">
+                        <Svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={colors.textPrimary} strokeWidth="2">
                              <Path d="M15 18l-6-6 6-6" />
                         </Svg>
                    )}
@@ -513,11 +517,11 @@ const CreateEventModal: React.FC<Props> = ({ visible, onClose, onSave, isDarkMod
             {step === 'info' && (
                 <View style={styles.footer}>
                     <TouchableOpacity 
-                        style={[styles.saveBtn, { backgroundColor: (!title || !pickedStartTime) ? (isDarkMode ? '#333' : '#e4e4e7') : color }]}
+                        style={[styles.saveBtn, { backgroundColor: (!title || !pickedStartTime) ? colors.border : color }]}
                         disabled={!title || !pickedStartTime}
                         onPress={handleSave}
                     >
-                        <Text style={[styles.saveText, { color: (!title || !pickedStartTime) ? '#999' : 'white' }]}>
+                        <Text style={[styles.saveText, { color: (!title || !pickedStartTime) ? colors.textDisabled : colors.onPrimary }]}>
                             {selectedFriends.length > 0 ? 'PROPOSE EVENT' : 'CREATE EVENT'}
                         </Text>
                     </TouchableOpacity>
@@ -531,7 +535,7 @@ const CreateEventModal: React.FC<Props> = ({ visible, onClose, onSave, isDarkMod
                         style={[styles.saveBtn, { backgroundColor: color }]}
                         onPress={() => setStep('info')}
                     >
-                        <Text style={[styles.saveText, { color: 'white' }]}>
+                        <Text style={[styles.saveText, { color: colors.onPrimary }]}>
                             DONE
                         </Text>
                     </TouchableOpacity>
@@ -542,73 +546,73 @@ const CreateEventModal: React.FC<Props> = ({ visible, onClose, onSave, isDarkMod
   );
 };
 
-const getStyles = (isDark: boolean) => StyleSheet.create({
-  container: { flex: 1, backgroundColor: isDark ? '#121212' : '#FDFCFB' },
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 24, paddingVertical: 20 },
-  closeBtn: { padding: 4 },
-  headerTitle: { fontSize: 12, fontWeight: '900', color: isDark ? 'white' : 'black', letterSpacing: 1, fontFamily: 'Inter' },
+const getStyles = ({ colors, typography, spacing, radius }: Theme) => StyleSheet.create({
+  container: { flex: 1, backgroundColor: colors.background },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: spacing.xl, paddingVertical: spacing.lg },
+  closeBtn: { padding: spacing.xs },
+  headerTitle: { fontSize: typography.caption.fontSize, fontWeight: '700', color: colors.textPrimary, letterSpacing: 1, fontFamily: 'Inter' },
   
   content: { flex: 1 },
-  scrollContent: { padding: 24 },
+  scrollContent: { padding: spacing.xl },
   
-  titleInput: { fontSize: 32, fontWeight: '700', color: isDark ? 'white' : 'black', fontFamily: 'Inter', marginBottom: 32, padding: 0 },
+  titleInput: { fontSize: typography.display.fontSize, fontWeight: '700', color: colors.textPrimary, fontFamily: 'Inter', marginBottom: spacing['2xl'], padding: 0 },
   
-  card: { backgroundColor: isDark ? '#1E1E1E' : '#FFFFFF', borderRadius: 24, padding: 20, borderWidth: 1, borderColor: isDark ? '#333' : '#f4f4f5' },
+  card: { backgroundColor: colors.surface, borderRadius: radius.xl, padding: spacing.lg, borderWidth: 1, borderColor: colors.border },
   cardRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  cardLabel: { fontSize: 10, fontWeight: '900', color: '#71717a', letterSpacing: 1, fontFamily: 'Inter', marginBottom: 4 },
-  cardValue: { fontSize: 16, fontWeight: '600', color: isDark ? 'white' : 'black', fontFamily: 'Inter' },
+  cardLabel: { fontSize: typography.micro.fontSize, fontWeight: '700', color: colors.textSecondary, letterSpacing: 1, fontFamily: 'Inter', marginBottom: spacing.xs },
+  cardValue: { fontSize: typography.body.fontSize, fontWeight: '600', color: colors.textPrimary, fontFamily: 'Inter' },
   
-  avatarRow: { flexDirection: 'row', marginTop: 4 },
-  avatar: { width: 32, height: 32, borderRadius: 16, borderWidth: 2, borderColor: isDark ? '#1E1E1E' : '#FFFFFF' },
+  avatarRow: { flexDirection: 'row', marginTop: spacing.xs },
+  avatar: { width: 32, height: 32, borderRadius: radius.pill, borderWidth: 2, borderColor: colors.surface },
 
-  timeRow: { flexDirection: 'row', marginTop: 16 },
-  timeCard: { flex: 1, backgroundColor: isDark ? '#1E1E1E' : '#FFFFFF', borderRadius: 24, padding: 20, borderWidth: 1, borderColor: isDark ? '#333' : '#f4f4f5' },
-  timeValue: { fontSize: 16, fontWeight: '600', color: isDark ? 'white' : 'black', fontFamily: 'Inter', marginTop: 4 },
-  timeSubValue: { fontSize: 13, color: '#71717a', fontFamily: 'Inter', marginTop: 2 },
+  timeRow: { flexDirection: 'row', marginTop: spacing.base },
+  timeCard: { flex: 1, backgroundColor: colors.surface, borderRadius: radius.xl, padding: spacing.lg, borderWidth: 1, borderColor: colors.border },
+  timeValue: { fontSize: typography.body.fontSize, fontWeight: '600', color: colors.textPrimary, fontFamily: 'Inter', marginTop: spacing.xs },
+  timeSubValue: { fontSize: typography.label.fontSize, color: colors.textSecondary, fontFamily: 'Inter', marginTop: spacing.xs },
   
-  plainInput: { fontSize: 16, fontWeight: '600', color: isDark ? 'white' : 'black', fontFamily: 'Inter', padding: 0, marginTop: 4 },
+  plainInput: { fontSize: typography.body.fontSize, fontWeight: '600', color: colors.textPrimary, fontFamily: 'Inter', padding: 0, marginTop: spacing.xs },
   
-  colorRow: { flexDirection: 'row', gap: 12 },
-  colorCircle: { width: 32, height: 32, borderRadius: 16, justifyContent: 'center', alignItems: 'center' },
-  colorSelected: { borderWidth: 2, borderColor: isDark ? 'white' : 'black' },
+  colorRow: { flexDirection: 'row', gap: spacing.md },
+  colorCircle: { width: 32, height: 32, borderRadius: radius.pill, justifyContent: 'center', alignItems: 'center' },
+  colorSelected: { borderWidth: 2, borderColor: colors.textPrimary },
   
-  footer: { padding: 24, paddingTop: 12, backgroundColor: isDark ? '#121212' : '#FDFCFB', borderTopWidth: 1, borderColor: isDark ? '#27272a' : '#f4f4f5' },
-  saveBtn: { height: 56, borderRadius: 28, justifyContent: 'center', alignItems: 'center' },
-  saveText: { fontSize: 12, fontWeight: '900', letterSpacing: 1, fontFamily: 'Inter' },
+  footer: { padding: spacing.xl, paddingTop: spacing.md, backgroundColor: colors.background, borderTopWidth: 1, borderColor: colors.border },
+  saveBtn: { height: 56, borderRadius: radius.pill, justifyContent: 'center', alignItems: 'center' },
+  saveText: { fontSize: typography.caption.fontSize, fontWeight: '700', letterSpacing: 1, fontFamily: 'Inter' },
 
   // Friends Step Styles
-  searchContainer: { flexDirection: 'row', alignItems: 'center', backgroundColor: isDark ? '#1E1E1E' : '#f4f4f5', padding: 12, borderRadius: 16, marginBottom: 16, borderWidth: 1, borderColor: isDark ? '#333' : '#e4e4e7' },
-  searchInput: { flex: 1, fontSize: 14, color: isDark ? 'white' : 'black', fontFamily: 'Inter', fontWeight: '600' },
-  friendRow: { flexDirection: 'row', alignItems: 'center', padding: 16, borderRadius: 20, marginBottom: 12, backgroundColor: isDark ? '#1E1E1E' : '#FFFFFF', borderWidth: 1, borderColor: isDark ? '#333' : '#f4f4f5' },
-  friendRowSelected: { backgroundColor: '#10b981', borderColor: '#10b981' },
-  friendRowBusy: { backgroundColor: isDark ? 'rgba(127, 29, 29, 0.2)' : '#fef2f2', borderColor: isDark ? 'rgba(127, 29, 29, 0.4)' : '#fee2e2' },
-  friendAvatar: { width: 48, height: 48, borderRadius: 24, marginRight: 16 },
-  friendName: { fontSize: 14, fontWeight: 'bold', color: isDark ? 'white' : 'black', fontFamily: 'Inter' },
-  busyLabel: { fontSize: 10, fontWeight: '900', color: '#ef4444', marginTop: 4, letterSpacing: 0.5 },
-  checkCircle: { width: 24, height: 24, borderRadius: 12, backgroundColor: 'white', justifyContent: 'center', alignItems: 'center' },
+  searchContainer: { flexDirection: 'row', alignItems: 'center', backgroundColor: colors.surfaceAlt, padding: spacing.md, borderRadius: radius.lg, marginBottom: spacing.base, borderWidth: 1, borderColor: colors.border },
+  searchInput: { flex: 1, fontSize: typography.label.fontSize, color: colors.textPrimary, fontFamily: 'Inter', fontWeight: '600' },
+  friendRow: { flexDirection: 'row', alignItems: 'center', padding: spacing.base, borderRadius: radius.xl, marginBottom: spacing.md, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
+  friendRowSelected: { backgroundColor: colors.primary, borderColor: colors.primary },
+  friendRowBusy: { backgroundColor: colors.dangerSurface, borderColor: colors.dangerSurface },
+  friendAvatar: { width: 48, height: 48, borderRadius: radius.pill, marginRight: spacing.base },
+  friendName: { fontSize: typography.label.fontSize, fontWeight: '700', color: colors.textPrimary, fontFamily: 'Inter' },
+  busyLabel: { fontSize: typography.micro.fontSize, fontWeight: '700', color: colors.danger, marginTop: spacing.xs, letterSpacing: 0.5 },
+  checkCircle: { width: 24, height: 24, borderRadius: radius.pill, backgroundColor: colors.onPrimary, justifyContent: 'center', alignItems: 'center' },
 
   // Calendar Styles
-  calendarHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 },
-  calMonthTitle: { fontSize: 16, fontWeight: '900', color: isDark ? 'white' : 'black', fontFamily: 'Inter', letterSpacing: 1 },
-  calNavBtn: { padding: 8 },
-  weekRow: { flexDirection: 'row', marginBottom: 12 },
-  weekDayText: { width: '14.28%', textAlign: 'center', fontSize: 10, fontWeight: '900', color: '#71717a', fontFamily: 'Inter' },
+  calendarHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing.xl },
+  calMonthTitle: { fontSize: typography.body.fontSize, fontWeight: '700', color: colors.textPrimary, fontFamily: 'Inter', letterSpacing: 1 },
+  calNavBtn: { padding: spacing.sm },
+  weekRow: { flexDirection: 'row', marginBottom: spacing.md },
+  weekDayText: { width: '14.28%', textAlign: 'center', fontSize: typography.micro.fontSize, fontWeight: '700', color: colors.textSecondary, fontFamily: 'Inter' },
   calGrid: { flexDirection: 'row', flexWrap: 'wrap' },
-  calCell: { width: '14.28%', aspectRatio: 1, justifyContent: 'center', alignItems: 'center', marginBottom: 8, borderRadius: 12 },
-  calCellSelected: { backgroundColor: '#10b981' },
-  calDateText: { fontSize: 16, fontWeight: 'bold', color: isDark ? '#ccc' : '#333', fontFamily: 'Inter' },
+  calCell: { width: '14.28%', aspectRatio: 1, justifyContent: 'center', alignItems: 'center', marginBottom: spacing.sm, borderRadius: radius.md },
+  calCellSelected: { backgroundColor: colors.primary },
+  calDateText: { fontSize: typography.body.fontSize, fontWeight: '700', color: colors.textPrimary, fontFamily: 'Inter' },
 
   // Hours Styles
-  hourRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20, borderRadius: 16, marginBottom: 8, backgroundColor: isDark ? '#1E1E1E' : '#FFFFFF', borderWidth: 1, borderColor: isDark ? '#333' : '#f4f4f5' },
-  hourRowExpanded: { backgroundColor: '#10b981', borderColor: '#10b981' },
-  hourRowConflict: { backgroundColor: isDark ? 'rgba(127, 29, 29, 0.1)' : '#fef2f2', borderColor: isDark ? 'rgba(127, 29, 29, 0.2)' : '#fee2e2', opacity: 0.8 },
-  hourText: { fontSize: 16, fontWeight: 'bold', color: isDark ? 'white' : 'black', fontFamily: 'Inter' },
-  hourTextConflict: { color: isDark ? '#fca5a5' : '#dc2626' },
-  conflictBadge: { backgroundColor: isDark ? 'rgba(220, 38, 38, 0.2)' : '#fee2e2', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8 },
-  conflictText: { fontSize: 9, fontWeight: '900', color: '#dc2626' },
-  minuteContainer: { flexDirection: 'row', gap: 8, marginBottom: 16, paddingHorizontal: 4 },
-  minuteBtn: { flex: 1, backgroundColor: isDark ? '#27272a' : '#f4f4f5', padding: 12, borderRadius: 12, alignItems: 'center' },
-  minuteText: { fontSize: 14, fontWeight: 'bold', color: isDark ? 'white' : 'black', fontFamily: 'Inter' }
+  hourRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: spacing.lg, borderRadius: radius.lg, marginBottom: spacing.sm, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
+  hourRowExpanded: { backgroundColor: colors.primary, borderColor: colors.primary },
+  hourRowConflict: { backgroundColor: colors.dangerSurface, borderColor: colors.dangerSurface, opacity: 0.8 },
+  hourText: { fontSize: typography.body.fontSize, fontWeight: '700', color: colors.textPrimary, fontFamily: 'Inter' },
+  hourTextConflict: { color: colors.danger },
+  conflictBadge: { backgroundColor: colors.dangerSurface, paddingHorizontal: spacing.sm, paddingVertical: spacing.xs, borderRadius: radius.sm },
+  conflictText: { fontSize: typography.micro.fontSize, fontWeight: '700', color: colors.danger },
+  minuteContainer: { flexDirection: 'row', gap: spacing.sm, marginBottom: spacing.base, paddingHorizontal: spacing.xs },
+  minuteBtn: { flex: 1, backgroundColor: colors.surfaceAlt, padding: spacing.md, borderRadius: radius.md, alignItems: 'center' },
+  minuteText: { fontSize: typography.label.fontSize, fontWeight: '700', color: colors.textPrimary, fontFamily: 'Inter' }
 });
 
 export default CreateEventModal;
