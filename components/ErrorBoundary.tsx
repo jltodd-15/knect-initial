@@ -15,7 +15,6 @@ interface State {
 // ThemeProvider (index.js), so what it gets is the light theme.
 class ErrorBoundary extends Component<Props, State> {
   static contextType = ThemeContext;
-  declare context: Theme;
   props: Props;
   state: State = {
     hasError: false,
@@ -37,7 +36,7 @@ class ErrorBoundary extends Component<Props, State> {
 
   render() {
     if (this.state.hasError) {
-      const styles = getStyles(this.context);
+      const styles = getStyles(this.context as Theme);
       return (
         <View style={styles.container}>
           <Text style={styles.title}>Something went wrong.</Text>
