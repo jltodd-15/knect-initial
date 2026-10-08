@@ -57,6 +57,12 @@ jest.mock('../services/UsersRepository', () => ({
   UsersRepository: {createUserDocuments: jest.fn(async () => {})},
 }));
 
+// Ticket 4.3: the Search tab imports the user search, which imports the native Firestore module
+// too. No test here searches (see SearchTab.test.tsx), so cut that import chain off as well.
+jest.mock('../services/UserSearchService', () => ({
+  UserSearchService: {searchUsers: jest.fn(async () => [])},
+}));
+
 jest.mock('../hooks/useProfileCheck', () => ({
   checkUserProfileExists: jest.fn(async () => true),
   withTimeout: jest.fn((promise: Promise<unknown>) => promise),

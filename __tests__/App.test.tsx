@@ -14,6 +14,12 @@ jest.mock('../services/UsersRepository', () => ({
   UsersRepository: {createUserDocuments: jest.fn(async () => {})},
 }));
 
+// Ticket 4.3: the Search tab imports the user search, which imports the native Firestore module
+// too. No test here searches (see SearchTab.test.tsx), so cut that import chain off as well.
+jest.mock('../services/UserSearchService', () => ({
+  UserSearchService: {searchUsers: jest.fn(async () => [])},
+}));
+
 // Ticket 2.3: App now also imports hooks/useProfileCheck, which imports services/firestore (the
 // native Firestore initializer). None of these tests sign a user in (the shared auth mock doesn't
 // cascade onAuthStateChanged on success — see jest.setup.js), so the missing-profile read never

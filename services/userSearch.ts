@@ -20,6 +20,9 @@ export interface UserSearchResult {
 // leading one would match no stored name, and three of them are not a search.
 const normalize = (text: string): string => text.trim().toLowerCase();
 
+// The 3-character gate: anything shorter is not a search and costs no read.
+export const isSearchable = (text: string): boolean => normalize(text).length >= MIN_QUERY_LENGTH;
+
 // The range that covers every name_lowercase starting with what was typed: >= start, < end.
 // Prefix-only on purpose: "smith" does not find "John Smith".
 export const buildNameBounds = (text: string): {start: string; end: string} => {
@@ -44,7 +47,7 @@ export const createSearchScheduler = (
 
   const input = (text: string) => {
     cancel();
-    if (normalize(text).length < MIN_QUERY_LENGTH) {
+    if (!isSearchable(text)) {
       onBelowMinimum();
       return;
     }

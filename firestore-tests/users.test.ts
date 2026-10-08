@@ -8,11 +8,16 @@ import {
   RulesTestEnvironment,
 } from '@firebase/rules-unit-testing';
 import {
+  collection,
   deleteDoc,
   doc,
   getDoc,
+  getDocs,
+  limit,
+  query,
   setDoc,
   updateDoc,
+  where,
   writeBatch,
 } from 'firebase/firestore';
 
@@ -61,10 +66,29 @@ const signupPrivateInfoDoc = {
   fcm_tokens: [],
 };
 
+// The Search tab's read (ticket 4.3, services/UserSearchService.ts): a prefix range on the
+// stored name_lowercase field, limit 10.
+const nameSearch = (db: ReturnType<typeof as>, prefix: string) =>
+  getDocs(
+    query(
+      collection(db, 'Users'),
+      where('name_lowercase', '>=', prefix),
+      where('name_lowercase', '<', prefix + '\uf8ff'),
+      limit(10),
+    ),
+  );
+
 describe('allowed', () => {
   test("a signed-in user reads another user's Users document", async () => {
     await seed('Users/alice', signupUserDoc);
     await assertSucceeds(getDoc(doc(as('bob'), 'Users/alice')));
+  });
+
+  test('a signed-in user runs the name search range query on Users', async () => {
+    await seed('Users/alice', signupUserDoc);
+    await seed('Users/carol', { ...signupUserDoc, name: 'Carol', name_lowercase: 'carol' });
+    const snapshot = await assertSucceeds(nameSearch(as('bob'), 'ali'));
+    expect(snapshot.docs.map(d => d.id)).toEqual(['alice']);
   });
 
   test("signup's two-document batch from ticket 2.2 is accepted", async () => {
@@ -93,6 +117,12 @@ describe('denied', () => {
     await seed('Users/alice', signupUserDoc);
     const db = testEnv.unauthenticatedContext().firestore();
     await assertFails(getDoc(doc(db, 'Users/alice')));
+  });
+
+  test('an unauthenticated client runs the name search range query on Users', async () => {
+    await seed('Users/alice', signupUserDoc);
+    const db = testEnv.unauthenticatedContext().firestore();
+    await assertFails(nameSearch(db, 'ali'));
   });
 
   test("another user creates someone else's Users document", async () => {

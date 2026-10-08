@@ -14,6 +14,7 @@ import {
   createLatestTracker,
   createSearchScheduler,
   excludeSelf,
+  isSearchable,
 } from '../services/userSearch';
 
 beforeEach(() => {
@@ -34,6 +35,14 @@ test('the cost controls are the ticket\'s numbers', () => {
   expect(MIN_QUERY_LENGTH).toBe(3);
   expect(DEBOUNCE_MS).toBe(300);
   expect(RESULT_LIMIT).toBe(10);
+});
+
+test('the gate opens at 3 characters, not counting spaces around the text', () => {
+  expect(isSearchable('')).toBe(false);
+  expect(isSearchable('ky')).toBe(false);
+  expect(isSearchable(' ky ')).toBe(false);
+  expect(isSearchable('kys')).toBe(true);
+  expect(isSearchable('KYSON')).toBe(true);
 });
 
 test('2 characters produce no query', () => {

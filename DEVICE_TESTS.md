@@ -22,6 +22,49 @@ part.
 
 ---
 
+## 4.3: The Search tab and user search
+
+Not yet run. `npm test` proves when a search fires and which state the screen shows, against a
+fake Firebase; `npm run test:rules` proves the rules allow the query. Whether the real query finds
+real people, and how the screen looks, is only checkable here.
+
+**Needs two test accounts.** Sign up account A with the name `Zed Tester` and account B with the
+name `zed OTHER` (the odd capitals are deliberate). Do the checks signed in as A.
+
+**Screenshots wanted.** For every line marked 📸, take one with the phone in light mode and one in
+dark mode.
+
+**The bar**
+- [ ] 📸 Open the Search tab. You should see: the green "Search" title, and under it a rounded
+  gray bar reading "Search for friends...". Nothing below it.
+- [ ] Tap the bar. You should see: the "Search for friends..." text disappears straight away,
+  before you type. Tap away with the bar still empty and it comes back.
+
+**Searching**
+- [ ] Type `ze`. You should see: nothing appears under the bar. No gray rows, no message.
+- [ ] 📸 Type one more letter: `zed`. You should see: three gray placeholder rows for a moment,
+  then one row, a green circle with "ZO" and the name `zed OTHER`. Your own account (`Zed Tester`)
+  is not in the list.
+- [ ] Clear the bar and type `ZED` in capitals. You should see: the same one row.
+- [ ] Clear the bar and type `oth`. You should see: "No one found". This is expected: the search
+  matches the start of the name only, so a last name finds nobody.
+- [ ] 📸 Type `qqq`. You should see: "No one found" in gray text, with no red circle and no
+  "Try again" button.
+- [ ] Tap the `zed OTHER` row. You should see: nothing happens. No highlight, no new screen.
+- [ ] Type `zed`, then delete one letter. You should see: the row disappears and nothing replaces it.
+
+**Never more than 10 rows**
+- [ ] In the Console, under **Firestore Database → Data → Users**, check how many documents have a
+  `name_lowercase` starting with the same three letters. If you have 11 or more (sign up extra
+  throwaway accounts named `Zed 1`, `Zed 2`... if you want to check this), search those letters.
+  You should see: at most 10 rows, or 9 if your own account was one of the 10 fetched.
+
+**Expected, not bugs**
+- Offline, a search shows "No one found" instead of an error. Search isn't built to work offline.
+- A row shows initials and a name only. Pictures, bios and friend markers come in later tickets.
+
+---
+
 ## 4.2: Theme, tokens, shared components and the full sweep
 
 Not yet run. The code is finished; every group below is ready to check. The groups follow the

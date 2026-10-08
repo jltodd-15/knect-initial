@@ -16,11 +16,14 @@ an Auth account with no profile document behind it.
   two-step onboarding sequence that creates the account and writes the `Users` documents). A
   signed-in user with no profile is sent back to finish signup.
 - **Hidden:** Google and Apple sign-in, until ticket 1.3 (needs a paid Apple Developer account).
+- **Real, not yet device-tested:** the Search tab. Typing the first 3 or more letters of a name
+  looks people up in Firebase, in any capitalization, and lists up to 10 of them by initials and
+  name. It matches the start of the name only ("smith" does not find "John Smith"), and tapping a
+  result does nothing yet.
 - **Reachable but not real yet:** the Planner, Discover, Circle and Profile tabs. They open without
   crashing, but show sample data. Anything changed there is saved only on that phone, never to
-  Firebase. The Profile tab shows "Alex Rivera", not the profile created at signup. The Search tab
-  is a placeholder: a title and nothing else.
-- **Not verified on a device:** tickets 2.3, 1.4 and 4.1 (the move to React Navigation). Their checks are in `DEVICE_TESTS.md`. Test on Android for now: iOS is missing its Firebase config on this branch (see below).
+  Firebase. The Profile tab shows "Alex Rivera", not the profile created at signup.
+- **Not verified on a device:** tickets 2.3, 1.4, 4.1 (the move to React Navigation) and 4.3 (search). Their checks are in `DEVICE_TESTS.md`. Test on Android for now: iOS is missing its Firebase config on this branch (see below).
 - **Known bugs** that belong to other tickets are listed in [`CLAUDE.md`](CLAUDE.md), under
   "Known bugs that are somebody else's ticket".
 

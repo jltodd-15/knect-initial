@@ -41,6 +41,9 @@ Hand-written and worth respecting: `CreateProfilePage.tsx`, `utils/storage.ts`.
   sent. Never describe blocking as enforced.
 - `name_lowercase` is a **stored** field, computed with `.toLowerCase()` at write time. It is never
   derived at query time. Do not optimize it away.
+- User search is a prefix range query on `name_lowercase`, and its rules (3-character minimum,
+  300ms debounce, limit 10, self-filter after the read, latest answer wins) are the pure functions
+  in `services/userSearch.ts`. Prefix-only is the MVP decision: don't add substring search.
 - No denormalized names or profile pictures anywhere. A screen showing a person reads the person.
 - A person with no uploaded picture, or who resolves to nothing ("Deleted user"), renders
   `components/InitialsAvatar.tsx`. Don't build a second placeholder.
@@ -97,7 +100,7 @@ ticket that hasn't been built yet, even if you know it's coming.
 
 ## Known bugs that are somebody else's ticket
 
-- Every tab except signup still runs on sample data and on-device storage, not Firestore. The
+- Every tab except Search still runs on sample data and on-device storage, not Firestore. The
   Profile tab shows "Alex Rivera", not the profile written at signup (D6). Friends, chats, and
   activities are sample data (Projects 5, 9, 11 and 15).
 - iOS has no Firebase config on this branch stack: `ios/Knect/GoogleService-Info.plist` is only in

@@ -54,6 +54,8 @@ is fine well ahead of time, invented implementation detail isn't.
   - *Left as found:* four "missing dependency" lint errors on effects in `DraggableEvent.tsx`, `CreateEventModal.tsx` and `SocialDashboard.tsx`. Fixing them changes logic, which 4.2 may not. ❓ no ticket owns them.
   - *Also left:* the crash screen (`ErrorBoundary`) is always light, because `index.js` mounts it above `ThemeProvider` and `index.js` wasn't 4.2's to change.
 - [ ] 4.3 — Search tab contents
+  - *Built (4.3), not yet device-tested:* the Search tab looks people up by the start of their name, in any capitalization, from 3 characters on, and lists up to 10 by initials and name. Checks are in `DEVICE_TESTS.md`.
+  - *Prefix-only on purpose:* "smith" does not find "John Smith". Substring search needs a search service; revisit if real users keep searching by last name.
   - *Uses `components/InitialsAvatar.tsx`* (from 1.4) for any person with no uploaded picture, or who no longer exists ("Deleted user"). Don't build a second placeholder.
 - [ ] 4.4 — Friends widgets
 
