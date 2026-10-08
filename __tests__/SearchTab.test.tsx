@@ -7,13 +7,13 @@ import {render, screen} from '@testing-library/react-native';
 import SearchTab from '../components/SearchTab';
 
 test('shows the Search banner', async () => {
-  await render(<SearchTab isDarkMode={false} />);
+  await render(<SearchTab />);
 
   expect(screen.getByText('Search')).toBeTruthy();
 });
 
 test('shows nothing but the banner', async () => {
-  await render(<SearchTab isDarkMode={false} />);
+  await render(<SearchTab />);
 
   // Every string anywhere in what was rendered.
   const collectText = (node: unknown): string[] => {

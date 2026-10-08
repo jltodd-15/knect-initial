@@ -1,5 +1,6 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { ThemeContext, Theme } from '../theme/ThemeProvider';
 
 interface Props {
   children: ReactNode;
@@ -10,7 +11,10 @@ interface State {
   error: Error | null;
 }
 
+// A class can't call useTheme(), so it reads the same context directly. It is mounted above
+// ThemeProvider (index.js), so what it gets is the light theme.
 class ErrorBoundary extends Component<Props, State> {
+  static contextType = ThemeContext;
   props: Props;
   state: State = {
     hasError: false,
@@ -32,6 +36,7 @@ class ErrorBoundary extends Component<Props, State> {
 
   render() {
     if (this.state.hasError) {
+      const styles = getStyles(this.context as Theme);
       return (
         <View style={styles.container}>
           <Text style={styles.title}>Something went wrong.</Text>
@@ -44,23 +49,22 @@ class ErrorBoundary extends Component<Props, State> {
   }
 }
 
-const styles = StyleSheet.create({
+const getStyles = ({ colors, typography, spacing }: Theme) => StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
-    backgroundColor: '#f8d7da'
+    padding: spacing.lg,
+    backgroundColor: colors.dangerSurface
   },
   title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#721c24',
-    marginBottom: 10
+    ...typography.headline,
+    color: colors.danger,
+    marginBottom: spacing.md
   },
   error: {
-    fontSize: 14,
-    color: '#721c24',
+    fontSize: typography.label.fontSize,
+    color: colors.danger,
     textAlign: 'center'
   }
 });

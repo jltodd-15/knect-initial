@@ -1,8 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Circle, Path } from 'react-native-svg';
 import InitialsAvatar from './InitialsAvatar';
+import { Theme } from '../theme/ThemeProvider';
+import { useTheme } from '../theme/useTheme';
 
 // Ticket 1.4: the fixed interests vocabulary, stored verbatim. These strings are also the tag
 // vocabulary Project 9 has to use for Activities.tags, so 13.2's affinity seeding matches them.
@@ -61,7 +63,6 @@ export interface SignupError {
 export type ProfileSubmitState = 'idle' | 'submitting' | 'failed';
 
 interface Props {
-  isDarkMode: boolean;
   // `credentials` is null when the user arrived with an identity and never saw step one.
   onComplete: (profile: ProfilePayload, credentials: Credentials | null) => void;
   submitting: ProfileSubmitState;
@@ -69,8 +70,10 @@ interface Props {
   signupError?: SignupError | null;
 }
 
-const CreateProfilePage: React.FC<Props> = ({ isDarkMode, onComplete, submitting, identity, signupError }) => {
-  const styles = getStyles(isDarkMode);
+const CreateProfilePage: React.FC<Props> = ({ onComplete, submitting, identity, signupError }) => {
+  const theme = useTheme();
+  const { colors } = theme;
+  const styles = useMemo(() => getStyles(theme), [theme]);
   const [step, setStep] = useState<'credentials' | 'profile'>(identity ? 'profile' : 'credentials');
 
   const [name, setName] = useState(identity?.name ?? '');
@@ -142,7 +145,7 @@ const CreateProfilePage: React.FC<Props> = ({ isDarkMode, onComplete, submitting
                   value={email}
                   onChangeText={setEmail}
                   placeholder="username@example.com"
-                  placeholderTextColor={isDarkMode ? '#666' : '#999'}
+                  placeholderTextColor={colors.placeholder}
               />
               { badEmail && (
               <Text style={styles.errorText}>Your email address is invalid (e.g, mark@example.com)</Text>
@@ -160,7 +163,7 @@ const CreateProfilePage: React.FC<Props> = ({ isDarkMode, onComplete, submitting
                     value={password}
                     onChangeText={setPassword}
                     placeholder="Create a password"
-                    placeholderTextColor={isDarkMode ? '#666' : '#999'}
+                    placeholderTextColor={colors.placeholder}
                     secureTextEntry={hideText}
                 />
                 <TouchableOpacity
@@ -168,7 +171,7 @@ const CreateProfilePage: React.FC<Props> = ({ isDarkMode, onComplete, submitting
                     onPress={() => setHideText(!hideText)}
                     accessibilityLabel={hideText ? 'Show password' : 'Hide password'}
                 >
-                  <Svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#71717a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <Svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={colors.textSecondary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <Path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
                     <Circle cx="12" cy="12" r="3" />
                   </Svg>
@@ -198,7 +201,7 @@ const CreateProfilePage: React.FC<Props> = ({ isDarkMode, onComplete, submitting
               disabled={!email || !password}
               accessibilityLabel="Next"
           >
-              <Svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <Svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={colors.onPrimary} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <Path d="M5 12h14M13 6l6 6-6 6" />
               </Svg>
           </TouchableOpacity>
@@ -215,7 +218,7 @@ const CreateProfilePage: React.FC<Props> = ({ isDarkMode, onComplete, submitting
               disabled={backLocked}
               accessibilityLabel="Back"
           >
-              <Svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={backLocked ? '#a1a1aa' : '#10b981'} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <Svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={backLocked ? colors.textDisabled : colors.primary} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <Path d="M19 12H5M11 6l-6 6 6 6" />
               </Svg>
           </TouchableOpacity>
@@ -239,7 +242,7 @@ const CreateProfilePage: React.FC<Props> = ({ isDarkMode, onComplete, submitting
                     value={name} 
                     onChangeText={setName}
                     placeholder="e.g. Alex Rivera"
-                    placeholderTextColor={isDarkMode ? '#666' : '#999'}
+                    placeholderTextColor={colors.placeholder}
                 />
                 ) : (
                 <View style={styles.prefilledRow}>
@@ -258,7 +261,7 @@ const CreateProfilePage: React.FC<Props> = ({ isDarkMode, onComplete, submitting
                     value={bio} 
                     onChangeText={setBio}
                     placeholder="A line about you (optional)"
-                    placeholderTextColor={isDarkMode ? '#666' : '#999'}
+                    placeholderTextColor={colors.placeholder}
                 />
             </View>
 
@@ -285,18 +288,18 @@ const CreateProfilePage: React.FC<Props> = ({ isDarkMode, onComplete, submitting
               style={[
                 styles.submitBtn,
                 !name.trim() && styles.submitBtnDisabled,
-                submitting === 'failed' && { borderWidth: 2, borderColor: '#ff8080', backgroundColor: 'transparent' },
+                submitting === 'failed' && styles.submitBtnFailed,
               ]}
               onPress={handleComplete}
               disabled={!canComplete}
           >
               { submitting === 'submitting' ? (
               <View style={styles.submittingRow}>
-                  <ActivityIndicator testID="submit-spinner" color="white" />
+                  <ActivityIndicator testID="submit-spinner" color={colors.onPrimary} />
                   <Text style={styles.submitBtnText}>SAVING PROFILE...</Text>
               </View>
               ) : (
-              <Text style={[styles.submitBtnText, submitting === 'failed' && { color: '#ff8080' }]}>
+              <Text style={[styles.submitBtnText, submitting === 'failed' && styles.submitBtnTextFailed]}>
                 {submitting === 'failed' ? 'TRY AGAIN' : 'COMPLETE PROFILE'}
               </Text>
               )}
@@ -307,45 +310,47 @@ const CreateProfilePage: React.FC<Props> = ({ isDarkMode, onComplete, submitting
     </ScrollView>
   );
 };
-const getStyles = (isDark: boolean) => StyleSheet.create({
-  container: { flex: 1, backgroundColor: isDark ? '#121212' : '#FDFCFB' },
-  header: { alignItems: 'center', marginTop: 40, marginBottom: 32 },
-  title: { fontSize: 32, fontWeight: '900', color: '#10b981', fontFamily: 'Inter', marginBottom: 8 },
-  subtitle: { fontSize: 14, color: '#71717a', fontFamily: 'Inter' },
+const getStyles = ({ colors, typography, spacing, radius }: Theme) => StyleSheet.create({
+  container: { flex: 1, backgroundColor: colors.background },
+  header: { alignItems: 'center', marginTop: 40, marginBottom: spacing['2xl'] },
+  title: { ...typography.display, color: colors.primary, fontFamily: 'Inter', marginBottom: spacing.sm },
+  subtitle: { fontSize: typography.label.fontSize, color: colors.textSecondary, fontFamily: 'Inter' },
   
-  avatarSection: { alignItems: 'center', marginBottom: 32 },
+  avatarSection: { alignItems: 'center', marginBottom: spacing['2xl'] },
 
-  form: { gap: 24 },
-  inputGroup: { gap: 8 },
-  label: { fontSize: 11, fontWeight: '900', color: '#71717a', letterSpacing: 1, fontFamily: 'Inter' },
-  input: { backgroundColor: isDark ? '#1E1E1E' : '#f4f4f5', padding: 16, borderRadius: 16, fontSize: 16, color: isDark ? 'white' : 'black', fontFamily: 'Inter' },
+  form: { gap: spacing.xl },
+  inputGroup: { gap: spacing.sm },
+  label: { fontSize: typography.caption.fontSize, fontWeight: '700', color: colors.textSecondary, letterSpacing: 1, fontFamily: 'Inter' },
+  input: { backgroundColor: colors.surfaceAlt, padding: spacing.base, borderRadius: radius.lg, fontSize: typography.body.fontSize, color: colors.textPrimary, fontFamily: 'Inter' },
   
-  prefilledRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: isDark ? '#1E1E1E' : '#f4f4f5', padding: 16, borderRadius: 16 },
-  prefilledName: { fontSize: 16, color: isDark ? 'white' : 'black', fontFamily: 'Inter' },
-  changeText: { fontSize: 11, fontWeight: '900', color: '#10b981', letterSpacing: 1, fontFamily: 'Inter' },
+  prefilledRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: colors.surfaceAlt, padding: spacing.base, borderRadius: radius.lg },
+  prefilledName: { fontSize: typography.body.fontSize, color: colors.textPrimary, fontFamily: 'Inter' },
+  changeText: { fontSize: typography.caption.fontSize, fontWeight: '700', color: colors.primary, letterSpacing: 1, fontFamily: 'Inter' },
 
-  ruleList: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
-  ruleText: { fontSize: 12, color: '#71717a', fontFamily: 'Inter' },
-  ruleMet: { color: '#10b981', fontWeight: '700' },
+  ruleList: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.md },
+  ruleText: { fontSize: typography.caption.fontSize, color: colors.textSecondary, fontFamily: 'Inter' },
+  ruleMet: { color: colors.primary, fontWeight: '700' },
 
-  tagCloud: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 8 },
-  tag: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20, backgroundColor: isDark ? '#27272a' : '#fff', borderWidth: 1, borderColor: isDark ? '#333' : '#e4e4e7' },
-  tagSelected: { backgroundColor: '#10b981', borderColor: '#10b981' },
-  tagText: { fontSize: 12, fontWeight: 'bold', color: isDark ? 'white' : 'black' },
-  tagTextSelected: { color: 'white' },
+  tagCloud: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, marginTop: spacing.sm },
+  tag: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: spacing.base, paddingVertical: spacing.sm, borderRadius: radius.xl, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
+  tagSelected: { backgroundColor: colors.primary, borderColor: colors.primary },
+  tagText: { fontSize: typography.caption.fontSize, fontWeight: '700', color: colors.textPrimary },
+  tagTextSelected: { color: colors.onPrimary },
 
-  submitBtn: { backgroundColor: '#10b981', padding: 20, borderRadius: 24, alignItems: 'center', marginTop: 24 },
+  submitBtn: { backgroundColor: colors.primary, padding: spacing.lg, borderRadius: radius.xl, alignItems: 'center', marginTop: spacing.xl },
   submitBtnDisabled: { opacity: 0.5 },
-  submitBtnText: { color: 'white', fontWeight: '900', fontSize: 14, letterSpacing: 1 },
-  submittingRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  submitBtnFailed: { borderWidth: 2, borderColor: colors.danger, backgroundColor: 'transparent' },
+  submitBtnText: { color: colors.onPrimary, fontWeight: '700', fontSize: typography.label.fontSize, letterSpacing: 1 },
+  submitBtnTextFailed: { color: colors.danger },
+  submittingRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
 
-  backBtn: { alignSelf: 'flex-start', paddingVertical: 8, paddingHorizontal: 4 },
+  backBtn: { alignSelf: 'flex-start', paddingVertical: spacing.sm, paddingHorizontal: spacing.xs },
   backBtnLocked: { opacity: 0.4 },
 
   passwordRow: { justifyContent: 'center' },
   passwordInput: { paddingRight: 52 },
-  eyeBtn: { position: 'absolute', right: 12, padding: 4 },
-  errorText: { color: '#ff8080', textAlign: 'center', fontFamily: 'Anonymous Pro' }
+  eyeBtn: { position: 'absolute', right: spacing.md, padding: spacing.xs },
+  errorText: { color: colors.danger, textAlign: 'center', fontFamily: 'Anonymous Pro' }
 });
 
 export default CreateProfilePage;

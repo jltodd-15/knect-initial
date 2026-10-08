@@ -60,9 +60,22 @@ call, is awaited.
 
 ## Styling
 
-- Primary green is `#10b981` (emerald-500). Never `emerald-600` or `#059669`.
-- Grays are Tailwind zinc. The iOS system grays (`#8e8e93`, `#1c1c1e`, `#2c2c2e`, `#f2f2f7`) are
-  being phased out — don't add new ones.
+- Colors, type sizes, spacing and radius are defined once, in `theme/tokens.ts`, and read through
+  `useTheme()`. No hex value, `rgba(...)` or named color appears in `components/` or `App.tsx`,
+  and no component takes an `isDarkMode` prop. A color that has no token gets a token first.
+- Dark mode follows the phone unless a Light or Dark override has been saved (`ThemeProvider`).
+  Every screen has to work in both.
+- The only skeleton, empty and error visuals are `SkeletonCard`, `EmptyState` and `ErrorState` in
+  `components/shared/`. Content that is loading shows a skeleton, never a spinner. (The spinner
+  inside the signup submit button is a "working on it" signal on a button, and stays.)
+- Primary green is `#10b981` (emerald-500). `emerald-600` / `#059669` exists only as the
+  `primaryPressed` token, for a pressed state — never as a button's resting color.
+- The six colors a user can pick for an event are `eventColors` in `theme/tokens.ts`. The picked
+  value is stored on the event, so they are not theme tokens and are the same in light and dark.
+- Font weight 900 is for `display` (size 32) only; 700 is the heaviest below it.
+- Radius `pill` is for circles and buttons. A card's largest radius is `xl`.
+- `components/ChatEventWidget.tsx` was left out of the 4.2 sweep because nothing imports it. It
+  still has hardcoded colors, the retired iOS grays and an `isDarkMode` prop; don't copy from it.
 
 ## How to work here
 

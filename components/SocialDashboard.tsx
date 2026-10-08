@@ -1,13 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { View, Text, TextInput, FlatList, TouchableOpacity, Image, StyleSheet, KeyboardAvoidingView, Platform, Alert, Modal, ScrollView } from 'react-native';
 import Svg, { Polyline, Path, Circle } from 'react-native-svg';
-import { Conversation, Message, Friend, DiscoveryItem } from '../types';
+import { Conversation, Message, DiscoveryItem } from '../types';
 import { ChatService } from '../services/ChatService';
 import StatusComposer from './StatusComposer';
 import { MOCK_FRIENDS, CURRENT_USER } from '../constants';
+import { Theme } from '../theme/ThemeProvider';
+import { useTheme } from '../theme/useTheme';
 
 interface Props { 
-    isDarkMode: boolean;
     onChatOpen?: () => void;
     onChatClose?: () => void;
     onPlanActivity?: (item: DiscoveryItem | null, participants?: string[]) => void;
@@ -17,19 +18,20 @@ import DraggableVoteList from './DraggableVoteList';
 
 interface VoteMessageProps {
     message: Message;
-    isDarkMode: boolean;
     currentUserId: string;
     onVote: (msgId: string, optionId: string, rankedOrder?: string[]) => void;
 }
 
-const VoteMessage: React.FC<VoteMessageProps> = ({ message, isDarkMode, currentUserId, onVote }) => {
+const VoteMessage: React.FC<VoteMessageProps> = ({ message, currentUserId, onVote }) => {
     const { question, options, mode, context, rankedVotes } = message.voteDetails!;
     const isRanked = mode === 'ranked';
-    const styles = getStyles(isDarkMode);
+    const theme = useTheme();
+    const { colors, typography, spacing, radius } = theme;
+    const styles = useMemo(() => getStyles(theme), [theme]);
 
     // Local state for ranked voting order
     const [localOrder, setLocalOrder] = useState<string[]>(options.map(o => o.id));
-    const [hasSubmitted, setHasSubmitted] = useState(false);
+    const [, setHasSubmitted] = useState(false);
 
     // Check if user has already voted
     const userVote = isRanked 
@@ -83,8 +85,8 @@ const VoteMessage: React.FC<VoteMessageProps> = ({ message, isDarkMode, currentU
         const sortedOptions = localOrder.map(id => options.find(o => o.id === id)!);
 
         return (
-            <View style={[styles.msgRow, { justifyContent: 'center', marginVertical: 12 }]}>
-                <View style={[styles.voteCard, { backgroundColor: isDarkMode ? '#2c2c2e' : 'white' }]}>
+            <View style={[styles.msgRow, { justifyContent: 'center', marginVertical: spacing.md }]}>
+                <View style={[styles.voteCard, { backgroundColor: colors.surfaceAlt }]}>
                     <View style={styles.voteHeader}>
                         <Text style={styles.voteQuestion}>{question}</Text>
                         <Text style={styles.voteType}>RANKED VOTE</Text>
@@ -93,14 +95,13 @@ const VoteMessage: React.FC<VoteMessageProps> = ({ message, isDarkMode, currentU
 
                     {!hasVoted ? (
                         <View>
-                            <Text style={{color: isDarkMode ? '#ccc' : '#666', marginBottom: 12, fontSize: 12}}>
+                            <Text style={{color: colors.textSecondary, marginBottom: spacing.md, fontSize: typography.caption.fontSize}}>
                                 Drag options to reorder
                             </Text>
                             <View style={styles.voteOptions}>
                                 <DraggableVoteList 
                                     options={sortedOptions.map(o => ({ id: o.id, text: o.text }))}
                                     onReorder={(newOrder) => setLocalOrder(newOrder)}
-                                    isDarkMode={isDarkMode}
                                 />
                             </View>
                             <TouchableOpacity style={styles.createVoteBtn} onPress={handleRankedSubmit}>
@@ -109,7 +110,7 @@ const VoteMessage: React.FC<VoteMessageProps> = ({ message, isDarkMode, currentU
                         </View>
                     ) : (
                         <View>
-                            <Text style={{color: isDarkMode ? '#ccc' : '#666', marginBottom: 12, fontSize: 12, fontStyle: 'italic'}}>
+                            <Text style={{color: colors.textSecondary, marginBottom: spacing.md, fontSize: typography.caption.fontSize, fontStyle: 'italic'}}>
                                 Top 2 Results (Current)
                             </Text>
                             <View style={styles.voteOptions}>
@@ -134,26 +135,26 @@ const VoteMessage: React.FC<VoteMessageProps> = ({ message, isDarkMode, currentU
                                                 top: 0,
                                                 bottom: 0,
                                                 width: '100%',
-                                                backgroundColor: isWinner ? 'rgba(16, 185, 129, 0.2)' : (isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)'),
+                                                backgroundColor: isWinner ? colors.primarySurface : colors.surfaceAlt,
                                                 zIndex: 0
                                             }} />
 
-                                            <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 16, zIndex: 1}}>
+                                            <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: spacing.base, zIndex: 1}}>
                                                 <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                                                    <Text style={[styles.voteOptionText, isWinner && {fontWeight: 'bold', color: '#10b981'}]}>
+                                                    <Text style={[styles.voteOptionText, isWinner && {fontWeight: '700', color: colors.primary}]}>
                                                         #{idx + 1} {opt.text}
                                                     </Text>
                                                 </View>
                                                 {isWinner && (
-                                                    <Svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="3"><Path d="M20 6L9 17l-5-5"/></Svg>
+                                                    <Svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={colors.primary} strokeWidth="3"><Path d="M20 6L9 17l-5-5"/></Svg>
                                                 )}
                                             </View>
                                         </View>
                                     );
                                 })}
                             </View>
-                            <TouchableOpacity style={{marginTop: 12}} onPress={() => showToast('Full results breakdown coming soon!')}>
-                                <Text style={{color: '#10b981', textAlign: 'center', fontSize: 12}}>View Full Results</Text>
+                            <TouchableOpacity style={{marginTop: spacing.md}} onPress={() => showToast('Full results breakdown coming soon!')}>
+                                <Text style={{color: colors.primary, textAlign: 'center', fontSize: typography.caption.fontSize}}>View Full Results</Text>
                             </TouchableOpacity>
                             
                             {/* Toast inside VoteMessage? No, better to have it at screen level, but for now let's put a local absolute one or pass a handler. 
@@ -166,13 +167,13 @@ const VoteMessage: React.FC<VoteMessageProps> = ({ message, isDarkMode, currentU
                                     bottom: 40, 
                                     left: 20, 
                                     right: 20, 
-                                    backgroundColor: 'rgba(0,0,0,0.8)', 
-                                    padding: 8, 
-                                    borderRadius: 12, 
+                                    backgroundColor: colors.scrim, 
+                                    padding: spacing.sm, 
+                                    borderRadius: radius.md, 
                                     alignItems: 'center',
                                     zIndex: 100
                                 }}>
-                                    <Text style={{color: 'white', fontSize: 12}}>{toastMessage}</Text>
+                                    <Text style={{color: colors.onPrimary, fontSize: typography.caption.fontSize}}>{toastMessage}</Text>
                                 </View>
                             )}
                         </View>
@@ -184,15 +185,15 @@ const VoteMessage: React.FC<VoteMessageProps> = ({ message, isDarkMode, currentU
 
     // Normal Vote
     return (
-        <View style={[styles.msgRow, { justifyContent: 'center', marginVertical: 12 }]}>
-            <View style={[styles.voteCard, { backgroundColor: isDarkMode ? '#2c2c2e' : 'white' }]}>
+        <View style={[styles.msgRow, { justifyContent: 'center', marginVertical: spacing.md }]}>
+            <View style={[styles.voteCard, { backgroundColor: colors.surfaceAlt }]}>
                 <View style={styles.voteHeader}>
                     <Text style={styles.voteQuestion}>{question}</Text>
                     {context && <Text style={styles.voteContext}>Linked to: {context.field === 'time' ? 'Time' : 'Activity'}</Text>}
                 </View>
                 
                 <View style={styles.voteOptions}>
-                    {options.map((opt, idx) => {
+                    {options.map((opt) => {
                         const voteCount = opt.votes.length;
                         const percentage = totalVotes > 0 ? Math.round((voteCount / totalVotes) * 100) : 0;
                         const isSelected = opt.votes.includes(currentUserId);
@@ -216,34 +217,36 @@ const VoteMessage: React.FC<VoteMessageProps> = ({ message, isDarkMode, currentU
                                         top: 0,
                                         bottom: 0,
                                         width: `${percentage}%`,
-                                        backgroundColor: isSelected ? 'rgba(16, 185, 129, 0.2)' : (isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)'),
+                                        backgroundColor: isSelected ? colors.primarySurface : colors.surfaceAlt,
                                         zIndex: 0
                                     }} />
                                 )}
 
-                                <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 16, zIndex: 1}}>
+                                <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: spacing.base, zIndex: 1}}>
                                     <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                                        <Text style={[styles.voteOptionText, isSelected && {fontWeight: 'bold', color: '#10b981'}]}>{opt.text}</Text>
-                                        <Text style={{fontSize: 12, color: '#999', marginLeft: 8}}>{voteCount > 0 ? voteCount : ''}</Text>
+                                        <Text style={[styles.voteOptionText, isSelected && {fontWeight: '700', color: colors.primary}]}>{opt.text}</Text>
+                                        <Text style={{fontSize: typography.caption.fontSize, color: colors.textSecondary, marginLeft: spacing.sm}}>{voteCount > 0 ? voteCount : ''}</Text>
                                     </View>
                                     {(hasVoted || totalVotes > 0) && (
-                                        <Text style={{fontSize: 14, fontWeight: '600', color: isSelected ? '#10b981' : (isDarkMode ? '#ccc' : '#666')}}>{percentage}%</Text>
+                                        <Text style={{fontSize: typography.label.fontSize, fontWeight: '600', color: isSelected ? colors.primary : colors.textSecondary}}>{percentage}%</Text>
                                     )}
                                 </View>
                             </TouchableOpacity>
                         );
                     })}
                 </View>
-                <View style={{marginTop: 12, alignItems: 'center'}}>
-                    <Text style={{fontSize: 12, color: '#999'}}>{totalVotes} votes</Text>
+                <View style={{marginTop: spacing.md, alignItems: 'center'}}>
+                    <Text style={{fontSize: typography.caption.fontSize, color: colors.textSecondary}}>{totalVotes} votes</Text>
                 </View>
             </View>
         </View>
     );
 };
 
-const SocialDashboard: React.FC<Props> = ({ isDarkMode, onChatOpen, onChatClose, onPlanActivity }) => {
-  const styles = getStyles(isDarkMode);
+const SocialDashboard: React.FC<Props> = ({ onChatOpen, onChatClose, onPlanActivity }) => {
+  const theme = useTheme();
+  const { colors, typography, spacing, radius } = theme;
+  const styles = useMemo(() => getStyles(theme), [theme]);
   const [selectedConvo, setSelectedConvo] = useState<Conversation | null>(null);
   const [input, setInput] = useState('');
   const [conversations, setConversations] = useState<Conversation[]>([]);
@@ -346,31 +349,31 @@ const SocialDashboard: React.FC<Props> = ({ isDarkMode, onChatOpen, onChatClose,
           onRequestClose={() => setShowEventMenu(false)}
       >
           <TouchableOpacity 
-              style={{flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center'}}
+              style={{flex: 1, backgroundColor: colors.scrim, justifyContent: 'center', alignItems: 'center'}}
               activeOpacity={1}
               onPress={() => setShowEventMenu(false)}
           >
-              <View style={{backgroundColor: isDarkMode ? '#1c1c1e' : 'white', width: '80%', maxWidth: 320, borderRadius: 24, padding: 20, position: 'relative'}}>
+              <View style={{backgroundColor: colors.surface, width: '80%', maxWidth: 320, borderRadius: radius.xl, padding: spacing.lg, position: 'relative'}}>
                   {/* Close Button */}
                   <TouchableOpacity 
                       style={{position: 'absolute', top: 16, left: 16, zIndex: 10}}
                       onPress={() => setShowEventMenu(false)}
                   >
-                      <Svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <Svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={colors.primary} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                           <Path d="M18 6L6 18M6 6l12 12" />
                       </Svg>
                   </TouchableOpacity>
 
-                  <Text style={{fontSize: 20, fontWeight: 'bold', color: isDarkMode ? 'white' : 'black', textAlign: 'center', marginBottom: 24, marginTop: 8}}>Manage Event</Text>
+                  <Text style={{fontSize: typography.headline.fontSize, fontWeight: '700', color: colors.textPrimary, textAlign: 'center', marginBottom: spacing.xl, marginTop: spacing.sm}}>Manage Event</Text>
                   
-                  <View style={{gap: 12}}>
+                  <View style={{gap: spacing.md}}>
                       <TouchableOpacity 
                           style={{
-                              backgroundColor: isDarkMode ? '#064e3b' : '#ecfdf5', 
-                              padding: 16, 
-                              borderRadius: 16, 
+                              backgroundColor: colors.primarySurface, 
+                              padding: spacing.base, 
+                              borderRadius: radius.lg, 
                               borderWidth: 1, 
-                              borderColor: '#10b981',
+                              borderColor: colors.primary,
                               alignItems: 'center'
                           }}
                           onPress={() => {
@@ -386,16 +389,16 @@ const SocialDashboard: React.FC<Props> = ({ isDarkMode, onChatOpen, onChatClose,
                               }
                           }}
                       >
-                          <Text style={{fontSize: 16, fontWeight: '600', color: '#10b981'}}>Propose Time Change</Text>
+                          <Text style={{fontSize: typography.body.fontSize, fontWeight: '600', color: colors.primary}}>Propose Time Change</Text>
                       </TouchableOpacity>
 
                       <TouchableOpacity 
                           style={{
-                              backgroundColor: isDarkMode ? '#064e3b' : '#ecfdf5', 
-                              padding: 16, 
-                              borderRadius: 16, 
+                              backgroundColor: colors.primarySurface, 
+                              padding: spacing.base, 
+                              borderRadius: radius.lg, 
                               borderWidth: 1, 
-                              borderColor: '#10b981',
+                              borderColor: colors.primary,
                               alignItems: 'center'
                           }}
                           onPress={() => {
@@ -411,21 +414,13 @@ const SocialDashboard: React.FC<Props> = ({ isDarkMode, onChatOpen, onChatClose,
                               }
                           }}
                       >
-                          <Text style={{fontSize: 16, fontWeight: '600', color: '#10b981'}}>Propose Activity Change</Text>
+                          <Text style={{fontSize: typography.body.fontSize, fontWeight: '600', color: colors.primary}}>Propose Activity Change</Text>
                       </TouchableOpacity>
                   </View>
               </View>
           </TouchableOpacity>
       </Modal>
   );
-
-  const handleViewDetails = (eventDetails: any) => {
-      Alert.alert(
-          eventDetails.title,
-          `Location: ${eventDetails.location}\nTime: ${new Date(eventDetails.time).toLocaleString()}`,
-          [{ text: 'OK' }]
-      );
-  };
 
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [newTitle, setNewTitle] = useState('');
@@ -446,10 +441,6 @@ const SocialDashboard: React.FC<Props> = ({ isDarkMode, onChatOpen, onChatClose,
       if (updatedMsg) {
           setMessages(prev => prev.map(m => m.id === msgId ? updatedMsg : m));
       }
-  };
-
-  const handleProposeChange = () => {
-      Alert.alert('Propose Change', 'Suggest a new time or location');
   };
 
   const createNewProposal = (voteMsg: Message, currentMessages: Message[]) => {
@@ -605,7 +596,6 @@ const SocialDashboard: React.FC<Props> = ({ isDarkMode, onChatOpen, onChatClose,
           return (
               <VoteMessage 
                   message={item} 
-                  isDarkMode={isDarkMode} 
                   currentUserId={CURRENT_USER.id} 
                   onVote={handleCastVote} 
               />
@@ -624,8 +614,8 @@ const SocialDashboard: React.FC<Props> = ({ isDarkMode, onChatOpen, onChatClose,
           }
 
           return (
-              <View style={[styles.msgRow, { justifyContent: 'center', marginVertical: 12 }]}>
-                  <View style={[styles.eventCard, { backgroundColor: item.eventDetails.color || '#10b981' }]}>
+              <View style={[styles.msgRow, { justifyContent: 'center', marginVertical: spacing.md }]}>
+                  <View style={[styles.eventCard, { backgroundColor: item.eventDetails.color || colors.primary }]}>
                       {/* Header with Menu */}
                       <View style={styles.eventHeader}>
                           <View style={{flex: 1}}>
@@ -636,7 +626,7 @@ const SocialDashboard: React.FC<Props> = ({ isDarkMode, onChatOpen, onChatClose,
                               </Text>
                           </View>
                           <TouchableOpacity onPress={() => handleEventMenu(item.id, item.eventDetails)} style={styles.eventMenuBtn}>
-                              <Svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5">
+                              <Svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={colors.onPrimary} strokeWidth="2.5">
                                   <Path d="M3 12h18M3 6h18M3 18h18" />
                               </Svg>
                           </TouchableOpacity>
@@ -669,12 +659,12 @@ const SocialDashboard: React.FC<Props> = ({ isDarkMode, onChatOpen, onChatClose,
                                               <Image source={{uri: pAvatar}} style={styles.participantAvatar} />
                                               {status === 'going' && (
                                                   <View style={styles.statusBadgeGreen}>
-                                                      <Svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="4"><Path d="M20 6L9 17l-5-5"/></Svg>
+                                                      <Svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke={colors.onPrimary} strokeWidth="4"><Path d="M20 6L9 17l-5-5"/></Svg>
                                                   </View>
                                               )}
                                               {status === 'not_going' && (
                                                   <View style={styles.statusBadgeRed}>
-                                                      <Svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="4"><Path d="M18 6L6 18M6 6l12 12"/></Svg>
+                                                      <Svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke={colors.onPrimary} strokeWidth="4"><Path d="M18 6L6 18M6 6l12 12"/></Svg>
                                                   </View>
                                               )}
                                           </View>
@@ -691,36 +681,36 @@ const SocialDashboard: React.FC<Props> = ({ isDarkMode, onChatOpen, onChatClose,
                               style={[styles.actionBtn, rsvps?.[CURRENT_USER.id] === 'going' ? styles.actionBtnGoing : styles.actionBtnInactive]}
                               onPress={() => handleVote(item.id, 'going')}
                           >
-                              {rsvps?.[CURRENT_USER.id] === 'going' && <Svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="3"><Path d="M20 6L9 17l-5-5"/></Svg>}
-                              <Text style={[styles.actionBtnText, rsvps?.[CURRENT_USER.id] === 'going' ? {color:'black'} : {color:'white'}]}>GOING</Text>
+                              {rsvps?.[CURRENT_USER.id] === 'going' && <Svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={colors.onPrimary} strokeWidth="3"><Path d="M20 6L9 17l-5-5"/></Svg>}
+                              <Text style={[styles.actionBtnText, {color:colors.onPrimary}]}>GOING</Text>
                           </TouchableOpacity>
                           
                           <TouchableOpacity 
                               style={[styles.actionBtn, rsvps?.[CURRENT_USER.id] === 'not_going' ? styles.actionBtnNotGoing : styles.actionBtnInactive]}
                               onPress={() => handleVote(item.id, 'not_going')}
                           >
-                              {rsvps?.[CURRENT_USER.id] === 'not_going' && <Svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3"><Path d="M18 6L6 18M6 6l12 12"/></Svg>}
-                              <Text style={[styles.actionBtnText, rsvps?.[CURRENT_USER.id] === 'not_going' ? {color:'white'} : {color:'white'}]}>NO</Text>
+                              {rsvps?.[CURRENT_USER.id] === 'not_going' && <Svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={colors.onPrimary} strokeWidth="3"><Path d="M18 6L6 18M6 6l12 12"/></Svg>}
+                              <Text style={[styles.actionBtnText, rsvps?.[CURRENT_USER.id] === 'not_going' ? {color:colors.onPrimary} : {color:colors.onPrimary}]}>NO</Text>
                           </TouchableOpacity>
                       </View>
 
                       {/* Propose Change for Not Going */}
                       {rsvps?.[CURRENT_USER.id] === 'not_going' && (
-                          <View style={{marginTop: 12, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.2)', paddingTop: 12, paddingBottom: 24}}>
-                              <Text style={{color: 'white', textAlign: 'center', marginBottom: 8, fontSize: 12, opacity: 0.8}}>
+                          <View style={{marginTop: spacing.md, borderTopWidth: 1, borderTopColor: colors.onPrimaryMuted, paddingTop: spacing.md, paddingBottom: spacing.xl}}>
+                              <Text style={{color: colors.onPrimary, textAlign: 'center', marginBottom: spacing.sm, fontSize: typography.caption.fontSize, opacity: 0.8}}>
                                   Can't make it? Propose a change instead!
                               </Text>
                               <TouchableOpacity 
                                   style={{
-                                      backgroundColor: 'rgba(255,255,255,0.2)', 
-                                      paddingVertical: 10, 
-                                      paddingHorizontal: 20, 
-                                      borderRadius: 24,
+                                      backgroundColor: colors.onPrimaryMuted, 
+                                      paddingVertical: spacing.md, 
+                                      paddingHorizontal: spacing.lg, 
+                                      borderRadius: radius.xl,
                                       alignSelf: 'center'
                                   }}
                                   onPress={() => handleEventMenu(item.id, item.eventDetails)}
                               >
-                                  <Text style={{color: 'white', fontWeight: '600', fontSize: 14}}>Propose Change</Text>
+                                  <Text style={{color: colors.onPrimary, fontWeight: '600', fontSize: typography.label.fontSize}}>Propose Change</Text>
                               </TouchableOpacity>
                           </View>
                       )}
@@ -733,7 +723,7 @@ const SocialDashboard: React.FC<Props> = ({ isDarkMode, onChatOpen, onChatClose,
         <TouchableOpacity 
             activeOpacity={0.8}
             onLongPress={() => handleDeleteMessage(item.id)}
-            style={[styles.msgRow, isMe ? styles.msgRowMe : styles.msgRowOther, isSameSender && { marginTop: 2 }]}
+            style={[styles.msgRow, isMe ? styles.msgRowMe : styles.msgRowOther, isSameSender && { marginTop: spacing.xs }]}
         >
            {!isMe && selectedConvo?.isGroup && !isSameSender && (
                <Image source={{ uri: senderAvatar }} style={styles.msgAvatar} />
@@ -744,13 +734,13 @@ const SocialDashboard: React.FC<Props> = ({ isDarkMode, onChatOpen, onChatClose,
            <View style={[
                styles.msgBubble, 
                isMe ? styles.msgMe : styles.msgOther,
-               isSameSender && isMe && { borderBottomRightRadius: 4, borderTopRightRadius: 4 },
-               isSameSender && !isMe && { borderBottomLeftRadius: 4, borderTopLeftRadius: 4 }
+               isSameSender && isMe && { borderBottomRightRadius: radius.sm, borderTopRightRadius: radius.sm },
+               isSameSender && !isMe && { borderBottomLeftRadius: radius.sm, borderTopLeftRadius: radius.sm }
            ]}>
               {!isMe && selectedConvo?.isGroup && !isSameSender && (
                   <Text style={styles.senderName}>{senderName}</Text>
               )}
-              <Text style={[styles.msgText, isMe && {color:'white'}]}>{item.text}</Text>
+              <Text style={[styles.msgText, isMe && {color:colors.onPrimary}]}>{item.text}</Text>
            </View>
         </TouchableOpacity>
       );
@@ -793,9 +783,9 @@ const SocialDashboard: React.FC<Props> = ({ isDarkMode, onChatOpen, onChatClose,
                           { 
                               width: 28, 
                               height: 28, 
-                              borderRadius: 14, 
+                              borderRadius: radius.lg, 
                               borderWidth: 2, 
-                              borderColor: isDarkMode ? '#121212' : 'white',
+                              borderColor: colors.border,
                               position: 'absolute',
                               zIndex: avatars.length - idx
                           },
@@ -912,73 +902,73 @@ const SocialDashboard: React.FC<Props> = ({ isDarkMode, onChatOpen, onChatClose,
         animationType="fade"
         onRequestClose={() => setShowVoteCreator(false)}
       >
-          <View style={{flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center', padding: 20}}>
-              <View style={[styles.voteCard, { backgroundColor: isDarkMode ? '#1c1c1e' : 'white', width: '100%', maxWidth: 340, padding: 0, borderRadius: 24, overflow: 'hidden' }]}>
+          <View style={{flex: 1, backgroundColor: colors.scrim, justifyContent: 'center', alignItems: 'center', padding: spacing.lg}}>
+              <View style={[styles.voteCard, { backgroundColor: colors.surface, width: '100%', maxWidth: 340, padding: 0, borderRadius: radius.xl, overflow: 'hidden' }]}>
                   {/* Colorful Header */}
-                  <View style={{backgroundColor: '#10b981', padding: 20, paddingTop: 24, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
-                      <Text style={[styles.modalTitle, {color: 'white', fontSize: 22}]}>Create Vote</Text>
-                      <TouchableOpacity onPress={() => setShowVoteCreator(false)} style={{backgroundColor: 'rgba(255,255,255,0.2)', padding: 8, borderRadius: 20}}>
-                          <Svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><Path d="M18 6L6 18M6 6l12 12"/></Svg>
+                  <View style={{backgroundColor: colors.primary, padding: spacing.lg, paddingTop: spacing.xl, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
+                      <Text style={[styles.modalTitle, {color: colors.onPrimary, fontSize: typography.title.fontSize}]}>Create Vote</Text>
+                      <TouchableOpacity onPress={() => setShowVoteCreator(false)} style={{backgroundColor: colors.onPrimaryMuted, padding: spacing.sm, borderRadius: radius.xl}}>
+                          <Svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={colors.onPrimary} strokeWidth="2.5"><Path d="M18 6L6 18M6 6l12 12"/></Svg>
                       </TouchableOpacity>
                   </View>
 
-                  <ScrollView style={{maxHeight: 400, padding: 24}}>
+                  <ScrollView style={{maxHeight: 400, padding: spacing.xl}}>
                       {/* Mode Selector */}
-                      <View style={{flexDirection: 'row', backgroundColor: isDarkMode ? '#333' : '#f0f0f5', borderRadius: 12, padding: 4, marginBottom: 20}}>
+                      <View style={{flexDirection: 'row', backgroundColor: colors.surfaceAlt, borderRadius: radius.md, padding: spacing.xs, marginBottom: spacing.lg}}>
                           <TouchableOpacity 
-                              style={{flex: 1, paddingVertical: 8, alignItems: 'center', borderRadius: 10, backgroundColor: voteMode === 'normal' ? (isDarkMode ? '#555' : 'white') : 'transparent', shadowColor: voteMode === 'normal' ? "#000" : "transparent", shadowOpacity: 0.1, shadowRadius: 2}}
+                              style={{flex: 1, paddingVertical: spacing.sm, alignItems: 'center', borderRadius: radius.md, backgroundColor: voteMode === 'normal' ? colors.surface : 'transparent', shadowColor: voteMode === 'normal' ? colors.shadow : "transparent", shadowOpacity: 0.1, shadowRadius: 2}}
                               onPress={() => setVoteMode('normal')}
                           >
-                              <Text style={{fontWeight: '600', color: isDarkMode ? 'white' : 'black'}}>Normal</Text>
+                              <Text style={{fontWeight: '600', color: colors.textPrimary}}>Normal</Text>
                           </TouchableOpacity>
                           <TouchableOpacity 
-                              style={{flex: 1, paddingVertical: 8, alignItems: 'center', borderRadius: 10, backgroundColor: voteMode === 'ranked' ? (isDarkMode ? '#555' : 'white') : 'transparent', shadowColor: voteMode === 'ranked' ? "#000" : "transparent", shadowOpacity: 0.1, shadowRadius: 2}}
+                              style={{flex: 1, paddingVertical: spacing.sm, alignItems: 'center', borderRadius: radius.md, backgroundColor: voteMode === 'ranked' ? colors.surface : 'transparent', shadowColor: voteMode === 'ranked' ? colors.shadow : "transparent", shadowOpacity: 0.1, shadowRadius: 2}}
                               onPress={() => setVoteMode('ranked')}
                           >
-                              <Text style={{fontWeight: '600', color: isDarkMode ? 'white' : 'black'}}>Ranked</Text>
+                              <Text style={{fontWeight: '600', color: colors.textPrimary}}>Ranked</Text>
                           </TouchableOpacity>
                       </View>
 
                       <Text style={styles.label}>Question</Text>
                       <TextInput
-                          style={[styles.voteInput, {backgroundColor: isDarkMode ? '#2c2c2e' : 'white'}]}
+                          style={[styles.voteInput, {backgroundColor: colors.surfaceAlt}]}
                           value={voteQuestion}
                           onChangeText={setVoteQuestion}
                           placeholder="What are we voting on?"
-                          placeholderTextColor="#999"
+                          placeholderTextColor={colors.placeholder}
                       />
                       
                       <Text style={styles.label}>Options</Text>
                       {voteOptions.map((opt, idx) => (
                           <TextInput
                               key={idx}
-                              style={[styles.voteInput, {backgroundColor: isDarkMode ? '#2c2c2e' : 'white'}]}
+                              style={[styles.voteInput, {backgroundColor: colors.surfaceAlt}]}
                               value={opt}
                               onChangeText={(text) => handleOptionChange(text, idx)}
                               placeholder={`Option ${idx + 1}`}
-                              placeholderTextColor="#999"
+                              placeholderTextColor={colors.placeholder}
                               autoFocus={idx === voteOptions.length - 1 && idx > 1}
                           />
                       ))}
                       
                       {/* Ghost Option */}
                       <TouchableOpacity 
-                          style={[styles.voteInput, {flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderStyle: 'dashed', borderColor: '#10b981', borderWidth: 1, backgroundColor: 'transparent'}]}
+                          style={[styles.voteInput, {flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderStyle: 'dashed', borderColor: colors.primary, borderWidth: 1, backgroundColor: 'transparent'}]}
                           onPress={addOption}
                       >
-                          <Text style={{color: '#10b981', fontWeight: '600'}}>Add Option</Text>
-                          <Svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2"><Path d="M12 5v14M5 12h14"/></Svg>
+                          <Text style={{color: colors.primary, fontWeight: '600'}}>Add Option</Text>
+                          <Svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={colors.primary} strokeWidth="2"><Path d="M12 5v14M5 12h14"/></Svg>
                       </TouchableOpacity>
 
                       {voteOptions.filter(o => o.trim()).length >= 3 && voteMode === 'normal' && (
-                          <TouchableOpacity onPress={() => setVoteMode('ranked')} style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center', padding: 10, backgroundColor: isDarkMode ? '#064e3b' : '#ecfdf5', borderRadius: 12, marginBottom: 10}}>
-                              <Svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2" style={{marginRight: 6}}><Path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></Svg>
-                              <Text style={{color: '#10b981', fontSize: 12, fontWeight: '600'}}>Tip: Try Ranked Vote for 3+ options!</Text>
+                          <TouchableOpacity onPress={() => setVoteMode('ranked')} style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center', padding: spacing.md, backgroundColor: colors.primarySurface, borderRadius: radius.md, marginBottom: spacing.md}}>
+                              <Svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={colors.primary} strokeWidth="2" style={{marginRight: spacing.sm}}><Path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></Svg>
+                              <Text style={{color: colors.primary, fontSize: typography.caption.fontSize, fontWeight: '600'}}>Tip: Try Ranked Vote for 3+ options!</Text>
                           </TouchableOpacity>
                       )}
                   </ScrollView>
                   
-                  <View style={{padding: 24, paddingTop: 0}}>
+                  <View style={{padding: spacing.xl, paddingTop: 0}}>
                       <TouchableOpacity style={styles.createVoteBtn} onPress={handleCreateVote}>
                           <Text style={styles.createVoteText}>Post Vote</Text>
                       </TouchableOpacity>
@@ -1000,45 +990,45 @@ const SocialDashboard: React.FC<Props> = ({ isDarkMode, onChatOpen, onChatClose,
             activeOpacity={1} 
             onPress={() => setShowFeaturesHub(false)}
         >
-            <View style={[styles.hubContent, { backgroundColor: isDarkMode ? 'rgba(30,30,30,0.95)' : 'rgba(255,255,255,0.95)' }]}>
-                <View style={{paddingHorizontal: 10, gap: 16}}>
+            <View style={[styles.hubContent, { backgroundColor: colors.surface }]}>
+                <View style={{paddingHorizontal: spacing.md, gap: spacing.base}}>
                     <TouchableOpacity style={styles.hubItemVertical} onPress={() => { setShowFeaturesHub(false); setVoteMode('normal'); setVoteContext(null); setShowVoteCreator(true); }}>
-                        <View style={[styles.hubIcon, {backgroundColor: 'transparent', borderWidth: 1, borderColor: isDarkMode ? '#fff' : '#000'}]}>
-                             <Svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={isDarkMode ? 'white' : 'black'} strokeWidth="2"><Path d="M9 11l3 3L22 4"/><Path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></Svg>
+                        <View style={[styles.hubIcon, {backgroundColor: 'transparent', borderWidth: 1, borderColor: colors.textPrimary}]}>
+                             <Svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={colors.textPrimary} strokeWidth="2"><Path d="M9 11l3 3L22 4"/><Path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></Svg>
                         </View>
-                        <Text style={[styles.hubLabelVertical, { color: isDarkMode ? 'white' : 'black' }]}>Vote</Text>
+                        <Text style={[styles.hubLabelVertical, { color: colors.textPrimary }]}>Vote</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.hubItemVertical} onPress={() => { setShowFeaturesHub(false); setVoteMode('ranked'); setVoteContext(null); setShowVoteCreator(true); }}>
-                        <View style={[styles.hubIcon, {backgroundColor: 'transparent', borderWidth: 1, borderColor: isDarkMode ? '#fff' : '#000'}]}>
-                             <Svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={isDarkMode ? 'white' : 'black'} strokeWidth="2"><Path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><Path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></Svg>
+                        <View style={[styles.hubIcon, {backgroundColor: 'transparent', borderWidth: 1, borderColor: colors.textPrimary}]}>
+                             <Svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={colors.textPrimary} strokeWidth="2"><Path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><Path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></Svg>
                         </View>
-                        <Text style={[styles.hubLabelVertical, { color: isDarkMode ? 'white' : 'black' }]}>Ranked Vote</Text>
+                        <Text style={[styles.hubLabelVertical, { color: colors.textPrimary }]}>Ranked Vote</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.hubItemVertical} onPress={handlePlanActivity}>
-                        <View style={[styles.hubIcon, {backgroundColor: 'transparent', borderWidth: 1, borderColor: isDarkMode ? '#fff' : '#000'}]}>
-                             <Svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={isDarkMode ? 'white' : 'black'} strokeWidth="2"><Path d="M19 4H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/><Path d="M16 2v4"/><Path d="M8 2v4"/><Path d="M3 10h18"/></Svg>
+                        <View style={[styles.hubIcon, {backgroundColor: 'transparent', borderWidth: 1, borderColor: colors.textPrimary}]}>
+                             <Svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={colors.textPrimary} strokeWidth="2"><Path d="M19 4H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/><Path d="M16 2v4"/><Path d="M8 2v4"/><Path d="M3 10h18"/></Svg>
                         </View>
-                        <Text style={[styles.hubLabelVertical, { color: isDarkMode ? 'white' : 'black' }]}>Plan Activity</Text>
+                        <Text style={[styles.hubLabelVertical, { color: colors.textPrimary }]}>Plan Activity</Text>
                     </TouchableOpacity>
                     
                     {/* Disabled Items */}
                     <TouchableOpacity style={[styles.hubItemVertical, {opacity: 0.5}]} disabled>
-                        <View style={[styles.hubIcon, {backgroundColor: 'transparent', borderWidth: 1, borderColor: isDarkMode ? '#fff' : '#000'}]}>
-                             <Svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={isDarkMode ? 'white' : 'black'} strokeWidth="2"><Path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><Circle cx="12" cy="13" r="4"/></Svg>
+                        <View style={[styles.hubIcon, {backgroundColor: 'transparent', borderWidth: 1, borderColor: colors.textPrimary}]}>
+                             <Svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={colors.textPrimary} strokeWidth="2"><Path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><Circle cx="12" cy="13" r="4"/></Svg>
                         </View>
-                        <Text style={[styles.hubLabelVertical, { color: isDarkMode ? 'white' : 'black' }]}>Photos</Text>
+                        <Text style={[styles.hubLabelVertical, { color: colors.textPrimary }]}>Photos</Text>
                     </TouchableOpacity>
                      <TouchableOpacity style={[styles.hubItemVertical, {opacity: 0.5}]} disabled>
-                        <View style={[styles.hubIcon, {backgroundColor: 'transparent', borderWidth: 1, borderColor: isDarkMode ? '#fff' : '#000'}]}>
-                             <Svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={isDarkMode ? 'white' : 'black'} strokeWidth="2"><Path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><Polyline points="14 2 14 8 20 8"/></Svg>
+                        <View style={[styles.hubIcon, {backgroundColor: 'transparent', borderWidth: 1, borderColor: colors.textPrimary}]}>
+                             <Svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={colors.textPrimary} strokeWidth="2"><Path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><Polyline points="14 2 14 8 20 8"/></Svg>
                         </View>
-                        <Text style={[styles.hubLabelVertical, { color: isDarkMode ? 'white' : 'black' }]}>GIFs</Text>
+                        <Text style={[styles.hubLabelVertical, { color: colors.textPrimary }]}>GIFs</Text>
                     </TouchableOpacity>
                      <TouchableOpacity style={[styles.hubItemVertical, {opacity: 0.5}]} disabled>
-                        <View style={[styles.hubIcon, {backgroundColor: 'transparent', borderWidth: 1, borderColor: isDarkMode ? '#fff' : '#000'}]}>
-                             <Svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={isDarkMode ? 'white' : 'black'} strokeWidth="2"><Path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><Polyline points="13 2 13 9 20 9"/></Svg>
+                        <View style={[styles.hubIcon, {backgroundColor: 'transparent', borderWidth: 1, borderColor: colors.textPrimary}]}>
+                             <Svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={colors.textPrimary} strokeWidth="2"><Path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><Polyline points="13 2 13 9 20 9"/></Svg>
                         </View>
-                        <Text style={[styles.hubLabelVertical, { color: isDarkMode ? 'white' : 'black' }]}>Files</Text>
+                        <Text style={[styles.hubLabelVertical, { color: colors.textPrimary }]}>Files</Text>
                     </TouchableOpacity>
                 </View>
             </View>
@@ -1053,8 +1043,8 @@ const SocialDashboard: React.FC<Props> = ({ isDarkMode, onChatOpen, onChatClose,
         {renderVoteCreator()}
         {renderEventMenu()}
         <View style={styles.chatHeader}>
-           <TouchableOpacity onPress={() => setSelectedConvo(null)} style={{marginRight: 10, padding: 8}}>
-              <Svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={isDarkMode?'white':'black'} strokeWidth="2.5"><Path d="M19 12H5M12 19l-7-7 7-7"/></Svg>
+           <TouchableOpacity onPress={() => setSelectedConvo(null)} style={{marginRight: spacing.md, padding: spacing.sm}}>
+              <Svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={colors.textPrimary} strokeWidth="2.5"><Path d="M19 12H5M12 19l-7-7 7-7"/></Svg>
            </TouchableOpacity>
            
            <TouchableOpacity style={{flexDirection: 'row', alignItems: 'center', flex: 1, justifyContent: 'center', marginRight: 40}} onPress={() => {
@@ -1063,13 +1053,13 @@ const SocialDashboard: React.FC<Props> = ({ isDarkMode, onChatOpen, onChatClose,
            }}>
                <View style={{alignItems: 'center'}}>
                    {selectedConvo.isGroup ? (
-                       <View style={{width: 40 + ((Math.min(selectedConvo.participants.length, 3)-1)*24), height: 40, marginBottom: 4, transform: [{scale: 0.7}]}}>
+                       <View style={{width: 40 + ((Math.min(selectedConvo.participants.length, 3)-1)*24), height: 40, marginBottom: spacing.xs, transform: [{scale: 0.7}]}}>
                            {renderGroupAvatar(selectedConvo.participants)}
                        </View>
                    ) : (
-                       <Image source={{ uri: selectedConvo.image }} style={{width: 30, height: 30, borderRadius: 15, marginBottom: 4}} />
+                       <Image source={{ uri: selectedConvo.image }} style={{width: 30, height: 30, borderRadius: radius.pill, marginBottom: spacing.xs}} />
                    )}
-                   <Text style={{fontSize: 14, fontWeight: '700', color: isDarkMode ? 'white' : 'black'}}>{selectedConvo.title}</Text>
+                   <Text style={{fontSize: typography.label.fontSize, fontWeight: '700', color: colors.textPrimary}}>{selectedConvo.title}</Text>
                </View>
            </TouchableOpacity>
         </View>
@@ -1078,7 +1068,7 @@ const SocialDashboard: React.FC<Props> = ({ isDarkMode, onChatOpen, onChatClose,
            <FlatList
              data={messages}
              keyExtractor={(item, index) => item.id || index.toString()}
-             contentContainerStyle={{ padding: 16, paddingBottom: 20 }}
+             contentContainerStyle={{ padding: spacing.base, paddingBottom: spacing.lg }}
              renderItem={renderMessage}
              inverted // Standard chat behavior
            />
@@ -1087,7 +1077,7 @@ const SocialDashboard: React.FC<Props> = ({ isDarkMode, onChatOpen, onChatClose,
                 style={styles.attachBtn}
                 onPress={() => setShowFeaturesHub(true)}
              >
-                <Svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={isDarkMode ? "#999" : "#666"} strokeWidth="2">
+                <Svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={colors.textSecondary} strokeWidth="2">
                     <Path d="M12 5v14M5 12h14" />
                 </Svg>
              </TouchableOpacity>
@@ -1096,11 +1086,11 @@ const SocialDashboard: React.FC<Props> = ({ isDarkMode, onChatOpen, onChatClose,
                value={input} 
                onChangeText={setInput} 
                placeholder="Message..." 
-               placeholderTextColor="#999"
+               placeholderTextColor={colors.placeholder}
              />
              {input.length > 0 && (
                  <TouchableOpacity style={styles.sendBtn} onPress={sendMessage}>
-                   <Svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><Path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></Svg>
+                   <Svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={colors.onPrimary} strokeWidth="2"><Path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></Svg>
                  </TouchableOpacity>
              )}
            </View>
@@ -1115,29 +1105,29 @@ const SocialDashboard: React.FC<Props> = ({ isDarkMode, onChatOpen, onChatClose,
                         <Text style={styles.closeText}>Done</Text>
                     </TouchableOpacity>
                 </View>
-                <ScrollView contentContainerStyle={{padding: 24}}>
-                    <View style={{alignItems: 'center', marginBottom: 32}}>
+                <ScrollView contentContainerStyle={{padding: spacing.xl}}>
+                    <View style={{alignItems: 'center', marginBottom: spacing['2xl']}}>
                         {selectedConvo.isGroup ? renderGroupAvatar(selectedConvo.participants) : (
-                            <Image source={{ uri: selectedConvo.image }} style={{width: 80, height: 80, borderRadius: 40}} />
+                            <Image source={{ uri: selectedConvo.image }} style={{width: 80, height: 80, borderRadius: radius.pill}} />
                         )}
                         
                         {isEditingTitle ? (
-                            <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 16}}>
+                            <View style={{flexDirection: 'row', alignItems: 'center', marginTop: spacing.base}}>
                                 <TextInput 
-                                    style={{fontSize: 24, fontWeight: 'bold', color: isDarkMode ? 'white' : 'black', borderBottomWidth: 1, borderColor: '#10b981', minWidth: 150, textAlign: 'center'}}
+                                    style={{fontSize: typography.title.fontSize, fontWeight: '700', color: colors.textPrimary, borderBottomWidth: 1, borderColor: colors.primary, minWidth: 150, textAlign: 'center'}}
                                     value={newTitle}
                                     onChangeText={setNewTitle}
                                     autoFocus
                                 />
-                                <TouchableOpacity onPress={handleSaveTitle} style={{marginLeft: 8}}>
-                                    <Svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2"><Path d="M20 6L9 17l-5-5"/></Svg>
+                                <TouchableOpacity onPress={handleSaveTitle} style={{marginLeft: spacing.sm}}>
+                                    <Svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={colors.primary} strokeWidth="2"><Path d="M20 6L9 17l-5-5"/></Svg>
                                 </TouchableOpacity>
                             </View>
                         ) : (
-                            <TouchableOpacity onPress={() => setIsEditingTitle(true)} style={{flexDirection: 'row', alignItems: 'center', marginTop: 16}}>
-                                <Text style={[styles.chatTitle, {fontSize: 24}]}>{selectedConvo.title}</Text>
+                            <TouchableOpacity onPress={() => setIsEditingTitle(true)} style={{flexDirection: 'row', alignItems: 'center', marginTop: spacing.base}}>
+                                <Text style={[styles.chatTitle, {fontSize: typography.title.fontSize}]}>{selectedConvo.title}</Text>
                                 {selectedConvo.isGroup && (
-                                    <Svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#999" strokeWidth="2" style={{marginLeft: 8}}>
+                                    <Svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={colors.textSecondary} strokeWidth="2" style={{marginLeft: spacing.sm}}>
                                         <Path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><Path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
                                     </Svg>
                                 )}
@@ -1146,7 +1136,7 @@ const SocialDashboard: React.FC<Props> = ({ isDarkMode, onChatOpen, onChatClose,
                     </View>
                     
                     <Text style={styles.sectionHeader}>MEMBERS</Text>
-                    <View style={{backgroundColor: isDarkMode ? '#1E1E1E' : 'white', borderRadius: 12, overflow: 'hidden'}}>
+                    <View style={{backgroundColor: colors.surface, borderRadius: radius.md, overflow: 'hidden'}}>
                         {selectedConvo.participants.map((pid, idx) => {
                             const isMe = pid === CURRENT_USER.id;
                             const friend = isMe ? CURRENT_USER : MOCK_FRIENDS.find(f => f.id === pid);
@@ -1162,10 +1152,10 @@ const SocialDashboard: React.FC<Props> = ({ isDarkMode, onChatOpen, onChatClose,
                     </View>
 
                     <TouchableOpacity 
-                        style={{marginTop: 32, backgroundColor: '#fee2e2', padding: 16, borderRadius: 12, alignItems: 'center'}}
+                        style={{marginTop: spacing['2xl'], backgroundColor: colors.dangerSurface, padding: spacing.base, borderRadius: radius.md, alignItems: 'center'}}
                         onPress={handleDeleteConversation}
                     >
-                        <Text style={{color: '#ef4444', fontWeight: 'bold', fontSize: 16}}>Delete Conversation</Text>
+                        <Text style={{color: colors.danger, fontWeight: '700', fontSize: typography.body.fontSize}}>Delete Conversation</Text>
                     </TouchableOpacity>
                 </ScrollView>
             </View>
@@ -1181,17 +1171,17 @@ const SocialDashboard: React.FC<Props> = ({ isDarkMode, onChatOpen, onChatClose,
       </View>
       
       {/* Status Composer */}
-      <StatusComposer isDarkMode={isDarkMode} />
+      <StatusComposer />
 
       {/* Search Bar */}
       <View style={styles.searchContainer}>
-          <Svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={isDarkMode ? '#999' : '#999'} strokeWidth="2" style={{marginRight: 8}}>
+          <Svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={colors.textSecondary} strokeWidth="2" style={{marginRight: spacing.sm}}>
               <Path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </Svg>
           <TextInput
               style={styles.searchInput}
               placeholder="Search"
-              placeholderTextColor={isDarkMode ? '#666' : '#999'}
+              placeholderTextColor={colors.placeholder}
               value={searchQuery}
               onChangeText={setSearchQuery}
           />
@@ -1200,10 +1190,10 @@ const SocialDashboard: React.FC<Props> = ({ isDarkMode, onChatOpen, onChatClose,
       <FlatList
         data={filteredConversations}
         keyExtractor={(item, index) => item.id || index.toString()}
-        contentContainerStyle={{ paddingHorizontal: 20 }}
+        contentContainerStyle={{ paddingHorizontal: spacing.lg }}
         ListEmptyComponent={
             <View style={{alignItems:'center', marginTop: 40}}>
-                <Text style={{color: isDarkMode ? '#666' : '#999', fontFamily:'Inter'}}>No conversations found.</Text>
+                <Text style={{color: colors.textSecondary, fontFamily:'Inter'}}>No conversations found.</Text>
             </View>
         }
         renderItem={({ item }) => (
@@ -1211,18 +1201,18 @@ const SocialDashboard: React.FC<Props> = ({ isDarkMode, onChatOpen, onChatClose,
             {item.isGroup ? renderGroupAvatar(item.participants) : (
                 <Image source={{ uri: item.image }} style={styles.avatar} />
             )}
-            <View style={{marginLeft: 12, flex: 1, justifyContent: 'center'}}>
-               <View style={{flexDirection:'row', justifyContent:'space-between', marginBottom: 2}}>
+            <View style={{marginLeft: spacing.md, flex: 1, justifyContent: 'center'}}>
+               <View style={{flexDirection:'row', justifyContent:'space-between', marginBottom: spacing.xs}}>
                    <Text style={styles.convoName}>{item.title}</Text>
                    <Text style={styles.convoTime}>
                        {new Date(item.lastMessageTimestamp).toLocaleTimeString([], {hour:'numeric', minute:'2-digit'})}
                    </Text>
                </View>
                <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                   <Text style={[styles.convoMsg, item.lastMessage.startsWith('📅') ? {color: isDarkMode ? 'white' : 'black'} : {}]} numberOfLines={2}>
+                   <Text style={[styles.convoMsg, item.lastMessage.startsWith('📅') ? {color: colors.textPrimary} : {}]} numberOfLines={2}>
                        {item.lastMessage.startsWith('📅') ? 'Event Proposal' : item.lastMessage}
                    </Text>
-                   <Svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={isDarkMode ? '#666' : '#ccc'} strokeWidth="2" style={{marginLeft: 'auto'}}>
+                   <Svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={colors.textSecondary} strokeWidth="2" style={{marginLeft: 'auto'}}>
                        <Polyline points="9 18 15 12 9 6" />
                    </Svg>
                </View>
@@ -1234,108 +1224,108 @@ const SocialDashboard: React.FC<Props> = ({ isDarkMode, onChatOpen, onChatClose,
   );
 };
 
-const getStyles = (isDark: boolean) => StyleSheet.create({
-  container: { flex: 1, backgroundColor: isDark ? '#000' : '#fff' },
-  header: { padding: 16, paddingTop: 20, paddingBottom: 10 },
-  headerTitle: { fontSize: 32, fontWeight: 'bold', color: '#10b981', fontFamily: 'Inter' },
-  headerSubtitle: { fontSize: 10, fontWeight: '900', color: '#71717a', letterSpacing: 2, fontFamily: 'Inter', marginTop: 4 },
+const getStyles = ({ colors, typography, spacing, radius }: Theme) => StyleSheet.create({
+  container: { flex: 1, backgroundColor: colors.background },
+  header: { padding: spacing.base, paddingTop: spacing.lg, paddingBottom: spacing.md },
+  headerTitle: { fontSize: typography.display.fontSize, fontWeight: '900', color: colors.primary, fontFamily: 'Inter' },
+  headerSubtitle: { fontSize: typography.micro.fontSize, fontWeight: '700', color: colors.textSecondary, letterSpacing: 2, fontFamily: 'Inter', marginTop: spacing.xs },
   
-  searchContainer: { flexDirection: 'row', alignItems: 'center', backgroundColor: isDark ? '#1c1c1e' : '#f2f2f7', marginHorizontal: 16, padding: 10, borderRadius: 10, marginBottom: 16 },
-  searchInput: { flex: 1, fontSize: 16, color: isDark ? 'white' : 'black', fontFamily: 'Inter' },
+  searchContainer: { flexDirection: 'row', alignItems: 'center', backgroundColor: colors.surfaceAlt, marginHorizontal: spacing.base, padding: spacing.md, borderRadius: radius.md, marginBottom: spacing.base },
+  searchInput: { flex: 1, fontSize: typography.body.fontSize, color: colors.textPrimary, fontFamily: 'Inter' },
 
-  convoItem: { flexDirection: 'row', paddingVertical: 12, borderBottomWidth: StyleSheet.hairlineWidth, borderColor: isDark ? '#333' : '#c6c6c8' },
-  avatar: { width: 52, height: 52, borderRadius: 26 },
-  groupAvatarContainer: { width: 52, height: 52, borderRadius: 26, overflow: 'hidden', flexDirection: 'row', flexWrap: 'wrap' },
+  convoItem: { flexDirection: 'row', paddingVertical: spacing.md, borderBottomWidth: StyleSheet.hairlineWidth, borderColor: colors.border },
+  avatar: { width: 52, height: 52, borderRadius: radius.pill },
+  groupAvatarContainer: { width: 52, height: 52, borderRadius: radius.pill, overflow: 'hidden', flexDirection: 'row', flexWrap: 'wrap' },
   groupAvatarPart: { resizeMode: 'cover' },
   
-  convoName: { fontSize: 16, fontWeight: '600', color: isDark ? 'white' : 'black', fontFamily: 'Inter' },
-  convoMsg: { fontSize: 15, color: isDark ? '#8e8e93' : '#8e8e93', fontFamily: 'Inter', flex: 1, marginRight: 8 },
-  convoTime: { fontSize: 14, color: isDark ? '#8e8e93' : '#8e8e93' },
+  convoName: { fontSize: typography.body.fontSize, fontWeight: '600', color: colors.textPrimary, fontFamily: 'Inter' },
+  convoMsg: { fontSize: typography.body.fontSize, color: colors.textSecondary, fontFamily: 'Inter', flex: 1, marginRight: spacing.sm },
+  convoTime: { fontSize: typography.label.fontSize, color: colors.textSecondary },
   
-  chatHeader: { flexDirection: 'row', alignItems: 'center', padding: 10, paddingTop: 10, borderBottomWidth: StyleSheet.hairlineWidth, borderColor: isDark ? '#333' : '#b2b2b2', backgroundColor: isDark ? '#1E1E1E' : 'rgba(249,249,249,0.94)' },
-  headerAvatar: { width: 40, height: 40, borderRadius: 20 },
-  chatTitle: { fontSize: 16, fontWeight: 'bold', color: isDark ? 'white' : 'black', fontFamily: 'Inter' },
-  chatSubtitle: { fontSize: 12, color: '#71717a', fontFamily: 'Inter' },
+  chatHeader: { flexDirection: 'row', alignItems: 'center', padding: spacing.md, paddingTop: spacing.md, borderBottomWidth: StyleSheet.hairlineWidth, borderColor: colors.border, backgroundColor: colors.surface },
+  headerAvatar: { width: 40, height: 40, borderRadius: radius.pill },
+  chatTitle: { fontSize: typography.body.fontSize, fontWeight: '700', color: colors.textPrimary, fontFamily: 'Inter' },
+  chatSubtitle: { fontSize: typography.caption.fontSize, color: colors.textSecondary, fontFamily: 'Inter' },
   
-  msgRow: { flexDirection: 'row', marginBottom: 8, alignItems: 'flex-end' },
+  msgRow: { flexDirection: 'row', marginBottom: spacing.sm, alignItems: 'flex-end' },
   msgRowMe: { justifyContent: 'flex-end' },
   msgRowOther: { justifyContent: 'flex-start' },
-  msgAvatar: { width: 28, height: 28, borderRadius: 14, marginRight: 8, marginBottom: 4 },
-  msgAvatarPlaceholder: { width: 28, marginRight: 8 },
+  msgAvatar: { width: 28, height: 28, borderRadius: radius.pill, marginRight: spacing.sm, marginBottom: spacing.xs },
+  msgAvatarPlaceholder: { width: 28, marginRight: spacing.sm },
   
-  msgBubble: { padding: 10, paddingHorizontal: 14, borderRadius: 22, maxWidth: '75%' },
-  msgMe: { backgroundColor: '#10b981' },
-  msgOther: { backgroundColor: isDark ? '#26262a' : '#e9e9eb' },
-  msgText: { fontSize: 16, color: isDark ? 'white' : 'black', fontFamily: 'Inter' },
-  senderName: { fontSize: 10, color: '#999', marginBottom: 2, marginLeft: 4 },
+  msgBubble: { padding: spacing.md, paddingHorizontal: spacing.base, borderRadius: radius.xl, maxWidth: '75%' },
+  msgMe: { backgroundColor: colors.primary },
+  msgOther: { backgroundColor: colors.surfaceAlt },
+  msgText: { fontSize: typography.body.fontSize, color: colors.textPrimary, fontFamily: 'Inter' },
+  senderName: { fontSize: typography.micro.fontSize, color: colors.textSecondary, marginBottom: spacing.xs, marginLeft: spacing.xs },
   
-  inputArea: { flexDirection: 'row', alignItems: 'center', padding: 10, paddingBottom: 30, backgroundColor: isDark ? '#1E1E1E' : '#f9f9f9', borderTopWidth: StyleSheet.hairlineWidth, borderColor: isDark ? '#333' : '#b2b2b2' },
-  input: { flex: 1, height: 36, backgroundColor: isDark ? '#000' : 'white', borderRadius: 18, paddingHorizontal: 16, color: isDark ? 'white' : 'black', fontFamily: 'Inter', marginHorizontal: 8, borderWidth: 1, borderColor: isDark ? '#333' : '#c6c6c8' },
-  sendBtn: { width: 32, height: 32, backgroundColor: '#10b981', borderRadius: 16, justifyContent: 'center', alignItems: 'center' },
+  inputArea: { flexDirection: 'row', alignItems: 'center', padding: spacing.md, paddingBottom: spacing['2xl'], backgroundColor: colors.surface, borderTopWidth: StyleSheet.hairlineWidth, borderColor: colors.border },
+  input: { flex: 1, height: 36, backgroundColor: colors.background, borderRadius: radius.pill, paddingHorizontal: spacing.base, color: colors.textPrimary, fontFamily: 'Inter', marginHorizontal: spacing.sm, borderWidth: 1, borderColor: colors.border },
+  sendBtn: { width: 32, height: 32, backgroundColor: colors.primary, borderRadius: radius.pill, justifyContent: 'center', alignItems: 'center' },
   attachBtn: { width: 32, height: 32, justifyContent: 'center', alignItems: 'center' },
 
   // Modal Styles
-  modalContainer: { flex: 1, backgroundColor: isDark ? '#000' : '#f2f2f7' },
-  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', padding: 16, alignItems: 'center', backgroundColor: isDark ? '#1c1c1e' : 'white' },
-  modalTitle: { fontSize: 17, fontWeight: '600', color: isDark ? 'white' : 'black' },
-  closeText: { color: '#10b981', fontSize: 17, fontWeight: '600' },
-  sectionHeader: { fontSize: 13, color: '#6d6d72', marginBottom: 8, marginLeft: 16, textTransform: 'uppercase' },
-  memberRow: { flexDirection: 'row', alignItems: 'center', padding: 12, paddingHorizontal: 16, borderBottomWidth: StyleSheet.hairlineWidth, borderColor: isDark ? '#333' : '#c6c6c8', backgroundColor: isDark ? '#1c1c1e' : 'white' },
-  memberAvatar: { width: 36, height: 36, borderRadius: 18, marginRight: 12 },
-  memberName: { fontSize: 16, fontWeight: '400', color: isDark ? 'white' : 'black' },
+  modalContainer: { flex: 1, backgroundColor: colors.surfaceAlt },
+  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', padding: spacing.base, alignItems: 'center', backgroundColor: colors.surface },
+  modalTitle: { fontSize: typography.body.fontSize, fontWeight: '600', color: colors.textPrimary },
+  closeText: { color: colors.primary, fontSize: typography.body.fontSize, fontWeight: '600' },
+  sectionHeader: { fontSize: typography.label.fontSize, color: colors.textSecondary, marginBottom: spacing.sm, marginLeft: spacing.base, textTransform: 'uppercase' },
+  memberRow: { flexDirection: 'row', alignItems: 'center', padding: spacing.md, paddingHorizontal: spacing.base, borderBottomWidth: StyleSheet.hairlineWidth, borderColor: colors.border, backgroundColor: colors.surface },
+  memberAvatar: { width: 36, height: 36, borderRadius: radius.pill, marginRight: spacing.md },
+  memberName: { fontSize: typography.body.fontSize, fontWeight: '400', color: colors.textPrimary },
 
   // New Event Widget Styles
-  eventCard: { width: '85%', borderRadius: 28, overflow: 'hidden', shadowColor: "#000", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.15, shadowRadius: 8, elevation: 5 },
-  eventHeader: { padding: 20, paddingBottom: 12, flexDirection: 'row', alignItems: 'flex-start' },
-  eventProposer: { color: 'rgba(255,255,255,0.9)', fontSize: 10, fontWeight: 'bold', letterSpacing: 1, marginBottom: 4 },
-  eventTitle: { color: 'white', fontSize: 24, fontWeight: '900', marginBottom: 4 },
-  eventTime: { color: 'rgba(255,255,255,0.9)', fontSize: 14, fontWeight: '600' },
-  eventMenuBtn: { padding: 4 },
+  eventCard: { width: '85%', borderRadius: radius.xl, overflow: 'hidden', shadowColor: colors.shadow, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.15, shadowRadius: 8, elevation: 5 },
+  eventHeader: { padding: spacing.lg, paddingBottom: spacing.md, flexDirection: 'row', alignItems: 'flex-start' },
+  eventProposer: { color: colors.onPrimary, fontSize: typography.micro.fontSize, fontWeight: '700', letterSpacing: 1, marginBottom: spacing.xs },
+  eventTitle: { color: colors.onPrimary, fontSize: typography.title.fontSize, fontWeight: '700', marginBottom: spacing.xs },
+  eventTime: { color: colors.onPrimary, fontSize: typography.label.fontSize, fontWeight: '600' },
+  eventMenuBtn: { padding: spacing.xs },
   
-  eventParticipants: { paddingHorizontal: 20, paddingBottom: 20 },
-  invitedLabel: { color: 'rgba(255,255,255,0.8)', fontSize: 10, fontWeight: 'bold', marginBottom: 12, letterSpacing: 0.5, textAlign: 'center' },
-  avatarRow: { flexDirection: 'row', justifyContent: 'center', gap: 16, flexWrap: 'wrap' },
+  eventParticipants: { paddingHorizontal: spacing.lg, paddingBottom: spacing.lg },
+  invitedLabel: { color: colors.onPrimary, fontSize: typography.micro.fontSize, fontWeight: '700', marginBottom: spacing.md, letterSpacing: 0.5, textAlign: 'center' },
+  avatarRow: { flexDirection: 'row', justifyContent: 'center', gap: spacing.base, flexWrap: 'wrap' },
   avatarContainer: { alignItems: 'center' },
-  participantAvatar: { width: 40, height: 40, borderRadius: 20, marginBottom: 4, borderWidth: 2, borderColor: 'rgba(255,255,255,0.2)' },
-  participantName: { color: 'white', fontSize: 11, fontWeight: '600' },
-  statusBadgeGreen: { position: 'absolute', bottom: 16, right: -4, width: 16, height: 16, borderRadius: 8, backgroundColor: '#4ade80', justifyContent: 'center', alignItems: 'center', borderWidth: 1.5, borderColor: 'white' },
-  statusBadgeRed: { position: 'absolute', bottom: 16, right: -4, width: 16, height: 16, borderRadius: 8, backgroundColor: '#ef4444', justifyContent: 'center', alignItems: 'center', borderWidth: 1.5, borderColor: 'white' },
+  participantAvatar: { width: 40, height: 40, borderRadius: radius.pill, marginBottom: spacing.xs, borderWidth: 2, borderColor: colors.onPrimaryMuted },
+  participantName: { color: colors.onPrimary, fontSize: typography.caption.fontSize, fontWeight: '600' },
+  statusBadgeGreen: { position: 'absolute', bottom: 16, right: -4, width: 16, height: 16, borderRadius: radius.pill, backgroundColor: colors.primary, justifyContent: 'center', alignItems: 'center', borderWidth: 1.5, borderColor: colors.onPrimary },
+  statusBadgeRed: { position: 'absolute', bottom: 16, right: -4, width: 16, height: 16, borderRadius: radius.pill, backgroundColor: colors.danger, justifyContent: 'center', alignItems: 'center', borderWidth: 1.5, borderColor: colors.onPrimary },
 
-  eventActions: { flexDirection: 'row', padding: 12, gap: 12, backgroundColor: 'rgba(0,0,0,0.1)' },
-  actionBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', padding: 12, borderRadius: 16, gap: 8, borderWidth: 1, borderColor: 'rgba(255,255,255,0.3)' },
-  actionBtnGoing: { backgroundColor: '#4ade80', borderColor: '#4ade80' },
-  actionBtnNotGoing: { backgroundColor: '#ef4444', borderColor: '#ef4444' },
+  eventActions: { flexDirection: 'row', padding: spacing.md, gap: spacing.md, backgroundColor: colors.surfaceAlt },
+  actionBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', padding: spacing.md, borderRadius: radius.lg, gap: spacing.sm, borderWidth: 1, borderColor: colors.onPrimaryMuted },
+  actionBtnGoing: { backgroundColor: colors.primary, borderColor: colors.primary },
+  actionBtnNotGoing: { backgroundColor: colors.danger, borderColor: colors.danger },
   actionBtnInactive: { backgroundColor: 'transparent' },
-  actionBtnText: { fontWeight: 'bold', fontSize: 13 },
+  actionBtnText: { fontWeight: '700', fontSize: typography.label.fontSize },
 
   // Vote Styles
-  voteCard: { width: '85%', borderRadius: 24, padding: 24, shadowColor: "#000", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.1, shadowRadius: 8, elevation: 5 },
-  voteHeader: { marginBottom: 20 },
-  voteQuestion: { fontSize: 20, fontWeight: 'bold', color: isDark ? 'white' : 'black', marginBottom: 4 },
-  voteType: { fontSize: 10, fontWeight: '900', color: '#10b981', letterSpacing: 1, textTransform: 'uppercase' },
-  voteContext: { fontSize: 12, color: '#999', marginTop: 4, fontStyle: 'italic' },
-  voteOptions: { gap: 12 },
-  voteOption: { borderRadius: 12, backgroundColor: isDark ? '#1c1c1e' : '#f3f4f6', borderWidth: 1, borderColor: 'transparent' },
-  voteOptionSelected: { borderColor: '#10b981', borderWidth: 2, backgroundColor: 'transparent' },
-  voteOptionText: { fontSize: 15, color: isDark ? 'white' : 'black', fontWeight: '500' },
-  voteAddOption: { marginTop: 16, alignItems: 'center', padding: 10 },
+  voteCard: { width: '85%', borderRadius: radius.xl, padding: spacing.xl, shadowColor: colors.shadow, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.1, shadowRadius: 8, elevation: 5 },
+  voteHeader: { marginBottom: spacing.lg },
+  voteQuestion: { fontSize: typography.headline.fontSize, fontWeight: '700', color: colors.textPrimary, marginBottom: spacing.xs },
+  voteType: { fontSize: typography.micro.fontSize, fontWeight: '700', color: colors.primary, letterSpacing: 1, textTransform: 'uppercase' },
+  voteContext: { fontSize: typography.caption.fontSize, color: colors.textSecondary, marginTop: spacing.xs, fontStyle: 'italic' },
+  voteOptions: { gap: spacing.md },
+  voteOption: { borderRadius: radius.md, backgroundColor: colors.surfaceAlt, borderWidth: 1, borderColor: 'transparent' },
+  voteOptionSelected: { borderColor: colors.primary, borderWidth: 2, backgroundColor: 'transparent' },
+  voteOptionText: { fontSize: typography.body.fontSize, color: colors.textPrimary, fontWeight: '600' },
+  voteAddOption: { marginTop: spacing.base, alignItems: 'center', padding: spacing.md },
   
   // Vote Creator Modal
-  label: { fontSize: 14, fontWeight: '600', color: isDark ? '#ccc' : '#666', marginBottom: 8, textTransform: 'uppercase', letterSpacing: 0.5 },
-  voteInput: { height: 56, borderRadius: 16, paddingHorizontal: 16, fontSize: 16, color: isDark ? 'white' : 'black', fontFamily: 'Inter', marginBottom: 16, shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 2 },
-  createVoteBtn: { backgroundColor: '#10b981', padding: 16, borderRadius: 16, alignItems: 'center', marginTop: 24 },
-  createVoteText: { color: 'white', fontWeight: 'bold', fontSize: 16 },
+  label: { fontSize: typography.label.fontSize, fontWeight: '600', color: colors.textSecondary, marginBottom: spacing.sm, textTransform: 'uppercase', letterSpacing: 0.5 },
+  voteInput: { height: 56, borderRadius: radius.lg, paddingHorizontal: spacing.base, fontSize: typography.body.fontSize, color: colors.textPrimary, fontFamily: 'Inter', marginBottom: spacing.base, shadowColor: colors.shadow, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 2 },
+  createVoteBtn: { backgroundColor: colors.primary, padding: spacing.base, borderRadius: radius.lg, alignItems: 'center', marginTop: spacing.xl },
+  createVoteText: { color: colors.onPrimary, fontWeight: '700', fontSize: typography.body.fontSize },
 
   // Hub Styles
-  hubOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
-  hubContent: { borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 24, paddingBottom: 40 },
-  hubTitle: { fontSize: 20, fontWeight: 'bold', marginBottom: 24, textAlign: 'center' },
-  hubGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 24, justifyContent: 'center' },
+  hubOverlay: { flex: 1, backgroundColor: colors.scrim, justifyContent: 'flex-end' },
+  hubContent: { borderTopLeftRadius: radius.xl, borderTopRightRadius: radius.xl, padding: spacing.xl, paddingBottom: 40 },
+  hubTitle: { fontSize: typography.headline.fontSize, fontWeight: '700', marginBottom: spacing.xl, textAlign: 'center' },
+  hubGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.xl, justifyContent: 'center' },
   hubItem: { alignItems: 'center', width: 80 },
-  hubItemVertical: { flexDirection: 'row', alignItems: 'center', gap: 16, width: '100%' },
-  hubIcon: { width: 56, height: 56, borderRadius: 28, justifyContent: 'center', alignItems: 'center', marginBottom: 8 },
-  hubLabel: { fontSize: 12, fontWeight: '500', textAlign: 'center' },
-  hubLabelVertical: { fontSize: 16, fontWeight: '600' }
+  hubItemVertical: { flexDirection: 'row', alignItems: 'center', gap: spacing.base, width: '100%' },
+  hubIcon: { width: 56, height: 56, borderRadius: radius.pill, justifyContent: 'center', alignItems: 'center', marginBottom: spacing.sm },
+  hubLabel: { fontSize: typography.caption.fontSize, fontWeight: '600', textAlign: 'center' },
+  hubLabelVertical: { fontSize: typography.body.fontSize, fontWeight: '600' }
 });
 
 export default SocialDashboard;

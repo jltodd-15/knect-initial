@@ -36,7 +36,7 @@ const renderPage = async (
 ) => {
   const onComplete = jest.fn();
   const utils = await render(
-    <CreateProfilePage isDarkMode={false} onComplete={onComplete} submitting="idle" {...props} />,
+    <CreateProfilePage onComplete={onComplete} submitting="idle" {...props} />,
   );
   return {onComplete, ...utils};
 };
@@ -290,7 +290,6 @@ describe('errors from creating the account', () => {
 
     await rerender(
       <CreateProfilePage
-        isDarkMode={false}
         onComplete={onComplete}
         submitting="idle"
         signupError={{target: 'email', message: 'Email already in use'}}
@@ -306,7 +305,6 @@ describe('errors from creating the account', () => {
     const {rerender, onComplete} = await renderAtStepTwo();
     await rerender(
       <CreateProfilePage
-        isDarkMode={false}
         onComplete={onComplete}
         submitting="idle"
         signupError={{target: 'general', message: 'No internet connection.'}}

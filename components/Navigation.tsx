@@ -1,13 +1,13 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native';
 import Svg, { Rect, Line, Circle, Path } from 'react-native-svg';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
+import { Theme } from '../theme/ThemeProvider';
+import { useTheme } from '../theme/useTheme';
 
 // Ticket 4.1: the tab navigator's bar. The tabs, their order and their labels come from the
 // navigator's own routes (App.tsx); this file only draws them.
-type NavigationProps = BottomTabBarProps & {
-  isDarkMode: boolean;
-};
+type NavigationProps = BottomTabBarProps;
 
 const renderIcon = (routeName: string, color: string) => {
   switch (routeName) {
@@ -55,15 +55,17 @@ const renderIcon = (routeName: string, color: string) => {
   }
 };
 
-const Navigation: React.FC<NavigationProps> = ({ state, navigation, isDarkMode }) => {
-  const styles = getStyles(isDarkMode);
+const Navigation: React.FC<NavigationProps> = ({ state, navigation }) => {
+  const theme = useTheme();
+  const { colors } = theme;
+  const styles = useMemo(() => getStyles(theme), [theme]);
 
   return (
     <View style={styles.container}>
       <View style={styles.tabBar}>
         {state.routes.map((route, index) => {
           const isActive = state.index === index;
-          const color = isActive ? '#10b981' : (isDarkMode ? '#52525b' : '#a1a1aa');
+          const color = isActive ? colors.primary : colors.textDisabled;
           const onPress = () => {
             const event = navigation.emit({ type: 'tabPress', target: route.key, canPreventDefault: true });
             if (!isActive && !event.defaultPrevented) {
@@ -94,23 +96,23 @@ const Navigation: React.FC<NavigationProps> = ({ state, navigation, isDarkMode }
   );
 };
 
-const getStyles = (isDark: boolean) => StyleSheet.create({
+const getStyles = ({ colors, typography, spacing }: Theme) => StyleSheet.create({
   container: {
     position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: isDark ? 'rgba(18, 18, 18, 0.95)' : 'rgba(255, 255, 255, 0.95)',
+    backgroundColor: colors.surface,
     borderTopWidth: 1,
-    borderTopColor: isDark ? '#27272a' : '#f4f4f5',
-    paddingBottom: Platform.OS === 'ios' ? 20 : 0,
+    borderTopColor: colors.border,
+    paddingBottom: Platform.OS === 'ios' ? spacing.lg : 0,
   },
   tabBar: {
     flexDirection: 'row',
     height: 70,
     justifyContent: 'space-around',
     alignItems: 'center',
-    paddingBottom: 10,
+    paddingBottom: spacing.md,
   },
   tab: {
     flex: 1,
@@ -119,15 +121,15 @@ const getStyles = (isDark: boolean) => StyleSheet.create({
     height: '100%',
   },
   iconContainer: {
-    marginBottom: 4,
+    marginBottom: spacing.xs,
     transform: [{ scale: 1 }],
   },
   activeIconContainer: {
     transform: [{ scale: 1.1 }],
   },
   label: {
-    fontSize: 9,
-    fontWeight: '900',
+    fontSize: typography.micro.fontSize,
+    fontWeight: '700',
     textTransform: 'uppercase',
     letterSpacing: 1,
   }

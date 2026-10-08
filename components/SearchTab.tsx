@@ -1,13 +1,12 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-
-interface Props {
-  isDarkMode: boolean;
-}
+import { Theme } from '../theme/ThemeProvider';
+import { useTheme } from '../theme/useTheme';
 
 // Ticket 4.1: a placeholder — the banner only. Ticket 4.3 fills it.
-const SearchTab: React.FC<Props> = ({ isDarkMode }) => {
-  const styles = getStyles(isDarkMode);
+const SearchTab: React.FC = () => {
+  const theme = useTheme();
+  const styles = useMemo(() => getStyles(theme), [theme]);
 
   return (
     <View style={styles.container}>
@@ -18,10 +17,10 @@ const SearchTab: React.FC<Props> = ({ isDarkMode }) => {
   );
 };
 
-const getStyles = (isDark: boolean) => StyleSheet.create({
-  container: { flex: 1, backgroundColor: isDark ? '#000' : '#fff' },
-  header: { padding: 16, paddingTop: 20, paddingBottom: 10 },
-  headerTitle: { fontSize: 32, fontWeight: 'bold', color: '#10b981', fontFamily: 'Inter' },
+const getStyles = ({ colors, typography, spacing }: Theme) => StyleSheet.create({
+  container: { flex: 1, backgroundColor: colors.background },
+  header: { padding: spacing.base, paddingTop: spacing.lg, paddingBottom: spacing.md },
+  headerTitle: { ...typography.display, color: colors.primary, fontFamily: 'Inter' },
 });
 
 export default SearchTab;
