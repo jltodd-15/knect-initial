@@ -1,7 +1,7 @@
 /**
  * Ticket 4.2: App.tsx on the theme. The app opens in the phone's light or dark setting, the two
- * launch waits show the "Kn" logo instead of a spinner, and the Profile tab's dark-mode switch
- * saves Light or Dark.
+ * launch waits show the "Kn" logo instead of a spinner. (The Profile tab's dark-mode switch is in
+ * ProfilePage.theme.test.tsx.)
  *
  * Same stand-ins as App.profileCheck.test.tsx: an auth mock that can start signed in, and stubbed
  * tab screens. The tab bar and the Search placeholder are the real components.
@@ -9,7 +9,7 @@
 
 import React from 'react';
 import {StyleSheet} from 'react-native';
-import {render, screen, fireEvent, waitFor} from '@testing-library/react-native';
+import {render, screen} from '@testing-library/react-native';
 import {act} from 'react-test-renderer';
 
 jest.mock('react-native/Libraries/Utilities/useColorScheme', () => ({
@@ -71,19 +71,7 @@ const stubComponent = (label: string) => () => {
 jest.mock('../components/EventPlanner', () => ({__esModule: true, default: stubComponent('PLANNER')}));
 jest.mock('../components/DiscoveryFeed', () => ({__esModule: true, default: stubComponent('FEED')}));
 jest.mock('../components/SocialDashboard', () => ({__esModule: true, default: stubComponent('SOCIAL')}));
-// Stands in for ProfilePage's dark-mode switch until ProfilePage itself moves onto the theme.
-jest.mock('../components/ProfilePage', () => ({
-  __esModule: true,
-  default: ({toggleDarkMode}: {toggleDarkMode: () => void}) => {
-    const mockReact = require('react');
-    const {TouchableOpacity, Text} = require('react-native');
-    return mockReact.createElement(
-      TouchableOpacity,
-      {onPress: toggleDarkMode},
-      mockReact.createElement(Text, null, 'DARK MODE SWITCH'),
-    );
-  },
-}));
+jest.mock('../components/ProfilePage', () => ({__esModule: true, default: stubComponent('PROFILE')}));
 
 const checkMock = checkUserProfileExists as jest.Mock;
 const styleOf = (node: {props: {style?: unknown}}) => StyleSheet.flatten(node.props.style as never) as Record<string, unknown>;
@@ -143,19 +131,6 @@ test('while checking that a signed-in user has a profile, the Kn logo shows, not
   });
   expect(screen.getByText('PLANNER')).toBeTruthy();
   expect(screen.queryByTestId('launch-logo')).toBeNull();
-});
-
-test("the Profile tab's dark-mode switch saves Dark, then Light", async () => {
-  authMock.__setSignedInUser({uid: 'test-uid', email: 'a@b.com'});
-  await render(<App />);
-  await screen.findByText('PLANNER');
-  fireEvent.press(screen.getByLabelText('Profile'));
-
-  fireEvent.press(await screen.findByText('DARK MODE SWITCH'));
-  await waitFor(async () => expect(await userStore.getItem('theme_override')).toBe('dark'));
-
-  fireEvent.press(screen.getByText('DARK MODE SWITCH'));
-  await waitFor(async () => expect(await userStore.getItem('theme_override')).toBe('light'));
 });
 
 test('the tab bar follows the theme', async () => {

@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { View, Text, PanResponder, Animated, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, PanResponder, Animated, StyleSheet } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import { useTheme } from '../theme/useTheme';
 import { typography, spacing, radius } from '../theme/tokens';

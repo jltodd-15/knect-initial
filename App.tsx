@@ -295,11 +295,6 @@ const AppContent: React.FC = () => {
     }
   };
 
-  // The Profile tab's switch picks Light or Dark; going back to following the phone is D6's.
-  const toggleDarkMode = () => {
-    theme.setOverride(theme.mode === 'dark' ? 'light' : 'dark');
-  };
-
   const handlePlanActivity = (goToPlanner: () => void, item: DiscoveryItem | null, participants?: string[]) => {
       if (item) setPendingDiscoveryItem(item);
       if (participants) setPendingParticipants(participants);
@@ -331,7 +326,6 @@ const AppContent: React.FC = () => {
           <SafeAreaView style={styles.container}>
               <StatusBar barStyle={barStyle} />
               <CreateProfilePage
-                isDarkMode={isDarkMode}
                 onComplete={handleProfileComplete}
                 submitting={submitState}
                 signupError={signupError}
@@ -457,7 +451,6 @@ const AppContent: React.FC = () => {
         <SafeAreaView style={styles.container}>
             <StatusBar barStyle={barStyle} />
             <CreateProfilePage
-              isDarkMode={isDarkMode}
               onComplete={handleProfileComplete}
               submitting={submitState}
               identity={signedInIdentity ?? { email: '' }}
@@ -502,7 +495,6 @@ const AppContent: React.FC = () => {
                   {({ navigation }) => (
                     <FocusedOnly>
                       <DiscoveryFeed
-                          isDarkMode={isDarkMode}
                           onPlanActivity={(item) => handlePlanActivity(() => navigation.navigate('Planner'), item)}
                       />
                     </FocusedOnly>
@@ -530,7 +522,7 @@ const AppContent: React.FC = () => {
                 <Tab.Screen name="Profile">
                   {() => (
                     <FocusedOnly>
-                      <ProfilePage isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} onLogout={handleLogout} />
+                      <ProfilePage onLogout={handleLogout} />
                     </FocusedOnly>
                   )}
                 </Tab.Screen>

@@ -1,8 +1,11 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { View, Text, Image, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator, ScrollView, Animated, Dimensions, Modal } from 'react-native';
+import React, { useEffect, useState, useRef, useMemo } from 'react';
+import { View, Text, Image, FlatList, TouchableOpacity, StyleSheet, ScrollView, Animated, Modal } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
-import { DiscoveryItem, CalendarEvent } from '../types';
+import { DiscoveryItem } from '../types';
 import { MOCK_ACTIVITIES } from '../services/mockActivities';
+import SkeletonCard from './shared/SkeletonCard';
+import { Theme } from '../theme/ThemeProvider';
+import { useTheme } from '../theme/useTheme';
 
 // Maps the schema-shaped Activity mock to the DiscoveryItem contract this component
 // (and onPlanActivity's callers, App.tsx / EventPlanner.tsx) already expect.
@@ -18,17 +21,17 @@ const getDiscoveryFeed = async (): Promise<DiscoveryItem[]> => {
 };
 
 interface Props { 
-  isDarkMode: boolean;
   onPlanActivity?: (item: DiscoveryItem) => void;
 }
 
-const { width } = Dimensions.get('window');
 const HEADER_MAX_HEIGHT = 120;
 const HEADER_MIN_HEIGHT = 60;
 const HEADER_SCROLL_DISTANCE = HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT;
 
-const DiscoveryFeed: React.FC<Props> = ({ isDarkMode, onPlanActivity }) => {
-  const styles = getStyles(isDarkMode);
+const DiscoveryFeed: React.FC<Props> = ({ onPlanActivity }) => {
+  const theme = useTheme();
+  const { colors } = theme;
+  const styles = useMemo(() => getStyles(theme), [theme]);
   const [items, setItems] = useState<DiscoveryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedItem, setSelectedItem] = useState<DiscoveryItem | null>(null);
@@ -94,7 +97,7 @@ const DiscoveryFeed: React.FC<Props> = ({ isDarkMode, onPlanActivity }) => {
     <View style={styles.container}>
       {/* Animated Header */}
       <AnimatedView style={[styles.header, { height: headerHeight }]}>
-         <AnimatedView style={{ opacity: headerTitleOpacity, position: 'absolute', top: 24, left: 24, right: 24 }}>
+         <AnimatedView style={[styles.headerTitleBlock, { opacity: headerTitleOpacity }]}>
              <Text style={styles.title}>Discover</Text>
              <Text style={styles.subtitle}>Curated local experiences</Text>
              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterRow}>
@@ -105,9 +108,9 @@ const DiscoveryFeed: React.FC<Props> = ({ isDarkMode, onPlanActivity }) => {
 
          {/* Sticky Header Content */}
          <AnimatedView style={[styles.stickyHeader, { opacity: stickyHeaderOpacity }]}>
-             <TouchableOpacity onPress={handleScrollToTop} style={{flexDirection: 'row', alignItems: 'center'}}>
+             <TouchableOpacity onPress={handleScrollToTop} style={styles.stickyRow}>
                  <Text style={styles.stickyTitle}>Discover</Text>
-                 <Svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={isDarkMode ? "white" : "black"} strokeWidth="3" style={{marginLeft: 8}}>
+                 <Svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={colors.textPrimary} strokeWidth="3" style={styles.stickyArrow}>
                      <Path d="M12 19V5M5 12l7-7 7 7" />
                  </Svg>
              </TouchableOpacity>
@@ -115,7 +118,10 @@ const DiscoveryFeed: React.FC<Props> = ({ isDarkMode, onPlanActivity }) => {
       </AnimatedView>
       
       {loading ? (
-        <ActivityIndicator size="large" color="#10b981" style={{marginTop: 150}} />
+        <View style={styles.skeletons}>
+          <SkeletonCard variant="activity" />
+          <SkeletonCard variant="activity" />
+        </View>
       ) : (
         <FlatList
           ref={listRef}
@@ -136,10 +142,10 @@ const DiscoveryFeed: React.FC<Props> = ({ isDarkMode, onPlanActivity }) => {
       <Modal visible={!!selectedItem} animationType="slide" presentationStyle="pageSheet" onRequestClose={() => setSelectedItem(null)}>
           {selectedItem && (
               <View style={styles.detailContainer}>
-                  <ScrollView style={{flex: 1}}>
+                  <ScrollView style={styles.detailScroll}>
                       <Image source={{ uri: selectedItem.image }} style={styles.detailImage} />
                       <TouchableOpacity style={styles.closeBtn} onPress={() => setSelectedItem(null)}>
-                          <Svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><Path d="M18 6L6 18M6 6l12 12" /></Svg>
+                          <Svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={colors.onPrimary} strokeWidth="2"><Path d="M18 6L6 18M6 6l12 12" /></Svg>
                       </TouchableOpacity>
                       
                       <View style={styles.detailContent}>
@@ -177,43 +183,49 @@ const DiscoveryFeed: React.FC<Props> = ({ isDarkMode, onPlanActivity }) => {
   );
 };
 
-const getStyles = (isDark: boolean) => StyleSheet.create({
-  container: { flex: 1, backgroundColor: isDark ? '#121212' : '#FDFCFB' },
-  header: { backgroundColor: isDark ? '#121212' : '#FDFCFB', zIndex: 10, overflow: 'hidden' },
-  stickyHeader: { position: 'absolute', bottom: 0, left: 0, right: 0, height: HEADER_MIN_HEIGHT, justifyContent: 'center', alignItems: 'center', borderBottomWidth: 1, borderColor: isDark ? '#333' : '#eee', backgroundColor: isDark ? '#121212' : 'rgba(255,255,255,0.95)' },
-  stickyTitle: { fontSize: 16, fontWeight: '900', color: isDark ? 'white' : 'black', fontFamily: 'Inter' },
+const getStyles = ({ colors, typography, spacing, radius }: Theme) => StyleSheet.create({
+  container: { flex: 1, backgroundColor: colors.background },
+  header: { backgroundColor: colors.background, zIndex: 10, overflow: 'hidden' },
+  headerTitleBlock: { position: 'absolute', top: spacing.xl, left: spacing.xl, right: spacing.xl },
+  stickyHeader: { position: 'absolute', bottom: 0, left: 0, right: 0, height: HEADER_MIN_HEIGHT, justifyContent: 'center', alignItems: 'center', borderBottomWidth: 1, borderColor: colors.border, backgroundColor: colors.background },
+  stickyRow: { flexDirection: 'row', alignItems: 'center' },
+  stickyArrow: { marginLeft: spacing.sm },
+  stickyTitle: { fontSize: typography.body.fontSize, fontWeight: '700', color: colors.textPrimary, fontFamily: 'Inter' },
   
-  title: { fontSize: 32, fontWeight: '900', color: '#10b981', fontFamily: 'Inter' },
-  subtitle: { fontSize: 12, fontWeight: 'bold', color: '#71717a', marginTop: 4, fontFamily: 'Inter' },
-  filterRow: { marginTop: 16, flexDirection: 'row' },
-  filterChip: { paddingHorizontal: 16, paddingVertical: 12, backgroundColor: isDark ? '#1E1E1E' : '#333', borderRadius: 12, marginRight: 8, borderWidth: 1, borderColor: isDark ? '#333' : '#444' },
-  filterText: { fontSize: 10, fontWeight: '900', textTransform: 'uppercase', color: 'white', fontFamily: 'Inter', letterSpacing: 0.5 },
+  title: { ...typography.display, color: colors.primary, fontFamily: 'Inter' },
+  subtitle: { fontSize: typography.caption.fontSize, fontWeight: '700', color: colors.textSecondary, marginTop: spacing.xs, fontFamily: 'Inter' },
+  filterRow: { marginTop: spacing.base, flexDirection: 'row' },
+  filterChip: { paddingHorizontal: spacing.base, paddingVertical: spacing.md, backgroundColor: colors.surfaceAlt, borderRadius: radius.md, marginRight: spacing.sm, borderWidth: 1, borderColor: colors.border },
+  filterText: { fontSize: typography.micro.fontSize, fontWeight: '700', textTransform: 'uppercase', color: colors.textPrimary, fontFamily: 'Inter', letterSpacing: 0.5 },
   
-  list: { padding: 24, paddingBottom: 100, paddingTop: 24 },
-  card: { height: 500, borderRadius: 40, marginBottom: 24, overflow: 'hidden', backgroundColor: '#333', position: 'relative' },
+  list: { padding: spacing.xl, paddingBottom: 100, paddingTop: spacing.xl },
+  skeletons: { padding: spacing.xl, gap: spacing.xl },
+  // Text and buttons on a card sit on a photo under a dark scrim, so they stay white in both modes.
+  card: { height: 500, borderRadius: radius.xl, marginBottom: spacing.xl, overflow: 'hidden', backgroundColor: colors.surfaceAlt, position: 'relative' },
   cardImage: { width: '100%', height: '100%' },
-  cardOverlay: { position: 'absolute', bottom: 0, left: 0, right: 0, height: '60%', backgroundColor: 'rgba(0,0,0,0.5)' }, 
-  cardContent: { position: 'absolute', bottom: 0, left: 0, right: 0, padding: 32, paddingBottom: 32 },
-  tag: { alignSelf: 'flex-start', backgroundColor: '#10b981', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8, marginBottom: 16 },
-  tagText: { color: 'white', fontSize: 10, fontWeight: '900', textTransform: 'uppercase', fontFamily: 'Inter' },
-  cardTitle: { color: 'white', fontSize: 32, fontWeight: '900', marginBottom: 12, fontFamily: 'Inter' },
-  cardDesc: { color: '#e4e4e7', fontSize: 14, fontWeight: '500', marginBottom: 32, fontFamily: 'Inter', opacity: 0.9 },
-  viewButton: { backgroundColor: 'white', padding: 20, borderRadius: 24, alignItems: 'center' },
-  viewButtonText: { color: 'black', fontWeight: '900', fontSize: 12, textTransform: 'uppercase', letterSpacing: 1, fontFamily: 'Inter' },
+  cardOverlay: { position: 'absolute', bottom: 0, left: 0, right: 0, height: '60%', backgroundColor: colors.scrim }, 
+  cardContent: { position: 'absolute', bottom: 0, left: 0, right: 0, padding: spacing['2xl'], paddingBottom: spacing['2xl'] },
+  tag: { alignSelf: 'flex-start', backgroundColor: colors.primary, paddingHorizontal: spacing.md, paddingVertical: spacing.sm, borderRadius: radius.sm, marginBottom: spacing.base },
+  tagText: { color: colors.onPrimary, fontSize: typography.micro.fontSize, fontWeight: '700', textTransform: 'uppercase', fontFamily: 'Inter' },
+  cardTitle: { ...typography.display, color: colors.onPrimary, marginBottom: spacing.md, fontFamily: 'Inter' },
+  cardDesc: { color: colors.onPrimary, fontSize: typography.label.fontSize, fontWeight: '600', marginBottom: spacing['2xl'], fontFamily: 'Inter', opacity: 0.9 },
+  viewButton: { backgroundColor: colors.surface, padding: spacing.lg, borderRadius: radius.xl, alignItems: 'center' },
+  viewButtonText: { color: colors.textPrimary, fontWeight: '700', fontSize: typography.caption.fontSize, textTransform: 'uppercase', letterSpacing: 1, fontFamily: 'Inter' },
 
   // Detail Styles
-  detailContainer: { flex: 1, backgroundColor: isDark ? '#121212' : 'white' },
+  detailContainer: { flex: 1, backgroundColor: colors.surface },
+  detailScroll: { flex: 1 },
   detailImage: { width: '100%', height: 400 },
-  closeBtn: { position: 'absolute', top: 40, right: 24, width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' },
-  detailContent: { padding: 24, paddingBottom: 100 },
-  detailTitle: { fontSize: 32, fontWeight: '900', color: isDark ? 'white' : 'black', fontFamily: 'Inter', marginBottom: 16 },
-  detailDesc: { fontSize: 16, lineHeight: 24, color: isDark ? '#ccc' : '#555', fontFamily: 'Inter', marginBottom: 32 },
-  infoRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 16, borderBottomWidth: 1, borderColor: isDark ? '#333' : '#eee' },
-  infoLabel: { fontSize: 12, fontWeight: '900', color: '#71717a', fontFamily: 'Inter', letterSpacing: 1 },
-  infoValue: { fontSize: 14, fontWeight: '600', color: isDark ? 'white' : 'black', fontFamily: 'Inter' },
-  detailFooter: { padding: 24, paddingBottom: 40, borderTopWidth: 1, borderColor: isDark ? '#333' : '#eee', backgroundColor: isDark ? '#121212' : 'white' },
-  planBtn: { backgroundColor: '#10b981', padding: 20, borderRadius: 24, alignItems: 'center' },
-  planBtnText: { color: 'white', fontWeight: '900', fontSize: 14, letterSpacing: 1, fontFamily: 'Inter' }
+  closeBtn: { position: 'absolute', top: 40, right: spacing.xl, width: 40, height: 40, borderRadius: radius.pill, backgroundColor: colors.scrim, justifyContent: 'center', alignItems: 'center' },
+  detailContent: { padding: spacing.xl, paddingBottom: 100 },
+  detailTitle: { ...typography.display, color: colors.textPrimary, fontFamily: 'Inter', marginBottom: spacing.base },
+  detailDesc: { fontSize: typography.body.fontSize, lineHeight: 24, color: colors.textSecondary, fontFamily: 'Inter', marginBottom: spacing['2xl'] },
+  infoRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: spacing.base, borderBottomWidth: 1, borderColor: colors.border },
+  infoLabel: { fontSize: typography.caption.fontSize, fontWeight: '700', color: colors.textSecondary, fontFamily: 'Inter', letterSpacing: 1 },
+  infoValue: { fontSize: typography.label.fontSize, fontWeight: '600', color: colors.textPrimary, fontFamily: 'Inter' },
+  detailFooter: { padding: spacing.xl, paddingBottom: 40, borderTopWidth: 1, borderColor: colors.border, backgroundColor: colors.surface },
+  planBtn: { backgroundColor: colors.primary, padding: spacing.lg, borderRadius: radius.xl, alignItems: 'center' },
+  planBtnText: { color: colors.onPrimary, fontWeight: '700', fontSize: typography.label.fontSize, letterSpacing: 1, fontFamily: 'Inter' }
 });
 
 export default DiscoveryFeed;

@@ -57,8 +57,7 @@ moved by a point or two.
 
 **The Profile tab's switch**
 - [ ] **It overrides the phone.** With the phone in light mode, turn the Profile tab's dark-mode
-  switch on. The tab bar and the Search tab go dark straight away. (Planner, Discover, Circle and
-  Profile themselves also go dark, as they did before this ticket.)
+  switch on. Every tab and the tab bar go dark straight away.
 - [ ] **It sticks.** Fully close and reopen the app. It is still dark, with the phone still light.
 - [ ] **And back.** Turn the switch off. The app is light, and stays light after a restart even if
   the phone is then put in dark mode. (Going back to "follow the phone" has no control yet; that
@@ -80,7 +79,47 @@ moved by a point or two.
 - [ ] **Ranking a vote.** In a chat with a ranked vote, the draggable rows are readable and lift
   with a shadow while dragged. 📸
 
-### Session D: onboarding, Profile, Discover — not built yet
+### Session D: onboarding, Profile, Discover — ready
+
+**Onboarding (tap CREATE ACCOUNT on the sign-in screen)**
+- [ ] **Step one, email and password.** Green "Create Profile"-style title, gray labels, the two
+  inputs, the password rules (gray, turning green as each is met), the round eye button, the green
+  arrow button. Type a bad password and tap the arrow: the error under it is red. 📸
+- [ ] **Step two, profile.** The initials circle (green, white letters), name and bio inputs, the
+  interest chips (white or dark with a thin outline; green with white text once picked), the green
+  COMPLETE PROFILE button. 📸 with two or three interests picked.
+- [ ] **Saving.** Tap COMPLETE PROFILE: the button still shows its small spinner and "SAVING
+  PROFILE...". This spinner is meant to stay.
+- [ ] **Failed save.** Go offline and tap COMPLETE PROFILE; after the wait the button turns into a
+  red outline reading TRY AGAIN. 📸
+
+**Profile tab**
+- [ ] **The whole tab.** Name in green, the gray line under it, the friends button, INTERESTS chips,
+  the calendar button, and the SETTINGS card with **Dark Mode** and a red **Log Out**. Cards are
+  white on the off-white background in light mode, dark gray on near-black in dark mode. 📸
+- [ ] **The Dark Mode switch.** It is on when the app is dark and off when it is light, and
+  flipping it changes the **whole Profile tab** at once (not just the tab bar, as in Session C).
+- [ ] **Editing.** Tap the pencil badge on the photo: the name and the line under it become
+  underlined inputs, the photo dims with a camera icon, and each interest chip shows a small ✕. 📸
+- [ ] **Adding an interest.** Tap **+**: a rounded input and a green ADD button appear. 📸
+- [ ] **Friends list.** Tap the friends button. A sheet opens with a gray hint box and the list.
+  Tap a star: it fills **green** (it was amber before this ticket). Unpicked stars are gray
+  outlines. 📸
+
+**Discover tab**
+- [ ] **Skeleton, not a spinner.** Open Discover. For an instant, before the cards, you see gray
+  placeholder cards (a block and two bars) instead of a spinning circle. It is very brief on
+  sample data; a screen recording is the way to catch it. If you can't catch it at all, say so.
+- [ ] **The feed.** Green "Discover" title, gray subtitle, and two filter chips. **The chips
+  changed the most:** they were dark with white text in both modes; now they are light gray with
+  dark text in light mode and dark gray with light text in dark mode. 📸
+- [ ] **A card.** The photo with its darkened lower half, a green tag, the title and description
+  in white (in both modes), and the VIEW SPOT button: white with dark text in light mode, dark
+  gray with light text in dark mode. Card corners are less round than before. 📸
+- [ ] **Scrolled.** Scroll down: the small "Discover ↑" bar at the top is solid, with a thin line
+  under it. 📸
+- [ ] **A spot's detail sheet.** Tap VIEW SPOT: photo, round dark ✕ button, title, description,
+  LOCATION and PRICE rows, and the green PLAN THIS ACTIVITY button. 📸
 
 ### Session E: Planner, create-event modal — not built yet
 

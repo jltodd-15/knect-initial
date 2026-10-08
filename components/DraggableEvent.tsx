@@ -1,6 +1,5 @@
 import React, { useRef, useState, useEffect, useMemo } from 'react';
 import { View, Text, StyleSheet, PanResponder, Animated, TouchableOpacity } from 'react-native';
-import Svg, { Path } from 'react-native-svg';
 import { CalendarEvent } from '../types';
 import { Theme } from '../theme/ThemeProvider';
 import { useTheme } from '../theme/useTheme';
@@ -27,7 +26,7 @@ const DraggableEvent: React.FC<Props> = (props) => {
   const theme = useTheme();
   const { colors } = theme;
   const styles = useMemo(() => getStyles(theme), [theme]);
-  const { event, layout, slotHeight, gridStartHour = 0, onDragEnd, onResizeEnd, onPress, allowResize = true, isMultiDay = false, onDragAttemptBlocked } = props;
+  const { event, layout, onPress, allowResize = true } = props;
   
   // Keep track of latest props to avoid stale closures in PanResponder
   const propsRef = useRef(props);
@@ -63,7 +62,7 @@ const DraggableEvent: React.FC<Props> = (props) => {
       onStartShouldSetPanResponder: () => true,
       onMoveShouldSetPanResponder: () => true,
       
-      onPanResponderGrant: (evt: any, gestureState) => {
+      onPanResponderGrant: (evt: any) => {
         const { locationY } = evt.nativeEvent;
         const currentLayout = propsRef.current.layout;
         const currentAllowResize = propsRef.current.allowResize;
