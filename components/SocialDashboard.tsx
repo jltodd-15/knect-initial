@@ -100,7 +100,6 @@ const VoteMessage: React.FC<VoteMessageProps> = ({ message, isDarkMode, currentU
                                 <DraggableVoteList 
                                     options={sortedOptions.map(o => ({ id: o.id, text: o.text }))}
                                     onReorder={(newOrder) => setLocalOrder(newOrder)}
-                                    isDarkMode={isDarkMode}
                                 />
                             </View>
                             <TouchableOpacity style={styles.createVoteBtn} onPress={handleRankedSubmit}>
@@ -1181,7 +1180,7 @@ const SocialDashboard: React.FC<Props> = ({ isDarkMode, onChatOpen, onChatClose,
       </View>
       
       {/* Status Composer */}
-      <StatusComposer isDarkMode={isDarkMode} />
+      <StatusComposer />
 
       {/* Search Bar */}
       <View style={styles.searchContainer}>

@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, StatusBar, ActivityIndicator } from 'react-native';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, StatusBar } from 'react-native';
 import {  SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { NavigationContainer, DefaultTheme, useIsFocused } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -23,6 +23,8 @@ import { DiscoveryItem } from './types';
 import { AuthService } from './services/AuthService';
 import { UsersRepository } from './services/UsersRepository';
 import { checkUserProfileExists, withTimeout, WRITE_TIMEOUT_MS } from './hooks/useProfileCheck';
+import { ThemeProvider, Theme } from './theme/ThemeProvider';
+import { useTheme } from './theme/useTheme';
 
 // Ticket 2.3: told once, at the moment the account survives a second failed profile write and
 // the user is signed out. The account is real and the email is taken — signing back in, not
@@ -90,8 +92,11 @@ const Tab = createBottomTabNavigator<TabParamList>();
 const FocusedOnly: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   useIsFocused() ? <>{children}</> : null;
 
-const App: React.FC = () => {
-  const [isDarkMode, setIsDarkMode] = useState(false);
+const AppContent: React.FC = () => {
+  const theme = useTheme();
+  const { colors } = theme;
+  // Ticket 4.2: the screens not yet moved onto the theme still take this as a prop.
+  const isDarkMode = theme.mode === 'dark';
   const [isAuth, setIsAuth] = useState(false);
   const [showCreateProfile, setShowCreateProfile] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -128,10 +133,6 @@ const App: React.FC = () => {
   // together so a retry can never pair one account's uid with a different, since-edited email.
   const accountRef = useRef<{ uid: string; email: string } | null>(null);
   const checkSeqRef = useRef(0); // invalidates a stale missing-profile read after our own write lands
-
-  useEffect(() => {
-    setIsDarkMode(false);
-  }, []);
 
   useEffect(() => {
     const unsubscribe = AuthService.subscribeToAuthState((user) => {
@@ -294,9 +295,9 @@ const App: React.FC = () => {
     }
   };
 
+  // The Profile tab's switch picks Light or Dark; going back to following the phone is D6's.
   const toggleDarkMode = () => {
-    const newVal = !isDarkMode;
-    setIsDarkMode(newVal);
+    theme.setOverride(theme.mode === 'dark' ? 'light' : 'dark');
   };
 
   const handlePlanActivity = (goToPlanner: () => void, item: DiscoveryItem | null, participants?: string[]) => {
@@ -306,22 +307,29 @@ const App: React.FC = () => {
       goToPlanner();
   };
 
-  const styles = getStyles(isDarkMode);
+  const styles = useMemo(() => getStyles(theme), [theme]);
+  const barStyle = theme.mode === 'dark' ? 'light-content' : 'dark-content';
+
+  // Ticket 4.2: the two waits before the app knows which screen to show - is anyone signed in,
+  // and do they have a profile - show the logo from the sign-in screen, never a spinner.
+  const launchScreen = (
+    <View style={[styles.container, styles.centered]}>
+      <StatusBar barStyle={barStyle} />
+      <View testID="launch-logo" style={[styles.logoBox, styles.launchLogo]}>
+        <Text style={styles.logoText}>Kn</Text>
+      </View>
+    </View>
+  );
 
   if (initializing) {
-    return (
-      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
-        <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-        <ActivityIndicator size="large" color="#10b981" />
-      </View>
-    );
+    return launchScreen;
   }
 
   if (showCreateProfile) {
       return (
         <SafeAreaProvider>
           <SafeAreaView style={styles.container}>
-              <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
+              <StatusBar barStyle={barStyle} />
               <CreateProfilePage
                 isDarkMode={isDarkMode}
                 onComplete={handleProfileComplete}
@@ -336,9 +344,9 @@ const App: React.FC = () => {
   if (!isAuth) {
     return (
       <View style={styles.container}>
-        <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
+        <StatusBar barStyle={barStyle} />
         <View style={styles.authContainer}>
-          <View style={{ alignItems: 'center', marginBottom: 40 }}>
+          <View style={styles.brand}>
              <View style={styles.logoBox}>
                 <Text style={styles.logoText}>Kn</Text>
              </View>
@@ -351,7 +359,7 @@ const App: React.FC = () => {
                <TextInput
                   style={styles.input}
                   placeholder="EMAIL ADDRESS"
-                  placeholderTextColor={isDarkMode ? '#666' : '#999'}
+                  placeholderTextColor={colors.placeholder}
                   value={email}
                   onChangeText={setEmail}
                   autoCapitalize="none"
@@ -362,7 +370,7 @@ const App: React.FC = () => {
                <TextInput
                   style={styles.input}
                   placeholder="PASSWORD"
-                  placeholderTextColor={isDarkMode ? '#666' : '#999'}
+                  placeholderTextColor={colors.placeholder}
                   value={password}
                   onChangeText={setPassword}
                   secureTextEntry
@@ -382,8 +390,8 @@ const App: React.FC = () => {
                   <Text style={styles.signInText}>{loading ? 'PROCESSING...' : 'SIGN IN'}</Text>
                </TouchableOpacity>
 
-               <TouchableOpacity style={[styles.signInBtn, {backgroundColor: 'transparent', borderWidth: 1, borderColor: isDarkMode ? '#333' : '#ddd', marginTop: 12}]} onPress={handleSignUp} disabled={loading}>
-                  <Text style={[styles.signInText, {color: isDarkMode ? 'white' : 'black'}]}>CREATE ACCOUNT</Text>
+               <TouchableOpacity style={[styles.signInBtn, styles.createAccountBtn]} onPress={handleSignUp} disabled={loading}>
+                  <Text style={[styles.signInText, styles.createAccountText]}>CREATE ACCOUNT</Text>
                </TouchableOpacity>
 
                <TouchableOpacity onPress={() => { setAuthError({ field: null, message: '' }); setAuthView('forgotPassword'); }} disabled={loading}>
@@ -400,7 +408,7 @@ const App: React.FC = () => {
                <TextInput
                   style={styles.input}
                   placeholder="EMAIL ADDRESS"
-                  placeholderTextColor={isDarkMode ? '#666' : '#999'}
+                  placeholderTextColor={colors.placeholder}
                   value={resetEmail}
                   onChangeText={setResetEmail}
                   autoCapitalize="none"
@@ -437,12 +445,7 @@ const App: React.FC = () => {
   // state exists to prevent. A rejected read (no cache, no connection) also lands here and stays
   // here, rather than guessing.
   if (profileCheckStatus === 'checking') {
-    return (
-      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
-        <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-        <ActivityIndicator size="large" color="#10b981" />
-      </View>
-    );
+    return launchScreen;
   }
 
   // Ticket 1.4: a signed-in user with no Users document - the account a failed profile write can
@@ -452,7 +455,7 @@ const App: React.FC = () => {
     return (
       <SafeAreaProvider>
         <SafeAreaView style={styles.container}>
-            <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
+            <StatusBar barStyle={barStyle} />
             <CreateProfilePage
               isDarkMode={isDarkMode}
               onComplete={handleProfileComplete}
@@ -468,12 +471,12 @@ const App: React.FC = () => {
   // The navigator paints its own background behind every screen; keep it the app's.
   const navigationTheme = {
     ...DefaultTheme,
-    colors: { ...DefaultTheme.colors, background: isDarkMode ? '#121212' : '#FDFCFB' },
+    colors: { ...DefaultTheme.colors, background: colors.background },
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
+      <StatusBar barStyle={barStyle} />
       <NavigationContainer theme={navigationTheme}>
         <RootStack.Navigator screenOptions={{ headerShown: false }}>
           <RootStack.Screen name="Tabs">
@@ -482,7 +485,7 @@ const App: React.FC = () => {
                 initialRouteName="Planner"
                 backBehavior="none"
                 screenOptions={{ headerShown: false }}
-                tabBar={(props) => (isChatOpen ? null : <Navigation {...props} isDarkMode={isDarkMode} />)}
+                tabBar={(props) => (isChatOpen ? null : <Navigation {...props} />)}
               >
                 <Tab.Screen name="Planner">
                   {() => (
@@ -508,7 +511,7 @@ const App: React.FC = () => {
                 <Tab.Screen name="Search">
                   {() => (
                     <FocusedOnly>
-                      <SearchTab isDarkMode={isDarkMode} />
+                      <SearchTab />
                     </FocusedOnly>
                   )}
                 </Tab.Screen>
@@ -540,38 +543,51 @@ const App: React.FC = () => {
   );
 };
 
-const getStyles = (isDark: boolean) => StyleSheet.create({
-  container: { flex: 1, backgroundColor: isDark ? '#121212' : '#FDFCFB' },
-  authContainer: { flex: 1, justifyContent: 'center', padding: 24 },
+// ThemeProvider sits above everything that reads the theme, including the sign-in screen.
+const App: React.FC = () => (
+  <ThemeProvider>
+    <AppContent />
+  </ThemeProvider>
+);
+
+const getStyles = ({ colors, typography, spacing, radius }: Theme) => StyleSheet.create({
+  container: { flex: 1, backgroundColor: colors.background },
+  centered: { justifyContent: 'center', alignItems: 'center' },
+  authContainer: { flex: 1, justifyContent: 'center', padding: spacing.xl },
+  brand: { alignItems: 'center', marginBottom: 40 },
 
   logoBox: {
     width: 80,
     height: 80,
-    borderRadius: 24,
-    backgroundColor: '#10b981',
+    borderRadius: radius.xl,
+    backgroundColor: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 24,
+    marginBottom: spacing.xl,
   },
+  launchLogo: { marginBottom: 0 },
+  // The logo and the app's name are the two sizes kept off the type scale.
   logoText: {
     fontFamily: 'Anonymous Pro',
     fontSize: 42,
     fontWeight: '700',
-    color: 'white',
+    color: colors.onPrimary,
     letterSpacing: -2
   },
 
-  appTitle: { fontSize: 40, fontWeight: '700', color: isDark ? 'white' : 'black', marginBottom: 8, fontFamily: 'Anonymous Pro' },
-  appSubtitle: { fontSize: 10, fontWeight: '900', color: '#71717a', textTransform: 'uppercase', letterSpacing: 2, fontFamily: 'Inter' },
+  appTitle: { fontSize: 40, fontWeight: '700', color: colors.textPrimary, marginBottom: spacing.sm, fontFamily: 'Anonymous Pro' },
+  appSubtitle: { fontSize: typography.micro.fontSize, fontWeight: '700', color: colors.textSecondary, textTransform: 'uppercase', letterSpacing: 2, fontFamily: 'Inter' },
 
-  formCard: { backgroundColor: isDark ? '#1E1E1E' : 'white', padding: 32, borderRadius: 40, gap: 16, borderWidth: 1, borderColor: isDark ? '#333' : '#f0f0f0' },
-  input: { backgroundColor: isDark ? '#2C2C2C' : '#f4f4f5', padding: 20, borderRadius: 24, fontSize: 12, fontWeight: 'bold', color: isDark ? 'white' : 'black', fontFamily: 'Inter' },
-  signInBtn: { backgroundColor: '#10b981', padding: 20, borderRadius: 24, alignItems: 'center' },
-  signInText: { color: 'white', fontWeight: '900', fontSize: 12, letterSpacing: 2, fontFamily: 'Inter' },
+  formCard: { backgroundColor: colors.surface, padding: spacing['2xl'], borderRadius: radius.xl, gap: spacing.base, borderWidth: 1, borderColor: colors.border },
+  input: { backgroundColor: colors.surfaceAlt, padding: spacing.lg, borderRadius: radius.xl, fontSize: typography.caption.fontSize, fontWeight: '700', color: colors.textPrimary, fontFamily: 'Inter' },
+  signInBtn: { backgroundColor: colors.primary, padding: spacing.lg, borderRadius: radius.xl, alignItems: 'center' },
+  signInText: { color: colors.onPrimary, fontWeight: '700', fontSize: typography.caption.fontSize, letterSpacing: 2, fontFamily: 'Inter' },
+  createAccountBtn: { backgroundColor: 'transparent', borderWidth: 1, borderColor: colors.border, marginTop: spacing.md },
+  createAccountText: { color: colors.textPrimary },
 
-  forgotPasswordText: { color: '#71717a', fontSize: 11, fontWeight: '700', textAlign: 'center', marginTop: 12, fontFamily: 'Inter' },
+  forgotPasswordText: { color: colors.textSecondary, fontSize: typography.caption.fontSize, fontWeight: '700', textAlign: 'center', marginTop: spacing.md, fontFamily: 'Inter' },
 
-  errorText: { color: '#ff8080', textAlign: 'center', fontFamily: 'Anonymous Pro' }
+  errorText: { color: colors.danger, textAlign: 'center', fontFamily: 'Anonymous Pro' }
 });
 
 export default App;

@@ -1,7 +1,9 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useMemo } from 'react';
 import { View, Text, StyleSheet, PanResponder, Animated, TouchableOpacity } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import { CalendarEvent } from '../types';
+import { Theme } from '../theme/ThemeProvider';
+import { useTheme } from '../theme/useTheme';
 
 interface Props {
   event: CalendarEvent;
@@ -16,14 +18,16 @@ interface Props {
   onDragEnd: (eventId: string, newStartTime: number) => void;
   onResizeEnd: (eventId: string, durationChange: number) => void;
   onPress: (event: CalendarEvent) => void;
-  isDarkMode: boolean;
   allowResize?: boolean;
   isMultiDay?: boolean;
   onDragAttemptBlocked?: () => void;
 }
 
 const DraggableEvent: React.FC<Props> = (props) => {
-  const { event, layout, slotHeight, gridStartHour = 0, onDragEnd, onResizeEnd, onPress, isDarkMode, allowResize = true, isMultiDay = false, onDragAttemptBlocked } = props;
+  const theme = useTheme();
+  const { colors } = theme;
+  const styles = useMemo(() => getStyles(theme), [theme]);
+  const { event, layout, slotHeight, gridStartHour = 0, onDragEnd, onResizeEnd, onPress, allowResize = true, isMultiDay = false, onDragAttemptBlocked } = props;
   
   // Keep track of latest props to avoid stale closures in PanResponder
   const propsRef = useRef(props);
@@ -239,9 +243,9 @@ const DraggableEvent: React.FC<Props> = (props) => {
           height: heightAnim,
           transform: [{ translateY: panY }],
           zIndex: isDragging || isResizing ? 100 : 1,
-          backgroundColor: isProposed ? `${event.color}33` : (event.color || '#10b981'), // 20% opacity for proposed
+          backgroundColor: isProposed ? `${event.color}33` : (event.color || colors.primary), // 20% opacity for proposed
           opacity: isDragging ? 0.9 : 1,
-          borderColor: isProposed ? event.color : (isResizing ? 'white' : 'rgba(255,255,255,0.2)'),
+          borderColor: isProposed ? event.color : (isResizing ? colors.onPrimary : colors.onPrimaryMuted),
           borderWidth: isProposed ? 2 : 1,
           borderStyle: isProposed ? 'dashed' : 'solid',
         }
@@ -272,13 +276,13 @@ const DraggableEvent: React.FC<Props> = (props) => {
   );
 };
 
-const styles = StyleSheet.create({
+const getStyles = ({ colors, typography, spacing, radius }: Theme) => StyleSheet.create({
   container: {
     position: 'absolute',
-    borderRadius: 12,
+    borderRadius: radius.md,
     overflow: 'hidden',
-    padding: 8,
-    shadowColor: "#000",
+    padding: spacing.sm,
+    shadowColor: colors.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.15,
     shadowRadius: 3,
@@ -288,23 +292,23 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   title: {
-    color: 'white',
-    fontSize: 13,
-    fontWeight: '800',
+    color: colors.onPrimary,
+    fontSize: typography.label.fontSize,
+    fontWeight: '700',
     fontFamily: 'Inter',
-    marginBottom: 2
+    marginBottom: spacing.xs
   },
   time: {
-    color: 'rgba(255,255,255,0.9)',
-    fontSize: 11,
+    color: colors.onPrimary,
+    fontSize: typography.caption.fontSize,
     fontFamily: 'Inter',
-    fontWeight: '500'
+    fontWeight: '600'
   },
   participants: {
-    color: 'rgba(255,255,255,0.8)',
-    fontSize: 10,
+    color: colors.onPrimary,
+    fontSize: typography.micro.fontSize,
     fontFamily: 'Inter',
-    marginTop: 4,
+    marginTop: spacing.xs,
     fontStyle: 'italic'
   },
   resizeHandleContainer: {

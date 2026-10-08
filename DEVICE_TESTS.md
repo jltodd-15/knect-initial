@@ -22,6 +22,72 @@ part.
 
 ---
 
+## 4.2: Theme, tokens, shared components and the full sweep
+
+Not yet run, and not finished: the sweep lands a few screens at a time. Each group below says
+which session of the ticket it belongs to. Only the groups marked **ready** can be checked yet.
+
+**Screenshots wanted.** Kyson can't run the app, so this ticket's look is judged from your
+screenshots. For every line marked 📸, take one with the phone in light mode and one in dark mode.
+
+**How to switch modes.** Change the phone's own setting (iOS: Settings → Display & Brightness.
+Android: Settings → Display → Dark theme), then come back to the app. It should change without a
+restart. Before the first check, leave the Profile tab's dark-mode switch alone: once it has been
+used, the app stops following the phone (that is the override, checked below).
+
+**Expected everywhere, not bugs:** text is a slightly softer black (and a slightly off white in
+dark mode), bold text is a little less heavy than before, and some gaps and corner curves have
+moved by a point or two.
+
+### Session C: the shell and small pieces — ready
+
+**Following the phone**
+- [ ] **Dark phone, dark app.** With a fresh install and the phone in dark mode, open the app. The
+  sign-in screen is dark: near-black background, a dark card, light text. 📸
+- [ ] **Light phone, light app.** Same in light mode: warm off-white background, white card. 📸
+- [ ] **Changes live.** With the app open on the sign-in screen, switch the phone's mode. The app
+  follows without being restarted.
+
+**Launch**
+- [ ] **Logo, not a spinner.** While signed in, fully close and reopen the app. For a moment you see
+  the green "Kn" square, centered, on the app's background; then the app. No spinning circle. 📸
+  (it is brief; a screen recording is fine).
+- [ ] **No flash of the wrong mode.** With the phone in dark mode, reopen the app a few times. It
+  never shows a light screen first.
+
+**The Profile tab's switch**
+- [ ] **It overrides the phone.** With the phone in light mode, turn the Profile tab's dark-mode
+  switch on. The tab bar and the Search tab go dark straight away. (Planner, Discover, Circle and
+  Profile themselves also go dark, as they did before this ticket.)
+- [ ] **It sticks.** Fully close and reopen the app. It is still dark, with the phone still light.
+- [ ] **And back.** Turn the switch off. The app is light, and stays light after a restart even if
+  the phone is then put in dark mode. (Going back to "follow the phone" has no control yet; that
+  is a later ticket. To reset it, delete and reinstall the app.)
+
+**Each piece, in both modes**
+- [ ] **Sign-in screen.** Logo, "Knect", the two inputs, SIGN IN (green), CREATE ACCOUNT (outlined),
+  "Forgot password?". The card's corners are less round than before. Error text is red. 📸
+- [ ] **Forgot-password and reset-sent screens.** Same card, readable in both modes. 📸
+- [ ] **Tab bar.** A solid bar (no longer slightly see-through) with a thin line above it. The
+  active tab is green; the others are gray. Labels are readable in both modes. 📸
+- [ ] **Search tab.** Just the green "Search" title on the app's background, now in the heaviest
+  weight. 📸
+- [ ] **Events on the Planner.** Colored event blocks have white text for the title, time and
+  "with N others". 📸
+- [ ] **Status box on Circle.** "MY STATUS" in green, the switch, and when on: the text field and
+  the two pills (**All Friends** / **Close Friends**), the chosen one green. Tap the small **?**:
+  a card appears over a dimmed screen. 📸 of both.
+- [ ] **Ranking a vote.** In a chat with a ranked vote, the draggable rows are readable and lift
+  with a shadow while dragged. 📸
+
+### Session D: onboarding, Profile, Discover — not built yet
+
+### Session E: Planner, create-event modal — not built yet
+
+### Session F: Circle and the chat thread — not built yet
+
+---
+
 ## 4.1: React Navigation migration
 
 Not yet run. The tabs now run on React Navigation. `npm test` proves which tab shows which screen
@@ -229,13 +295,13 @@ Not yet run.
 - [ ] **Existing profile.** Sign in as a user whose `Users` document exists. The app opens normally.
 
 **Opening the app**
-- [ ] **No flash on startup.** While signed in, fully close and reopen the app. You see a loading
-  spinner, then the app. The login or signup screen **never** flashes up, even briefly.
+- [ ] **No flash on startup.** While signed in, fully close and reopen the app. You see the "Kn"
+  logo (a spinner before ticket 4.2), then the app. The login or signup screen **never** flashes up, even briefly.
 - [ ] **Offline startup, returning user.** Use an account that has already opened the app on this
   device before. Go offline and reopen the app. It should reach the app, using the copy of the
   profile saved on the device.
-  *If it sits on the spinner forever, report it: the code assumes this works.* (Accepted and
-  expected: a user whose profile was **never** loaded on this device will sit on the spinner while
+  *If it sits on the logo forever, report it: the code assumes this works.* (Accepted and
+  expected: a user whose profile was **never** loaded on this device will sit on the logo while
   offline until they reopen the app online.)
 
 **Nothing extra written**

@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Switch, Modal } from 'react-native';
 import { statusService } from '../services/StatusService';
 import { UserStatus } from '../types';
+import { Theme } from '../theme/ThemeProvider';
+import { useTheme } from '../theme/useTheme';
 
-interface Props {
-  isDarkMode: boolean;
-}
-
-const StatusComposer: React.FC<Props> = ({ isDarkMode }) => {
-  const styles = getStyles(isDarkMode);
+const StatusComposer: React.FC = () => {
+  const theme = useTheme();
+  const { colors } = theme;
+  const styles = useMemo(() => getStyles(theme), [theme]);
   const [status, setStatus] = useState<UserStatus>({ isAvailable: false, activity: '', privacy: 'all', timestamp: Date.now() });
 
   useEffect(() => {
@@ -58,34 +58,34 @@ const StatusComposer: React.FC<Props> = ({ isDarkMode }) => {
       </Modal>
 
       <View style={styles.statusHeader}>
-        <View style={{flexDirection:'row', alignItems:'center', gap: 6}}>
+        <View style={styles.statusLabelRow}>
             <Text style={styles.statusLabel}>MY STATUS</Text>
             <TouchableOpacity onPress={() => setShowTooltip(true)} hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}>
-                <View style={{width: 14, height: 14, borderRadius: 7, borderWidth: 1, borderColor: '#10b981', justifyContent: 'center', alignItems: 'center'}}>
-                    <Text style={{fontSize: 9, fontWeight: 'bold', color: '#10b981'}}>?</Text>
+                <View style={styles.infoDot}>
+                    <Text style={styles.infoDotText}>?</Text>
                 </View>
             </TouchableOpacity>
         </View>
         <Switch 
             value={status.isAvailable} 
             onValueChange={handleToggle}
-            trackColor={{ false: '#767577', true: '#10b981' }}
-            thumbColor={status.isAvailable ? '#fff' : '#f4f3f4'}
+            trackColor={{ false: colors.border, true: colors.primary }}
+            thumbColor={colors.surface}
             style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }] }}
         />
       </View>
 
       {status.isAvailable && (
-        <View style={{marginTop: 8}}>
+        <View style={styles.statusBody}>
             <TextInput 
                 style={styles.statusInput}
                 value={status.activity}
                 onChangeText={handleActivityChange}
                 placeholder="What are you up to?"
-                placeholderTextColor="#666"
+                placeholderTextColor={colors.placeholder}
             />
             
-            <View style={{flexDirection: 'row', marginTop: 12, gap: 8}}>
+            <View style={styles.privacyRow}>
                 <TouchableOpacity 
                     style={[styles.privacyPill, status.privacy === 'all' && styles.privacyPillActive]}
                     onPress={() => handlePrivacyChange('all')}
@@ -105,23 +105,28 @@ const StatusComposer: React.FC<Props> = ({ isDarkMode }) => {
   );
 };
 
-const getStyles = (isDark: boolean) => StyleSheet.create({
-  statusContainer: { marginHorizontal: 16, marginBottom: 16, padding: 16, backgroundColor: isDark ? '#1c1c1e' : '#f2f2f7', borderRadius: 16 },
+const getStyles = ({ colors, typography, spacing, radius }: Theme) => StyleSheet.create({
+  statusContainer: { marginHorizontal: spacing.base, marginBottom: spacing.base, padding: spacing.base, backgroundColor: colors.surfaceAlt, borderRadius: radius.lg },
   statusHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  statusLabel: { fontSize: 11, fontWeight: '900', color: '#10b981', letterSpacing: 1 },
-  statusInput: { fontSize: 15, fontWeight: '600', color: isDark ? 'white' : 'black', marginTop: 4 },
-  
-  privacyPill: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 12, backgroundColor: isDark ? '#2c2c2e' : '#e5e5ea' },
-  privacyPillActive: { backgroundColor: '#10b981' },
-  privacyText: { fontSize: 11, fontWeight: '600', color: isDark ? '#8e8e93' : '#666' },
-  privacyTextActive: { color: 'white' },
-  
-  tooltipOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' },
-  tooltipContent: { width: '80%', backgroundColor: isDark ? '#1c1c1e' : 'white', borderRadius: 16, padding: 20, shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 3.84, elevation: 5 },
-  tooltipHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
-  tooltipTitle: { fontSize: 16, fontWeight: 'bold', color: isDark ? 'white' : 'black' },
-  tooltipClose: { fontSize: 18, color: '#999', padding: 4 },
-  tooltipText: { fontSize: 14, color: isDark ? '#ccc' : '#666', lineHeight: 20 }
+  statusLabelRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
+  statusLabel: { fontSize: typography.caption.fontSize, fontWeight: '700', color: colors.primary, letterSpacing: 1 },
+  infoDot: { width: 14, height: 14, borderRadius: radius.pill, borderWidth: 1, borderColor: colors.primary, justifyContent: 'center', alignItems: 'center' },
+  infoDotText: { fontSize: typography.micro.fontSize, fontWeight: '700', color: colors.primary },
+  statusBody: { marginTop: spacing.sm },
+  statusInput: { fontSize: typography.body.fontSize, fontWeight: '600', color: colors.textPrimary, marginTop: spacing.xs },
+
+  privacyRow: { flexDirection: 'row', marginTop: spacing.md, gap: spacing.sm },
+  privacyPill: { paddingHorizontal: spacing.md, paddingVertical: spacing.sm, borderRadius: radius.md, backgroundColor: colors.border },
+  privacyPillActive: { backgroundColor: colors.primary },
+  privacyText: { fontSize: typography.caption.fontSize, fontWeight: '600', color: colors.textSecondary },
+  privacyTextActive: { color: colors.onPrimary },
+
+  tooltipOverlay: { flex: 1, backgroundColor: colors.scrim, justifyContent: 'center', alignItems: 'center' },
+  tooltipContent: { width: '80%', backgroundColor: colors.surface, borderRadius: radius.lg, padding: spacing.lg, shadowColor: colors.shadow, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 3.84, elevation: 5 },
+  tooltipHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing.md },
+  tooltipTitle: { fontSize: typography.body.fontSize, fontWeight: '700', color: colors.textPrimary },
+  tooltipClose: { fontSize: typography.headline.fontSize, color: colors.textSecondary, padding: spacing.xs },
+  tooltipText: { fontSize: typography.label.fontSize, color: colors.textSecondary, lineHeight: 20 }
 });
 
 export default StatusComposer;

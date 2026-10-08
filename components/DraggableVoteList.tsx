@@ -1,6 +1,8 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { View, Text, PanResponder, Animated, StyleSheet, TouchableOpacity } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
+import { useTheme } from '../theme/useTheme';
+import { typography, spacing, radius } from '../theme/tokens';
 
 interface Option {
     id: string;
@@ -10,7 +12,6 @@ interface Option {
 interface Props {
     options: Option[];
     onReorder: (newOrder: string[]) => void;
-    isDarkMode: boolean;
 }
 
 const ITEM_HEIGHT = 60;
@@ -21,16 +22,15 @@ interface DraggableItemProps {
     index: number;
     totalItems: number;
     onDragEnd: (from: number, to: number) => void;
-    isDarkMode: boolean;
 }
 
 const DraggableItem: React.FC<DraggableItemProps> = ({ 
     item, 
     index, 
     totalItems, 
-    onDragEnd, 
-    isDarkMode 
+    onDragEnd 
 }) => {
+    const { colors } = useTheme();
     const pan = useRef(new Animated.ValueXY()).current;
     const [isDragging, setIsDragging] = useState(false);
     
@@ -85,12 +85,12 @@ const DraggableItem: React.FC<DraggableItemProps> = ({
             style={[
                 styles.item,
                 { 
-                    backgroundColor: isDarkMode ? '#1c1c1e' : '#f9f9f9',
-                    borderColor: isDarkMode ? '#333' : '#eee',
+                    backgroundColor: colors.surfaceAlt,
+                    borderColor: colors.border,
                     transform: [{ translateY: pan.y }],
                     zIndex: isDragging ? 999 : 1,
                     opacity: isDragging ? 0.8 : 1,
-                    shadowColor: "#000",
+                    shadowColor: colors.shadow,
                     shadowOffset: { width: 0, height: 2 },
                     shadowOpacity: isDragging ? 0.2 : 0,
                     shadowRadius: isDragging ? 4 : 0,
@@ -100,16 +100,16 @@ const DraggableItem: React.FC<DraggableItemProps> = ({
             {...panResponder.panHandlers}
         >
             <View style={{flexDirection: 'row', alignItems: 'center', flex: 1}}>
-                <Text style={[styles.text, { color: isDarkMode ? 'white' : 'black' }]}>{item.text}</Text>
+                <Text style={[styles.text, { color: colors.textPrimary }]}>{item.text}</Text>
             </View>
-            <Svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={isDarkMode ? '#666' : '#ccc'} strokeWidth="2">
+            <Svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={colors.textSecondary} strokeWidth="2">
                 <Path d="M8 6h8M8 12h8M8 18h8" />
             </Svg>
         </AnimatedView>
     );
 };
 
-const DraggableVoteList: React.FC<Props> = ({ options, onReorder, isDarkMode }) => {
+const DraggableVoteList: React.FC<Props> = ({ options, onReorder }) => {
     const [items, setItems] = useState(options);
 
     useEffect(() => {
@@ -136,7 +136,6 @@ const DraggableVoteList: React.FC<Props> = ({ options, onReorder, isDarkMode }) 
                     index={index} 
                     totalItems={items.length} 
                     onDragEnd={handleDragEnd}
-                    isDarkMode={isDarkMode}
                 />
             ))}
         </View>
@@ -154,14 +153,14 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingHorizontal: 16,
-        marginBottom: 8,
-        borderRadius: 12,
+        paddingHorizontal: spacing.base,
+        marginBottom: spacing.sm,
+        borderRadius: radius.md,
         borderWidth: 1,
     },
     text: {
-        fontSize: 16,
-        fontWeight: '500',
+        fontSize: typography.body.fontSize,
+        fontWeight: '600',
     }
 });
 

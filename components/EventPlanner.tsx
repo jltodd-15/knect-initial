@@ -444,7 +444,6 @@ const EventPlanner: React.FC<Props> = ({ isDarkMode, initialProposal, initialPar
                             onDragEnd={handleEventDragEnd}
                             onResizeEnd={handleEventResizeEnd}
                             onPress={handleEventPress}
-                            isDarkMode={isDarkMode}
                             allowResize={ev.endTime <= dayEnd.getTime()}
                             isMultiDay={isMultiDay}
                             onDragAttemptBlocked={() => showToast("You cannot move multi-day events")}
