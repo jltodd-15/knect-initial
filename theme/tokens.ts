@@ -19,6 +19,11 @@ export const colors = {
   textSecondary: { light: '#71717a', dark: '#a1a1aa' },
   textDisabled: { light: '#a1a1aa', dark: '#52525b' },
   placeholder: { light: '#a1a1aa', dark: '#52525b' },
+  // Added during 4.2's mapping approval, for colors A.2 had no name for. The last two digits of an
+  // eight-digit value are its opacity.
+  shadow: { light: '#000000', dark: '#000000' },
+  scrim: { light: '#00000080', dark: '#00000080' }, // the dim behind a modal, black at 50%
+  onPrimaryMuted: { light: '#FFFFFF33', dark: '#FFFFFF33' }, // dividers on a colored block, white at 20%
 } as const;
 
 export type ColorToken = keyof typeof colors;

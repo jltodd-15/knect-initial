@@ -60,7 +60,11 @@ call, is awaited.
 
 ## Styling
 
-- Primary green is `#10b981` (emerald-500). Never `emerald-600` or `#059669`.
+- Colors, type sizes, spacing and radius are defined once, in `theme/tokens.ts`, and read through
+  `useTheme()`. The three shared states (skeleton, empty, error) are in `components/shared/`. Most
+  screens have not been moved onto either yet (ticket 4.2 is in progress).
+- Primary green is `#10b981` (emerald-500). `emerald-600` / `#059669` exists only as the
+  `primaryPressed` token, for a pressed state — never as a button's resting color.
 - Grays are Tailwind zinc. The iOS system grays (`#8e8e93`, `#1c1c1e`, `#2c2c2e`, `#f2f2f7`) are
   being phased out — don't add new ones.
 

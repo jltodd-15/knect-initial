@@ -5,8 +5,11 @@
 
 import {colors, eventColors, typography, spacing, radius, resolveColors} from '../theme/tokens';
 
-const HEX = /^#[0-9a-fA-F]{6}$/;
+// Six digits, or eight when the last two are an opacity.
+const HEX = /^#([0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/;
 
+// Appendix A.2, plus three added during 4.2's mapping approval for colors A.2 had no name for:
+// shadow, scrim (the dim behind a modal) and onPrimaryMuted (dividers on a colored block).
 const APPENDIX_A2 = [
   'primary',
   'primaryPressed',
@@ -22,9 +25,12 @@ const APPENDIX_A2 = [
   'textSecondary',
   'textDisabled',
   'placeholder',
+  'shadow',
+  'scrim',
+  'onPrimaryMuted',
 ];
 
-test('the color tokens are exactly the ones in Appendix A.2', () => {
+test('the color tokens are exactly Appendix A.2 plus the three approved additions', () => {
   expect(Object.keys(colors).sort()).toEqual([...APPENDIX_A2].sort());
 });
 
@@ -36,6 +42,12 @@ test.each(APPENDIX_A2)('%s has both a light and a dark value', name => {
 
 test('primary is emerald-500 in both modes', () => {
   expect(colors.primary).toEqual({light: '#10b981', dark: '#10b981'});
+});
+
+test('the approved additions have the agreed values', () => {
+  expect(colors.shadow).toEqual({light: '#000000', dark: '#000000'});
+  expect(colors.scrim).toEqual({light: '#00000080', dark: '#00000080'});
+  expect(colors.onPrimaryMuted).toEqual({light: '#FFFFFF33', dark: '#FFFFFF33'});
 });
 
 test('resolveColors picks one value per token for a mode', () => {
