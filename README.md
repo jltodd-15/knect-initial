@@ -16,11 +16,14 @@ an Auth account with no profile document behind it.
   two-step onboarding sequence that creates the account and writes the `Users` documents). A
   signed-in user with no profile is sent back to finish signup.
 - **Hidden:** Google and Apple sign-in, until ticket 1.3 (needs a paid Apple Developer account).
+- **Real, not yet device-tested:** the Search tab. Typing the first 3 or more letters of a name
+  looks people up in Firebase, in any capitalization, and lists up to 10 of them by initials and
+  name. It matches the start of the name only ("smith" does not find "John Smith"), and tapping a
+  result does nothing yet.
 - **Reachable but not real yet:** the Planner, Discover, Circle and Profile tabs. They open without
   crashing, but show sample data. Anything changed there is saved only on that phone, never to
-  Firebase. The Profile tab shows "Alex Rivera", not the profile created at signup. The Search tab
-  is a placeholder: a title and nothing else.
-- **Not verified on a device:** tickets 2.3, 1.4 and 4.1 (the move to React Navigation). Their checks are in `DEVICE_TESTS.md`. Test on Android for now: iOS is missing its Firebase config on this branch (see below).
+  Firebase. The Profile tab shows "Alex Rivera", not the profile created at signup.
+- **Not verified on a device:** tickets 2.3, 1.4, 4.1 (the move to React Navigation) and 4.3 (search). Their checks are in `DEVICE_TESTS.md`. What has been seen on a phone so far, and what is wanted changed, is in [`DEVICE_FINDINGS.md`](DEVICE_FINDINGS.md).
 - **Known bugs** that belong to other tickets are listed in [`CLAUDE.md`](CLAUDE.md), under
   "Known bugs that are somebody else's ticket".
 
@@ -87,5 +90,4 @@ New behavior should have a failing test written before the implementation — se
   schema wins (see `CLAUDE.md`). It can lag the source doc, so flag a mismatch rather than guessing.
 - `utils/storage.ts` — hand-written async storage wrapper; not the browser's `localStorage`.
 - `android/`, `ios/` — native projects. Firebase config lives at `android/app/google-services.json`
-  (Android) and `ios/Knect/GoogleService-Info.plist` (iOS). The iOS file arrives with ticket 0.2's
-  PR (#3), which isn't merged into this branch yet — see the known bugs in `CLAUDE.md`.
+  (Android) and `ios/Knect/GoogleService-Info.plist` (iOS). Both are in the repo; signup has been seen working on an iPhone.

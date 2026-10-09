@@ -4,6 +4,10 @@ Checks that can only be done by running the app on a real device or emulator, wi
 Console open. The automated tests (`npm test`) use a fake Firebase, so they can't prove that the
 real one behaves as expected, that the Console shows the right data, or that screens look right.
 
+**Paused since 2026-10-09.** Device testing waits until the app is connected and its layout is
+sound; the reasons, and everything seen on a phone so far, are in `DEVICE_FINDINGS.md`. The boxes
+already ticked below come from one video and two screenshots, and say so.
+
 Each ticket adds its own section here as part of that ticket. Tick a box only after watching it
 happen. If something doesn't match "you should see", note what you saw instead. That's the useful
 part.
@@ -19,6 +23,49 @@ part.
 - Expected, not bugs: the tabs show sample data (friends, chats, activities, and "Alex Rivera" on
   the Profile tab), not what you typed at signup, and changes there are only saved on that phone.
   Later tickets connect them to Firebase.
+
+---
+
+## 4.3: The Search tab and user search
+
+Not yet run. `npm test` proves when a search fires and which state the screen shows, against a
+fake Firebase; `npm run test:rules` proves the rules allow the query. Whether the real query finds
+real people, and how the screen looks, is only checkable here.
+
+**Needs two test accounts.** Sign up account A with the name `Zed Tester` and account B with the
+name `zed OTHER` (the odd capitals are deliberate). Do the checks signed in as A.
+
+**Screenshots wanted.** For every line marked 📸, take one with the phone in light mode and one in
+dark mode.
+
+**The bar**
+- [ ] 📸 Open the Search tab. You should see: the green "Search" title, and under it a rounded
+  gray bar reading "Search for friends...". Nothing below it.
+- [ ] Tap the bar. You should see: the "Search for friends..." text disappears straight away,
+  before you type. Tap away with the bar still empty and it comes back.
+
+**Searching**
+- [ ] Type `ze`. You should see: nothing appears under the bar. No gray rows, no message.
+- [ ] 📸 Type one more letter: `zed`. You should see: three gray placeholder rows for a moment,
+  then one row, a green circle with "ZO" and the name `zed OTHER`. Your own account (`Zed Tester`)
+  is not in the list.
+- [ ] Clear the bar and type `ZED` in capitals. You should see: the same one row.
+- [ ] Clear the bar and type `oth`. You should see: "No one found". This is expected: the search
+  matches the start of the name only, so a last name finds nobody.
+- [ ] 📸 Type `qqq`. You should see: "No one found" in gray text, with no red circle and no
+  "Try again" button.
+- [ ] Tap the `zed OTHER` row. You should see: nothing happens. No highlight, no new screen.
+- [ ] Type `zed`, then delete one letter. You should see: the row disappears and nothing replaces it.
+
+**Never more than 10 rows**
+- [ ] In the Console, under **Firestore Database → Data → Users**, check how many documents have a
+  `name_lowercase` starting with the same three letters. If you have 11 or more (sign up extra
+  throwaway accounts named `Zed 1`, `Zed 2`... if you want to check this), search those letters.
+  You should see: at most 10 rows, or 9 if your own account was one of the 10 fetched.
+
+**Expected, not bugs**
+- Offline, a search shows "No one found" instead of an error. Search isn't built to work offline.
+- A row shows initials and a name only. Pictures, bios and friend markers come in later tickets.
 
 ---
 
@@ -222,10 +269,10 @@ screenshots. Please send one of each: the Planner tab (whole screen, bar include
 tab, the Search tab, the Circle tab, the Profile tab, and an open chat in Circle. If you have a
 screenshot of any tab from before this ticket, send it alongside for comparison.
 
-- [ ] **The app builds and opens.** After the fresh build, sign in. You should see the Planner tab
-  with the tab bar at the bottom, and no pink "Something went wrong" screen.
-- [ ] **Five tabs, in order.** The bar reads Planner, Discover, Search, Circle, Profile, left to
-  right. All five labels fit on one line each, none cut off.
+- [x] **The app builds and opens.** After the fresh build, sign in. You should see the Planner tab
+  with the tab bar at the bottom, and no pink "Something went wrong" screen. *(Seen: video 2026-10-08, iPhone, dark mode.)*
+- [x] **Five tabs, in order.** The bar reads Planner, Discover, Search, Circle, Profile, left to
+  right. All five labels fit on one line each, none cut off. *(Seen: video 2026-10-08, iPhone, dark mode.)*
 - [ ] **The icons.** Planner is a calendar. Discover is a compass (a circle with a diamond-shaped
   needle). Search is a magnifying glass. Circle is two people. Profile is one person. The tab you
   are on is green and slightly larger; the others are gray.
@@ -249,10 +296,10 @@ screenshot of any tab from before this ticket, send it alongside for comparison.
   Planner with the create-event sheet open, and the tab bar is showing.
 - [ ] **Circle after planning from a chat.** After the step above, tap Circle. You should see the
   chat list with the tab bar showing, not the chat you left.
-- [ ] **A fresh signup lands on Planner.** Go to Profile and sign out. Create a new account. When
-  signup finishes you are on Planner, not Profile.
-- [ ] **Sign out and back in.** From Profile, sign out. You see the sign-in screen with no tab bar.
-  Sign in again. The tabs are back, on Planner.
+- [x] **A fresh signup lands on Planner.** Go to Profile and sign out. Create a new account. When
+  signup finishes you are on Planner, not Profile. *(Seen: video 2026-10-08, iPhone, dark mode.)*
+- [x] **Sign out and back in.** From Profile, sign out. You see the sign-in screen with no tab bar.
+  Sign in again. The tabs are back, on Planner. *(Reported by Kyson with a screenshot, 2026-10-09. The layout changed after doing it: `DEVICE_FINDINGS.md`, issue 2.)*
 - [ ] **Android back button.** On any tab other than Planner, press the system back button. The app
   closes, as it did before; it does not jump to another tab.
 - [ ] **Android, returning from the background.** With the app open on Circle, press home, open a
@@ -301,24 +348,24 @@ is set to: minimum 8, maximum 24 characters, require an uppercase letter, requir
 says anything else, write down what it says. The app and the Console have to match.
 
 **The two steps**
-- [ ] **One step at a time.** Tap **CREATE ACCOUNT**. Only the email and password step shows. Fill it
+- [x] **One step at a time.** Tap **CREATE ACCOUNT**. Only the email and password step shows. Fill it
   in, tap the **→** arrow. The email and password step is **gone**, not just scrolled away, and only the
-  profile step shows.
+  profile step shows. *(Seen: video 2026-10-08, iPhone, dark mode.)*
 - [ ] **Back fixes a typo.** On the profile step tap the **←** arrow. The email you typed is still there.
   Change it, tap the **→** arrow, finish signing up. In the Console, Authentication shows the **changed**
   email.
 - [ ] **Back locks once the account exists.** Go offline, reach the profile step, tap **COMPLETE
   PROFILE**, wait for **TRY AGAIN**. The **←** arrow is grayed out and does nothing when tapped.
 
-- [ ] **No Google or Apple buttons.** The login screen has no Google or Apple button and no "OR"
-  line. (Hidden until ticket 1.3.)
+- [x] **No Google or Apple buttons.** The login screen has no Google or Apple button and no "OR"
+  line. (Hidden until ticket 1.3.) *(Seen: video 2026-10-08, iPhone, dark mode.)*
 
 **Password rule**
 - [ ] **Show/hide password.** Inside the right end of the password field there's a plain eye icon.
   Tapping it shows what you typed; tapping again hides it.
-- [ ] **Requirements show up front.** Before typing anything, the password field shows
+- [x] **Requirements show up front.** Before typing anything, the password field shows
   *8–24 characters*, *A capital letter* and *A number* underneath it. Each one turns green as you
-  meet it.
+  meet it. *(Seen: video 2026-10-08, iPhone, dark mode.)*
 - [ ] **Accepted and rejected.** `Passw0rd` moves on to the profile step. Each of these stays on the
   first step and shows *"Password must be at least 8 characters and include a capital letter and a
   number"*: `Passw0r`, `password1`, `Password`, and a 25-character one like `Passw0rdPassw0rdPassw0rdP`.
@@ -344,12 +391,12 @@ says anything else, write down what it says. The app and the Console have to mat
   is empty (`""`).
 
 **Loading and errors**
-- [ ] **Spinner.** Tap **COMPLETE PROFILE**. The button shows a spinning indicator with **SAVING
-  PROFILE...** until it lands in the app.
+- [x] **Spinner.** Tap **COMPLETE PROFILE**. The button shows a spinning indicator with **SAVING
+  PROFILE...** until it lands in the app. *(Seen: video 2026-10-08, iPhone, dark mode.)*
 - [ ] **Email already in use.** Sign up with an email that already has an account. You're taken back
   to the email step, the message *"Email already in use"* is under the email, and you are **not**
   thrown back to the login screen. Change the email and finish: it works.
-- [ ] **Lands on Planner.** A finished signup opens the app on the **Planner** tab.
+- [x] **Lands on Planner.** A finished signup opens the app on the **Planner** tab. *(Seen: video 2026-10-08, iPhone, dark mode.)*
 
 **Coming back after a failed save**
 - [ ] **Resumes at the profile step.** Go offline, sign up, tap **COMPLETE PROFILE**, wait for **TRY
@@ -440,4 +487,4 @@ Not yet run.
 
 Not yet run.
 
-- [ ] **Sign-in reaches the app.** Signing in with a real account opens the app (the tab tree).
+- [x] **Sign-in reaches the app.** Signing in with a real account opens the app (the tab tree). *(Seen: video 2026-10-08, iPhone, dark mode.)*
