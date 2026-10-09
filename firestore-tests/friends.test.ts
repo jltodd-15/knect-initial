@@ -8,11 +8,15 @@ import {
   RulesTestEnvironment,
 } from '@firebase/rules-unit-testing';
 import {
+  collection,
   deleteDoc,
   doc,
   getDoc,
+  getDocs,
+  query,
   setDoc,
   updateDoc,
+  where,
   writeBatch,
 } from 'firebase/firestore';
 
@@ -98,6 +102,25 @@ describe('allowed', () => {
   test("a signed-in user reads someone else's Friends entry", async () => {
     await seed(ALICES, { status: 'friend' });
     await assertSucceeds(getDoc(doc(as('carol'), ALICES)));
+  });
+
+  // Ticket 4.4: the two queries behind the Search tab's Friends and Pending Requests sections.
+  test('a signed-in user queries their own Friends by status', async () => {
+    await seed('Users/alice/Friends/bob', { status: 'friend' });
+    await seed('Users/alice/Friends/carol', { status: 'close_friend' });
+    await seed('Users/alice/Friends/dave', { status: 'pending' });
+    await seed('Users/alice/Friends/erin', { status: 'request_sent' });
+    const friends = collection(as('alice'), 'Users/alice/Friends');
+
+    const accepted = await assertSucceeds(
+      getDocs(query(friends, where('status', 'in', ['friend', 'close_friend']))),
+    );
+    expect(accepted.docs.map(d => d.id).sort()).toEqual(['bob', 'carol']);
+
+    const pending = await assertSucceeds(
+      getDocs(query(friends, where('status', '==', 'pending'))),
+    );
+    expect(pending.docs.map(d => d.id)).toEqual(['dave']);
   });
 });
 

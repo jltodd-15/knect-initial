@@ -20,6 +20,15 @@ jest.mock('../services/UserSearchService', () => ({
   UserSearchService: {searchUsers: jest.fn(async () => [])},
 }));
 
+// Ticket 4.4: the Search tab's Friends and Pending Requests sections import the native Firestore
+// module the same way. No test here reads friends (see SearchTab.test.tsx), so cut that off too.
+jest.mock('../services/FriendsService', () => ({
+  FriendsService: {getFriends: jest.fn(async () => []), getPendingRequests: jest.fn(async () => [])},
+}));
+jest.mock('../services/userProfileCache', () => ({
+  userProfileCache: {get: jest.fn(async () => null), clear: jest.fn()},
+}));
+
 // Ticket 2.3: App now also imports hooks/useProfileCheck, which imports services/firestore (the
 // native Firestore initializer). None of these tests sign a user in (the shared auth mock doesn't
 // cascade onAuthStateChanged on success — see jest.setup.js), so the missing-profile read never

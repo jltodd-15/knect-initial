@@ -61,7 +61,12 @@ until the app is connected (decided 2026-10-09); the reasons are there too.
   - *Built (4.3), not yet device-tested:* the Search tab looks people up by the start of their name, in any capitalization, from 3 characters on, and lists up to 10 by initials and name. Checks are in `DEVICE_TESTS.md`.
   - *Prefix-only on purpose:* "smith" does not find "John Smith". Substring search needs a search service; revisit if real users keep searching by last name.
   - *Uses `components/InitialsAvatar.tsx`* (from 1.4) for any person with no uploaded picture, or who no longer exists ("Deleted user"). Don't build a second placeholder.
-- [ ] 4.4 — Friends widgets
+- [ ] 4.4 — Friends list & pending requests
+  - *Built (4.4), not yet device-tested:* under the search bar, a Pending Requests section (hidden when there are none, with a red count badge) and a Friends section (close friends first, then A–Z, filled or outline star). Read-only. Both disappear while a search is showing. Checks are in `DEVICE_TESTS.md`.
+  - *Nothing writes a Friends document yet* (Project 5), so the only way to see rows is to add documents by hand in the Console.
+  - *Names are remembered for the session* in `services/userProfileCache.ts`: one `Users` read per person, re-read only on pull-down or after signing in as someone else. 15.2's sender names reuse it instead of building a second cache.
+  - *The badge's white number uses the `onPrimary` token:* there is no `onDanger`, and `theme/tokens.ts` wasn't 4.4's to change.
+  - ❓ *No ticket owns this:* `App.tsx` throws a tab's screen away when you leave it and rebuilds it when you come back (`FocusedOnly`). That was a stopgap from 4.1 and isn't a long-term answer (it loses scroll position and typed text, and re-reads on every visit). The Search tab already reloads on real focus, so it keeps working when this is removed; the other tabs need checking.
 
 ## Project 5 — Friend requests
 - [ ] 5 — Friend request logic 📄 *depends on D2 and 15.1 — see Running Order F1*
