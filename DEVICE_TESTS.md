@@ -26,6 +26,92 @@ part.
 
 ---
 
+## 4.4: Friends list and pending requests
+
+Not yet run. `npm test` proves which section a person lands in, the order, the stars, the badge's
+number and when each read happens, against a fake Firebase; `npm run test:rules` proves the rules
+allow both queries. Whether the real queries return the real documents, and how the two sections
+look, is only checkable here.
+
+**Nothing in the app creates a friendship yet** (that is Project 5), so every Friends document
+here is added by hand in the Console.
+
+**Setup.** Sign up account A (`Zed Tester`) and at least four more accounts with different names,
+say `Ana Diaz`, `bob Ray`, `Carol Lee`, `Dave Poe`. Do the checks signed in as A. In the Console,
+under **Firestore Database → Data → Users**, copy each other account's document ID (its uid). To
+add a Friends document: open A's `Users` document → **Start collection** (or open the existing
+`Friends` collection → **Add document**) → collection ID `Friends`, **document ID = the other
+person's uid**, one field `status` of type **string**.
+
+**Screenshots wanted.** For every line marked 📸, take one with the phone in light mode and one in
+dark mode.
+
+**No friends, no requests**
+- [ ] 📸 With no Friends documents under A, open the Search tab. You should see: under the search
+  bar, the small gray heading "Friends", the gray text "No friends yet" and a green "Find friends"
+  button. The words "Pending Requests" are nowhere on the screen.
+- [ ] Tap "Find friends". You should see: the cursor lands in the search bar and the keyboard opens.
+
+**Pending requests**
+- [ ] Add three Friends documents under A with `status` = `pending` (for Ana, bob and Carol). Leave
+  the Search tab and come back. 📸 You should see: the heading "Pending Requests" with a small red
+  pill beside it reading "3" in white, then three rows (green circle with initials, then the name)
+  in the order Ana Diaz, bob Ray, Carol Lee. Below them, the Friends section, still empty.
+- [ ] Delete the three documents, leave the tab and come back. You should see: the "Pending
+  Requests" heading, the badge and the rows are all gone, not left as an empty section.
+
+**Friends, order and stars**
+- [ ] Set these under A: Ana = `friend`, bob = `close_friend`, Carol = `friend`, Dave =
+  `close_friend`. Leave the tab and come back. 📸 You should see, top to bottom: bob Ray, Dave Poe
+  (each with a filled green star at the right edge), then Ana Diaz, Carol Lee (each with an
+  outline green star). Capital letters make no difference to the order.
+- [ ] Add one more with `status` = `request_sent`. Leave and come back. You should see: that person
+  appears in neither section.
+- [ ] Tap a row, then tap a star. You should see: nothing happens. No highlight, no new screen, the
+  star does not change.
+- [ ] Open the Profile tab. You should see: it is unchanged, sample data and all.
+
+**Coming back, and pulling down**
+- [ ] In the Console, change Ana's `status` from `friend` to `close_friend`. Without pulling down,
+  go to another tab and come back to Search. You should see: Ana now has a filled star and has
+  moved up among the close friends.
+- [ ] In the Console, open Ana's own `Users` document and change both `name` and `name_lowercase`
+  (e.g. `Zoe Diaz` / `zoe diaz`). Leave the tab and come back. You should see: still "Ana Diaz".
+  This is expected: names are remembered until you pull down or sign out.
+- [ ] Pull the list down and let go. You should see: a green spinner at the top for a moment, then
+  the row reads "Zoe Diaz" and has moved to its new alphabetical place.
+
+**Deleted user**
+- [ ] 📸 Add a Friends document whose document ID is a made-up uid (e.g. `nobody123`) with
+  `status` = `friend`, and another (`nobody456`) with `status` = `pending`. Leave and come back.
+  You should see: in each section a row reading "Deleted user" with a green circle holding a plain
+  person outline, at the bottom of its section. The pending badge counts it.
+
+**More than one page**
+- [ ] Give A more than 10 friends (made-up uids are fine: 12 documents with `status` = `friend`).
+  Open the tab. You should see: about 10 rows. Scroll to the bottom. You should see: the rest
+  appear as you reach the end.
+
+**While searching**
+- [ ] With friends and a pending request showing, type `zed` in the bar. 📸 You should see: both
+  sections disappear and only the search's rows are on screen. Clear the bar. You should see: both
+  sections come back.
+- [ ] Type just `ze`. You should see: both sections stay where they are.
+
+**Offline**
+- [ ] Go offline, then open the Search tab. Note what you see in each section (the lists from last
+  time, or the red circle with "Try again"). Either is acceptable for now; write down which.
+
+**Expected, not bugs**
+- While the tab loads, three gray rows flash above "Friends" and then vanish when there are no
+  pending requests. If that looks wrong on the phone, say so: the alternative is showing nothing
+  there until a request exists.
+- A close friend's star shows your own copy of the status. The other person may only have you as a
+  plain friend.
+- Accepting, declining, unfriending and starring are Project 5. Nothing here writes anything.
+
+---
+
 ## 4.3: The Search tab and user search
 
 Not yet run. `npm test` proves when a search fires and which state the screen shows, against a
@@ -40,12 +126,13 @@ dark mode.
 
 **The bar**
 - [ ] 📸 Open the Search tab. You should see: the green "Search" title, and under it a rounded
-  gray bar reading "Search for friends...". Nothing below it.
+  gray bar reading "Search for friends...". Below it are the two sections from 4.4 (see above).
 - [ ] Tap the bar. You should see: the "Search for friends..." text disappears straight away,
   before you type. Tap away with the bar still empty and it comes back.
 
 **Searching**
-- [ ] Type `ze`. You should see: nothing appears under the bar. No gray rows, no message.
+- [ ] Type `ze`. You should see: no search results appear. No "No one found", and the sections
+  from 4.4 stay as they were.
 - [ ] 📸 Type one more letter: `zed`. You should see: three gray placeholder rows for a moment,
   then one row, a green circle with "ZO" and the name `zed OTHER`. Your own account (`Zed Tester`)
   is not in the list.
@@ -55,7 +142,8 @@ dark mode.
 - [ ] 📸 Type `qqq`. You should see: "No one found" in gray text, with no red circle and no
   "Try again" button.
 - [ ] Tap the `zed OTHER` row. You should see: nothing happens. No highlight, no new screen.
-- [ ] Type `zed`, then delete one letter. You should see: the row disappears and nothing replaces it.
+- [ ] Type `zed`, then delete one letter. You should see: the row disappears and the sections from
+  4.4 come back.
 
 **Never more than 10 rows**
 - [ ] In the Console, under **Firestore Database → Data → Users**, check how many documents have a
