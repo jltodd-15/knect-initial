@@ -23,7 +23,7 @@ an Auth account with no profile document behind it.
 - **Reachable but not real yet:** the Planner, Discover, Circle and Profile tabs. They open without
   crashing, but show sample data. Anything changed there is saved only on that phone, never to
   Firebase. The Profile tab shows "Alex Rivera", not the profile created at signup.
-- **Not verified on a device:** tickets 2.3, 1.4, 4.1 (the move to React Navigation) and 4.3 (search). Their checks are in `DEVICE_TESTS.md`. Test on Android for now: iOS is missing its Firebase config on this branch (see below).
+- **Not verified on a device:** tickets 2.3, 1.4, 4.1 (the move to React Navigation) and 4.3 (search). Their checks are in `DEVICE_TESTS.md`. What has been seen on a phone so far, and what is wanted changed, is in [`DEVICE_FINDINGS.md`](DEVICE_FINDINGS.md).
 - **Known bugs** that belong to other tickets are listed in [`CLAUDE.md`](CLAUDE.md), under
   "Known bugs that are somebody else's ticket".
 
@@ -90,5 +90,4 @@ New behavior should have a failing test written before the implementation — se
   schema wins (see `CLAUDE.md`). It can lag the source doc, so flag a mismatch rather than guessing.
 - `utils/storage.ts` — hand-written async storage wrapper; not the browser's `localStorage`.
 - `android/`, `ios/` — native projects. Firebase config lives at `android/app/google-services.json`
-  (Android) and `ios/Knect/GoogleService-Info.plist` (iOS). The iOS file arrives with ticket 0.2's
-  PR (#3), which isn't merged into this branch yet — see the known bugs in `CLAUDE.md`.
+  (Android) and `ios/Knect/GoogleService-Info.plist` (iOS). Both are in the repo; signup has been seen working on an iPhone.

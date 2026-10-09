@@ -103,8 +103,9 @@ ticket that hasn't been built yet, even if you know it's coming.
 - Every tab except Search still runs on sample data and on-device storage, not Firestore. The
   Profile tab shows "Alex Rivera", not the profile written at signup (D6). Friends, chats, and
   activities are sample data (Projects 5, 9, 11 and 15).
-- iOS has no Firebase config on this branch stack: `ios/Knect/GoogleService-Info.plist` is only in
-  ticket 0.2's PR (#3), not merged yet. Until it is, test on Android. (Ticket 0.2)
+- The signed-in screens don't fit the phone: titles are drawn under the status bar, and the layout
+  changes after logging out and back in. These and the other problems seen on a device are in
+  `DEVICE_FINDINGS.md`; each needs its own ticket.
 - `firestore.rules` sits next to Rowy's default rules, which still give `ADMIN`/`OWNER` role
   accounts everything.
 - `components/ChatEventWidget.tsx` and `utils/votingLogic.ts` are dead — nothing imports either.
@@ -122,7 +123,8 @@ and starts and stops the Firestore emulator itself. They live in `firestore-test
 place the web `firebase` SDK may be imported, and never run under `npm test`.
 
 Anything that can only be checked on a device or emulator goes in `DEVICE_TESTS.md`, under the
-ticket's own heading, as part of that ticket.
+ticket's own heading, as part of that ticket. Running those checks is paused until the app is
+connected (`DEVICE_FINDINGS.md`); writing them is not.
 
 ### Testing protocol
 

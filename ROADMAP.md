@@ -9,6 +9,10 @@ placeholder for a new one as soon as it's known. Per [`CLAUDE.md`](CLAUDE.md)'s 
 note, only describe a ticket's *scope* once it's actually been decided — a placeholder title
 is fine well ahead of time, invented implementation detail isn't.
 
+**Seen on a phone:** issues found and changes wanted from device runs are collected in
+[`DEVICE_FINDINGS.md`](DEVICE_FINDINGS.md), waiting to become tickets. Device testing is paused
+until the app is connected (decided 2026-10-09); the reasons are there too.
+
 **Legend**
 - `[x]` / `[ ]` — code shipped and verified / not shipped
 - 📄 — a written spec doc exists. **Read it; do not infer scope from the title here.**
