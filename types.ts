@@ -34,6 +34,15 @@ export interface PrivateInfoDocument {
   fcm_tokens: string[];
 }
 
+// Schema-shaped: Users/{uid}/Friends/{friendId}. The document ID is the other person's uid and
+// status is the only field: no name, no picture. The Friend interface below is the prototype's
+// and goes when the screens still using it move to real data.
+export type FriendStatus = 'request_sent' | 'pending' | 'friend' | 'close_friend';
+
+export interface FriendDocument {
+  status: FriendStatus;
+}
+
 export interface Friend {
   id: string;
   name: string;
