@@ -98,7 +98,7 @@ const getStyles = ({ colors, typography, spacing, radius }: Theme) => StyleSheet
     paddingTop: spacing.md,
     paddingBottom: spacing.xs,
   },
-  headingText: { ...typography.label, color: colors.textSecondary, fontFamily: 'Inter' },
+  headingText: { ...typography.label, color: colors.textSecondary, fontFamily: 'Manrope' },
   badge: {
     minWidth: BADGE_SIZE,
     height: BADGE_SIZE,
@@ -108,10 +108,9 @@ const getStyles = ({ colors, typography, spacing, radius }: Theme) => StyleSheet
     alignItems: 'center',
     justifyContent: 'center',
   },
-  // onPrimary is the theme's white-on-a-colored-block; there is no separate on-danger token.
-  badgeText: { ...typography.micro, color: colors.onPrimary, fontFamily: 'Inter' },
+  badgeText: { ...typography.micro, color: colors.onDanger, fontFamily: 'Manrope' },
   row: { flexDirection: 'row', alignItems: 'center', padding: spacing.base, gap: spacing.md },
-  rowName: { ...typography.body, flex: 1, color: colors.textPrimary, fontFamily: 'Inter' },
+  rowName: { ...typography.body, flex: 1, color: colors.textPrimary, fontFamily: 'Manrope' },
 });
 
 export default PendingRequests;

@@ -86,7 +86,7 @@ const ProfilePage: React.FC<Props> = ({ onLogout }) => {
                  <Image source={{ uri: avatar }} style={styles.avatar} />
                  {isEditing && (
                      <View style={styles.cameraOverlay}>
-                        <Svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={colors.onPrimary} strokeWidth="2">
+                        <Svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={colors.onColor} strokeWidth="2">
                             <Path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
                             <Path d="M12 13a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" />
                         </Svg>
@@ -206,7 +206,7 @@ const ProfilePage: React.FC<Props> = ({ onLogout }) => {
                     value={theme.mode === 'dark'} 
                     onValueChange={(on) => theme.setOverride(on ? 'dark' : 'light')}
                     trackColor={{false: colors.border, true: colors.primary}}
-                    thumbColor={colors.onPrimary} 
+                    thumbColor={colors.onColor} 
                 />
              </View>
              <View style={styles.divider} />
@@ -264,41 +264,41 @@ const getStyles = ({ colors, typography, spacing, radius }: Theme) => StyleSheet
   avatar: { width: 120, height: 120, borderRadius: radius.pill, borderWidth: 0 },
   cameraOverlay: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: colors.scrim, borderRadius: radius.pill, justifyContent: 'center', alignItems: 'center' },
   editBadge: { position: 'absolute', bottom: 0, right: 0, backgroundColor: colors.surface, width: 36, height: 36, borderRadius: radius.pill, justifyContent: 'center', alignItems: 'center', borderWidth: 4, borderColor: colors.background },
-  name: { ...typography.display, color: colors.primary, fontFamily: 'Inter', letterSpacing: -1, marginBottom: spacing.sm },
-  role: { fontSize: typography.caption.fontSize, fontWeight: '700', color: colors.textSecondary, letterSpacing: 2, textTransform: 'uppercase', fontFamily: 'Inter' },
-  nameInput: { ...typography.display, color: colors.primary, fontFamily: 'Inter', letterSpacing: -1, marginBottom: spacing.sm, borderBottomWidth: 1, borderBottomColor: colors.primary, textAlign: 'center', minWidth: 200 },
-  roleInput: { fontSize: typography.caption.fontSize, fontWeight: '700', color: colors.textSecondary, letterSpacing: 2, marginTop: spacing.md, textTransform: 'uppercase', fontFamily: 'Inter', borderBottomWidth: 1, borderBottomColor: colors.textSecondary, textAlign: 'center', minWidth: 250 },
+  name: { ...typography.display, color: colors.primary, fontFamily: 'Manrope', letterSpacing: -1, marginBottom: spacing.sm },
+  role: { fontSize: typography.caption.fontSize, fontWeight: '700', color: colors.textSecondary, letterSpacing: 2, textTransform: 'uppercase', fontFamily: 'Manrope' },
+  nameInput: { ...typography.display, color: colors.primary, fontFamily: 'Manrope', letterSpacing: -1, marginBottom: spacing.sm, borderBottomWidth: 1, borderBottomColor: colors.primary, textAlign: 'center', minWidth: 200 },
+  roleInput: { fontSize: typography.caption.fontSize, fontWeight: '700', color: colors.textSecondary, letterSpacing: 2, marginTop: spacing.md, textTransform: 'uppercase', fontFamily: 'Manrope', borderBottomWidth: 1, borderBottomColor: colors.textSecondary, textAlign: 'center', minWidth: 250 },
   photoHint: { fontSize: typography.micro.fontSize, color: colors.textSecondary, marginTop: spacing.sm },
   
   friendsBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: colors.surface, padding: spacing.lg, borderRadius: radius.xl, marginBottom: spacing['2xl'], borderWidth: 1, borderColor: colors.border },
-  friendsBtnText: { fontSize: typography.body.fontSize, fontWeight: '700', color: colors.textPrimary, fontFamily: 'Inter' },
+  friendsBtnText: { fontSize: typography.body.fontSize, fontWeight: '700', color: colors.textPrimary, fontFamily: 'Manrope' },
   miniAvatars: { flexDirection: 'row', marginRight: spacing.md },
   miniAvatar: { width: 32, height: 32, borderRadius: radius.pill, borderWidth: 2, borderColor: colors.surface },
   miniAvatarOverlap: { marginLeft: -spacing.md },
 
   section: { marginBottom: spacing['2xl'] },
   sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing.base },
-  label: { fontSize: typography.caption.fontSize, fontWeight: '700', color: colors.textSecondary, textTransform: 'uppercase', letterSpacing: 2, fontFamily: 'Inter' },
+  label: { fontSize: typography.caption.fontSize, fontWeight: '700', color: colors.textSecondary, textTransform: 'uppercase', letterSpacing: 2, fontFamily: 'Manrope' },
   plusBtn: { width: 32, height: 32, borderRadius: radius.pill, backgroundColor: colors.surfaceAlt, justifyContent: 'center', alignItems: 'center' },
   
   addInterestRow: { flexDirection: 'row', marginBottom: spacing.md, gap: spacing.sm },
-  tagInput: { flex: 1, height: 40, borderWidth: 1, borderColor: colors.border, borderRadius: radius.pill, paddingHorizontal: spacing.base, fontSize: typography.caption.fontSize, color: colors.textPrimary, fontFamily: 'Inter' },
+  tagInput: { flex: 1, height: 40, borderWidth: 1, borderColor: colors.border, borderRadius: radius.pill, paddingHorizontal: spacing.base, fontSize: typography.caption.fontSize, color: colors.textPrimary, fontFamily: 'Manrope' },
   addTagBtn: { backgroundColor: colors.primary, paddingHorizontal: spacing.base, justifyContent: 'center', borderRadius: radius.pill },
   addTagText: { color: colors.onPrimary, fontWeight: '700' },
 
   tagCloud: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.md },
   tag: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: spacing.lg, paddingVertical: spacing.md, borderRadius: radius.xl, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
-  tagText: { fontSize: typography.caption.fontSize, fontWeight: '700', color: colors.textPrimary, textTransform: 'uppercase', fontFamily: 'Inter', letterSpacing: 1 },
+  tagText: { fontSize: typography.caption.fontSize, fontWeight: '700', color: colors.textPrimary, textTransform: 'uppercase', fontFamily: 'Manrope', letterSpacing: 1 },
   tagRemove: { marginLeft: spacing.sm },
   
   calendarBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: colors.surface, padding: spacing.lg, borderRadius: radius.xl, borderWidth: 1, borderColor: colors.border },
   calendarRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
   calendarIcon: { width: 40, height: 40, borderRadius: radius.pill, backgroundColor: colors.primary, justifyContent: 'center', alignItems: 'center' },
-  calendarBtnText: { fontSize: typography.label.fontSize, fontWeight: '700', color: colors.textPrimary, fontFamily: 'Inter' },
+  calendarBtnText: { fontSize: typography.label.fontSize, fontWeight: '700', color: colors.textPrimary, fontFamily: 'Manrope' },
 
   settingCard: { backgroundColor: colors.surface, borderRadius: radius.xl, overflow: 'hidden' },
   settingRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: spacing.lg },
-  settingText: { fontWeight: '700', color: colors.textPrimary, fontSize: typography.label.fontSize, fontFamily: 'Inter' },
+  settingText: { fontWeight: '700', color: colors.textPrimary, fontSize: typography.label.fontSize, fontFamily: 'Manrope' },
   logOutText: { color: colors.danger },
   divider: { height: 1, backgroundColor: colors.border, marginHorizontal: spacing.lg },
 

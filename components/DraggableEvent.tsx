@@ -244,7 +244,7 @@ const DraggableEvent: React.FC<Props> = (props) => {
           zIndex: isDragging || isResizing ? 100 : 1,
           backgroundColor: isProposed ? `${event.color}33` : (event.color || colors.primary), // 20% opacity for proposed
           opacity: isDragging ? 0.9 : 1,
-          borderColor: isProposed ? event.color : (isResizing ? colors.onPrimary : colors.onPrimaryMuted),
+          borderColor: isProposed ? event.color : (isResizing ? colors.onColor : colors.onPrimaryMuted),
           borderWidth: isProposed ? 2 : 1,
           borderStyle: isProposed ? 'dashed' : 'solid',
         }
@@ -291,22 +291,22 @@ const getStyles = ({ colors, typography, spacing, radius }: Theme) => StyleSheet
     flex: 1,
   },
   title: {
-    color: colors.onPrimary,
+    color: colors.onColor,
     fontSize: typography.label.fontSize,
     fontWeight: '700',
-    fontFamily: 'Inter',
+    fontFamily: 'Manrope',
     marginBottom: spacing.xs
   },
   time: {
-    color: colors.onPrimary,
+    color: colors.onColor,
     fontSize: typography.caption.fontSize,
-    fontFamily: 'Inter',
+    fontFamily: 'Manrope',
     fontWeight: '600'
   },
   participants: {
-    color: colors.onPrimary,
+    color: colors.onColor,
     fontSize: typography.micro.fontSize,
-    fontFamily: 'Inter',
+    fontFamily: 'Manrope',
     marginTop: spacing.xs,
     fontStyle: 'italic'
   },

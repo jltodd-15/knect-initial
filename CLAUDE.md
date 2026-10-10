@@ -88,9 +88,18 @@ call, is awaited.
   inside the signup submit button is a "working on it" signal on a button, and stays.)
 - Primary green is `#10b981` (emerald-500). `emerald-600` / `#059669` exists only as the
   `primaryPressed` token, for a pressed state — never as a button's resting color.
-- The six colors a user can pick for an event are `eventColors` in `theme/tokens.ts`. The picked
-  value is stored on the event, so they are not theme tokens and are the same in light and dark.
-- Font weight 900 is for `display` (size 32) only; 700 is the heaviest below it.
+- `onPrimary` is dark green and goes only on a `primary` fill. Text on a `danger` fill is
+  `onDanger`. White on a photo, an event color, a dark toast or a switch thumb is `onColor`.
+- The six colors a user can pick for an event are `eventColors` in `theme/tokens.ts`. Each has a
+  `base` (the value stored on the event, so it must never change) and a `solid` shade for fills.
+  They are not theme tokens and are the same in light and dark.
+- `theme/tokens.ts` must equal `docs/design/tokens.json` (a test compares them). Change both, and
+  Appendix A, together.
+- The only font family is `Manrope`, weights 400 to 800, picked by `fontWeight`. There is no 900.
+  The files live in `ios/Knect/Fonts` and `android/app/src/main/res/font`.
+- New icons come from `lucide-react-native`, with `strokeWidth` and size from `useTheme().icons`.
+  The Planner, the create-event modal, Circle, Discover and the Profile tab still have hand-drawn
+  `Svg` icons from before 4.5; each is replaced when its screen is rebuilt. Don't copy them.
 - Radius `pill` is for circles and buttons. A card's largest radius is `xl`.
 - `components/ChatEventWidget.tsx` was left out of the 4.2 sweep because nothing imports it. It
   still has hardcoded colors, the retired iOS grays and an `isDarkMode` prop; don't copy from it.

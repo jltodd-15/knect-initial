@@ -1,7 +1,7 @@
 import React, { createContext, useCallback, useEffect, useMemo, useState } from 'react';
 import { useColorScheme } from 'react-native';
 import { userStore } from '../utils/storage';
-import { resolveColors, typography, spacing, radius, ThemeColors, ThemeMode } from './tokens';
+import { resolveColors, typography, spacing, radius, sizes, icons, ThemeColors, ThemeMode } from './tokens';
 
 // Ticket 4.2: the theme follows the phone's light/dark setting unless the user has picked Light or
 // Dark. The pick is saved on the device and read back on launch.
@@ -16,6 +16,8 @@ export interface Theme {
   typography: typeof typography;
   spacing: typeof spacing;
   radius: typeof radius;
+  sizes: typeof sizes;
+  icons: typeof icons;
 }
 
 const OVERRIDE_KEY = 'theme_override';
@@ -28,6 +30,8 @@ const buildTheme = (mode: ThemeMode, override: ThemeOverride, setOverride: Theme
   typography,
   spacing,
   radius,
+  sizes,
+  icons,
 });
 
 // What useTheme() returns with no provider above it: the light theme, with a pick that does nothing.

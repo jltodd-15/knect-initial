@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
-import Svg, { Path } from 'react-native-svg';
+import { ChevronLeft } from 'lucide-react-native';
 import { Theme } from '../theme/ThemeProvider';
 import { useTheme } from '../theme/useTheme';
 import FriendsList from './FriendsList';
@@ -9,7 +9,6 @@ import { userProfileCache } from '../services/userProfileCache';
 // Ticket 4.6: the friends list on its own screen, opened from the Friends box on the Search tab.
 // A title bar over ticket 4.4's list. This is where each friend's name is read, not the Search tab.
 
-const BACK_ICON_SIZE = 24;
 // The smallest comfortable tap target.
 const BACK_TARGET = 44;
 
@@ -43,18 +42,12 @@ const FriendsListScreen: React.FC<Props> = ({ onBack }) => {
           onPress={onBack}
           style={styles.back}
         >
-          <Svg
-            width={BACK_ICON_SIZE}
-            height={BACK_ICON_SIZE}
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke={theme.colors.textPrimary}
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <Path d="m15 18-6-6 6-6" />
-          </Svg>
+          <ChevronLeft
+            testID="friends-back-icon"
+            size={theme.icons.sizes.nav}
+            color={theme.colors.textPrimary}
+            strokeWidth={theme.icons.strokeWidth}
+          />
         </Pressable>
         <Text style={styles.title}>Friends</Text>
         {count !== null && <Text testID="friends-count" style={styles.count}>{count}</Text>}
@@ -83,8 +76,8 @@ const getStyles = ({ colors, typography, spacing }: Theme) => StyleSheet.create(
     paddingBottom: spacing.sm,
   },
   back: { width: BACK_TARGET, height: BACK_TARGET, alignItems: 'center', justifyContent: 'center' },
-  title: { ...typography.headline, color: colors.textPrimary, fontFamily: 'Inter' },
-  count: { ...typography.body, color: colors.textSecondary, fontFamily: 'Inter' },
+  title: { ...typography.headline, color: colors.textPrimary, fontFamily: 'Manrope' },
+  count: { ...typography.body, color: colors.textSecondary, fontFamily: 'Manrope' },
 });
 
 export default FriendsListScreen;

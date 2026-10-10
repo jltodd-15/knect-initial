@@ -28,7 +28,7 @@ Status key: **reviewed** · **written-unreviewed** · **needs split** (the Restr
 | 4.2 | Theme, Tokens, Shared Components & Sweep | written-unreviewed [built — Likely] | | 4.1 | `theme/` + shared states; sweep onto Appendix A |
 | 4.3 | Search Tab & User Search | written-unreviewed [built — Likely] | | 4.1, 4.2, `*2.2`, `*3.2` | Prefix search on `name_lowercase` |
 | 4.4 | Friends List & Pending Requests | written-unreviewed [PR open, **not merged** — tickets after it are written as if it were done] | | 4.3, `*3.2` | Read-only friends + pending |
-| 4.5 | Token, font & icon update | unwritten | | 4.2 | `theme/tokens.ts` up to Appendix A; Manrope; Lucide; `on-danger` |
+| 4.5 | Token, Font & Icon Update | written-unreviewed [built, `ticket/4.5`] | | 4.2, 4.6 | `theme/tokens.ts` up to Appendix A; Manrope; Lucide; `on-danger` |
 | 4.6 | Friends Box & Friends List Screen | written-unreviewed [built, `ticket/4.6`] | | 4.4, 4.1 | Counts on Search; list on its own screen |
 | 5 | Friend Request Logic | needs edit pass | `*` | 4.4; own Functions setup + chat creation (§3.3) | Send/accept/decline/star/remove/block |
 | 6 | Profile Picture Uploads | needs edit pass | | `*2.2`, D9 | Pick, compress, upload |
@@ -150,10 +150,10 @@ With 4.4 in PR, the next tickets by number are 5, 6 and 7. **None of them is rea
 
 Each line names the winner. Apply the edit in the named ticket the next time it's opened; don't re-ask.
 
-- [ ] **`on-primary` = `#052e22`**, plus the other new and changed tokens. Appendix A was updated 2026-10-09 and matches `docs/design/tokens.json`. **Still to do: `theme/tokens.ts`** (4.2 is built with `#FFFFFF`). Needs the token follow-up ticket below.
-- [ ] **Event colors = base + solid 700 + text color each** (Appendix A.2.1, 2026-10-09) over 4.2's flat six. Amend `eventColors` in `theme/tokens.ts` before 18.1. Same follow-up ticket.
-- [ ] **Font = Manrope (OFL)**, weights 400–800; `display` drops from 900 to 800 (Appendix A.3). The five `.ttf` files are in `docs/design/fonts/`; they still need linking into the iOS and Android projects. **Icons = Lucide** via `lucide-react-native` (Appendix A.6), a new dependency (`react-native-svg` is already installed). Same follow-up ticket.
-- [ ] **Token follow-up ticket: 4.5, unwritten.** Brings `theme/tokens.ts` up to Appendix A (colors, event colors, type scale, radius, sizes), links Manrope, adds Lucide, and updates the `CLAUDE.md` styling lines it makes stale (weight 900, the six event colors). Must land before any 18.x UI. Also answers Appendix B.1's `on-danger` bracket.
+- [x] **`on-primary` = `#052e22`**, plus the other new and changed tokens. Appendix A was updated 2026-10-09 and matches `docs/design/tokens.json`. **Still to do: `theme/tokens.ts`** (4.2 is built with `#FFFFFF`). Needs the token follow-up ticket below.
+- [x] **Event colors = base + solid 700 + text color each** (Appendix A.2.1, 2026-10-09) over 4.2's flat six. Amend `eventColors` in `theme/tokens.ts` before 18.1. Same follow-up ticket.
+- [x] **Font = Manrope (OFL)**, weights 400–800; `display` drops from 900 to 800 (Appendix A.3). The five `.ttf` files are in `docs/design/fonts/`; they still need linking into the iOS and Android projects. **Icons = Lucide** via `lucide-react-native` (Appendix A.6), a new dependency (`react-native-svg` is already installed). Same follow-up ticket.
+- [x] **Token follow-up ticket: 4.5.** Brings `theme/tokens.ts` up to Appendix A (colors, event colors, type scale, radius, sizes), links Manrope, adds Lucide, and updates the `CLAUDE.md` styling lines it makes stale (weight 900, the six event colors). Must land before any 18.x UI. Also answers Appendix B.1's `on-danger` bracket. **Built 2026-10-10 as ticket 4.5.** Still open from it: the hand-drawn icons in the screens waiting on their own tickets, and a device check that Manrope actually draws.
 - [ ] **Split 16 and 17 using the Restructure Plan's numbering** (16.1–16.8, 17.1–17.8), because 18 — the newest ticket — depends on those numbers (16.4, 16.7, 16.8, 17.2 "creating a vote", 17.5–17.8). The written "16.1/16.2/17.1/17.2" docs become the source text for those splits. Rules work in the plan's `*16.1`/`*17.1` is **verify-and-extend** (`*3.3`'s whole-file ruling is newer than the plan).
 - [ ] **18's own rulings over its flags list:** RSVP carry-over and who can start are ruled in 18.5 (the flags list still calls them open); the busy field is one Boolean, no per-user map (18.2).
 - [ ] **Votes on confirmed events are allowed** (18.5, 2026-10-09) over 16.1, the 16 Phase 1 ledger and the Master Schema ("alternatives only while proposed"). Project 17 change — see 3.4.

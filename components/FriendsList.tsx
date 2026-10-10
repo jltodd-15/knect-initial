@@ -9,7 +9,7 @@ import {
   NativeScrollEvent,
   NativeSyntheticEvent,
 } from 'react-native';
-import Svg, { Path } from 'react-native-svg';
+import { Star } from 'lucide-react-native';
 import { Theme } from '../theme/ThemeProvider';
 import { useTheme } from '../theme/useTheme';
 import InitialsAvatar from './InitialsAvatar';
@@ -47,19 +47,14 @@ interface Props {
 }
 
 // Filled for a close friend, outline for a friend. Not a button: starring is Project 5.
-const Star: React.FC<{ filled: boolean; color: string }> = ({ filled, color }) => (
-  <Svg
+const FriendStar: React.FC<{ filled: boolean; color: string; strokeWidth: number }> = ({ filled, color, strokeWidth }) => (
+  <Star
     testID={filled ? 'friend-star-filled' : 'friend-star-outline'}
-    width={STAR_SIZE}
-    height={STAR_SIZE}
-    viewBox="0 0 24 24"
+    size={STAR_SIZE}
+    color={color}
     fill={filled ? color : 'none'}
-    stroke={color}
-    strokeWidth="2"
-    strokeLinejoin="round"
-  >
-    <Path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-  </Svg>
+    strokeWidth={strokeWidth}
+  />
 );
 
 const FriendsList: React.FC<Props> = ({ reloadToken, refreshing, onRefresh, onFindFriends, onSettled, onLoaded }) => {
@@ -137,7 +132,7 @@ const FriendsList: React.FC<Props> = ({ reloadToken, refreshing, onRefresh, onFi
         <View key={person.uid} testID="friend-row" style={styles.row}>
           <InitialsAvatar name={person.avatarName} size={AVATAR_SIZE} />
           <Text style={styles.rowName} numberOfLines={1}>{person.name}</Text>
-          <Star filled={isStarFilled(person.status)} color={theme.colors.primary} />
+          <FriendStar filled={isStarFilled(person.status)} color={theme.colors.primary} strokeWidth={theme.icons.strokeWidth} />
         </View>
       ))}
     </ScrollView>
@@ -146,7 +141,7 @@ const FriendsList: React.FC<Props> = ({ reloadToken, refreshing, onRefresh, onFi
 
 const getStyles = ({ colors, typography, spacing }: Theme) => StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center', padding: spacing.base, gap: spacing.md },
-  rowName: { ...typography.body, flex: 1, color: colors.textPrimary, fontFamily: 'Inter' },
+  rowName: { ...typography.body, flex: 1, color: colors.textPrimary, fontFamily: 'Manrope' },
 });
 
 export default FriendsList;

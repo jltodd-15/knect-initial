@@ -173,7 +173,7 @@ const VoteMessage: React.FC<VoteMessageProps> = ({ message, currentUserId, onVot
                                     alignItems: 'center',
                                     zIndex: 100
                                 }}>
-                                    <Text style={{color: colors.onPrimary, fontSize: typography.caption.fontSize}}>{toastMessage}</Text>
+                                    <Text style={{color: colors.onColor, fontSize: typography.caption.fontSize}}>{toastMessage}</Text>
                                 </View>
                             )}
                         </View>
@@ -626,7 +626,7 @@ const SocialDashboard: React.FC<Props> = ({ onChatOpen, onChatClose, onPlanActiv
                               </Text>
                           </View>
                           <TouchableOpacity onPress={() => handleEventMenu(item.id, item.eventDetails)} style={styles.eventMenuBtn}>
-                              <Svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={colors.onPrimary} strokeWidth="2.5">
+                              <Svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={colors.onColor} strokeWidth="2.5">
                                   <Path d="M3 12h18M3 6h18M3 18h18" />
                               </Svg>
                           </TouchableOpacity>
@@ -664,7 +664,7 @@ const SocialDashboard: React.FC<Props> = ({ onChatOpen, onChatClose, onPlanActiv
                                               )}
                                               {status === 'not_going' && (
                                                   <View style={styles.statusBadgeRed}>
-                                                      <Svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke={colors.onPrimary} strokeWidth="4"><Path d="M18 6L6 18M6 6l12 12"/></Svg>
+                                                      <Svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke={colors.onDanger} strokeWidth="4"><Path d="M18 6L6 18M6 6l12 12"/></Svg>
                                                   </View>
                                               )}
                                           </View>
@@ -682,22 +682,22 @@ const SocialDashboard: React.FC<Props> = ({ onChatOpen, onChatClose, onPlanActiv
                               onPress={() => handleVote(item.id, 'going')}
                           >
                               {rsvps?.[CURRENT_USER.id] === 'going' && <Svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={colors.onPrimary} strokeWidth="3"><Path d="M20 6L9 17l-5-5"/></Svg>}
-                              <Text style={[styles.actionBtnText, {color:colors.onPrimary}]}>GOING</Text>
+                              <Text style={[styles.actionBtnText, {color: rsvps?.[CURRENT_USER.id] === 'going' ? colors.onPrimary : colors.onColor}]}>GOING</Text>
                           </TouchableOpacity>
                           
                           <TouchableOpacity 
                               style={[styles.actionBtn, rsvps?.[CURRENT_USER.id] === 'not_going' ? styles.actionBtnNotGoing : styles.actionBtnInactive]}
                               onPress={() => handleVote(item.id, 'not_going')}
                           >
-                              {rsvps?.[CURRENT_USER.id] === 'not_going' && <Svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={colors.onPrimary} strokeWidth="3"><Path d="M18 6L6 18M6 6l12 12"/></Svg>}
-                              <Text style={[styles.actionBtnText, rsvps?.[CURRENT_USER.id] === 'not_going' ? {color:colors.onPrimary} : {color:colors.onPrimary}]}>NO</Text>
+                              {rsvps?.[CURRENT_USER.id] === 'not_going' && <Svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={colors.onDanger} strokeWidth="3"><Path d="M18 6L6 18M6 6l12 12"/></Svg>}
+                              <Text style={[styles.actionBtnText, {color: rsvps?.[CURRENT_USER.id] === 'not_going' ? colors.onDanger : colors.onColor}]}>NO</Text>
                           </TouchableOpacity>
                       </View>
 
                       {/* Propose Change for Not Going */}
                       {rsvps?.[CURRENT_USER.id] === 'not_going' && (
                           <View style={{marginTop: spacing.md, borderTopWidth: 1, borderTopColor: colors.onPrimaryMuted, paddingTop: spacing.md, paddingBottom: spacing.xl}}>
-                              <Text style={{color: colors.onPrimary, textAlign: 'center', marginBottom: spacing.sm, fontSize: typography.caption.fontSize, opacity: 0.8}}>
+                              <Text style={{color: colors.onColor, textAlign: 'center', marginBottom: spacing.sm, fontSize: typography.caption.fontSize, opacity: 0.8}}>
                                   Can't make it? Propose a change instead!
                               </Text>
                               <TouchableOpacity 
@@ -710,7 +710,7 @@ const SocialDashboard: React.FC<Props> = ({ onChatOpen, onChatClose, onPlanActiv
                                   }}
                                   onPress={() => handleEventMenu(item.id, item.eventDetails)}
                               >
-                                  <Text style={{color: colors.onPrimary, fontWeight: '600', fontSize: typography.label.fontSize}}>Propose Change</Text>
+                                  <Text style={{color: colors.onColor, fontWeight: '600', fontSize: typography.label.fontSize}}>Propose Change</Text>
                               </TouchableOpacity>
                           </View>
                       )}
@@ -1193,7 +1193,7 @@ const SocialDashboard: React.FC<Props> = ({ onChatOpen, onChatClose, onPlanActiv
         contentContainerStyle={{ paddingHorizontal: spacing.lg }}
         ListEmptyComponent={
             <View style={{alignItems:'center', marginTop: 40}}>
-                <Text style={{color: colors.textSecondary, fontFamily:'Inter'}}>No conversations found.</Text>
+                <Text style={{color: colors.textSecondary, fontFamily: 'Manrope'}}>No conversations found.</Text>
             </View>
         }
         renderItem={({ item }) => (
@@ -1227,25 +1227,25 @@ const SocialDashboard: React.FC<Props> = ({ onChatOpen, onChatClose, onPlanActiv
 const getStyles = ({ colors, typography, spacing, radius }: Theme) => StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
   header: { padding: spacing.base, paddingTop: spacing.lg, paddingBottom: spacing.md },
-  headerTitle: { fontSize: typography.display.fontSize, fontWeight: '900', color: colors.primary, fontFamily: 'Inter' },
-  headerSubtitle: { fontSize: typography.micro.fontSize, fontWeight: '700', color: colors.textSecondary, letterSpacing: 2, fontFamily: 'Inter', marginTop: spacing.xs },
+  headerTitle: { fontSize: typography.display.fontSize, fontWeight: '800', color: colors.primary, fontFamily: 'Manrope' },
+  headerSubtitle: { fontSize: typography.micro.fontSize, fontWeight: '700', color: colors.textSecondary, letterSpacing: 2, fontFamily: 'Manrope', marginTop: spacing.xs },
   
   searchContainer: { flexDirection: 'row', alignItems: 'center', backgroundColor: colors.surfaceAlt, marginHorizontal: spacing.base, padding: spacing.md, borderRadius: radius.md, marginBottom: spacing.base },
-  searchInput: { flex: 1, fontSize: typography.body.fontSize, color: colors.textPrimary, fontFamily: 'Inter' },
+  searchInput: { flex: 1, fontSize: typography.body.fontSize, color: colors.textPrimary, fontFamily: 'Manrope' },
 
   convoItem: { flexDirection: 'row', paddingVertical: spacing.md, borderBottomWidth: StyleSheet.hairlineWidth, borderColor: colors.border },
   avatar: { width: 52, height: 52, borderRadius: radius.pill },
   groupAvatarContainer: { width: 52, height: 52, borderRadius: radius.pill, overflow: 'hidden', flexDirection: 'row', flexWrap: 'wrap' },
   groupAvatarPart: { resizeMode: 'cover' },
   
-  convoName: { fontSize: typography.body.fontSize, fontWeight: '600', color: colors.textPrimary, fontFamily: 'Inter' },
-  convoMsg: { fontSize: typography.body.fontSize, color: colors.textSecondary, fontFamily: 'Inter', flex: 1, marginRight: spacing.sm },
+  convoName: { fontSize: typography.body.fontSize, fontWeight: '600', color: colors.textPrimary, fontFamily: 'Manrope' },
+  convoMsg: { fontSize: typography.body.fontSize, color: colors.textSecondary, fontFamily: 'Manrope', flex: 1, marginRight: spacing.sm },
   convoTime: { fontSize: typography.label.fontSize, color: colors.textSecondary },
   
   chatHeader: { flexDirection: 'row', alignItems: 'center', padding: spacing.md, paddingTop: spacing.md, borderBottomWidth: StyleSheet.hairlineWidth, borderColor: colors.border, backgroundColor: colors.surface },
   headerAvatar: { width: 40, height: 40, borderRadius: radius.pill },
-  chatTitle: { fontSize: typography.body.fontSize, fontWeight: '700', color: colors.textPrimary, fontFamily: 'Inter' },
-  chatSubtitle: { fontSize: typography.caption.fontSize, color: colors.textSecondary, fontFamily: 'Inter' },
+  chatTitle: { fontSize: typography.body.fontSize, fontWeight: '700', color: colors.textPrimary, fontFamily: 'Manrope' },
+  chatSubtitle: { fontSize: typography.caption.fontSize, color: colors.textSecondary, fontFamily: 'Manrope' },
   
   msgRow: { flexDirection: 'row', marginBottom: spacing.sm, alignItems: 'flex-end' },
   msgRowMe: { justifyContent: 'flex-end' },
@@ -1256,11 +1256,11 @@ const getStyles = ({ colors, typography, spacing, radius }: Theme) => StyleSheet
   msgBubble: { padding: spacing.md, paddingHorizontal: spacing.base, borderRadius: radius.xl, maxWidth: '75%' },
   msgMe: { backgroundColor: colors.primary },
   msgOther: { backgroundColor: colors.surfaceAlt },
-  msgText: { fontSize: typography.body.fontSize, color: colors.textPrimary, fontFamily: 'Inter' },
+  msgText: { fontSize: typography.body.fontSize, color: colors.textPrimary, fontFamily: 'Manrope' },
   senderName: { fontSize: typography.micro.fontSize, color: colors.textSecondary, marginBottom: spacing.xs, marginLeft: spacing.xs },
   
   inputArea: { flexDirection: 'row', alignItems: 'center', padding: spacing.md, paddingBottom: spacing['2xl'], backgroundColor: colors.surface, borderTopWidth: StyleSheet.hairlineWidth, borderColor: colors.border },
-  input: { flex: 1, height: 36, backgroundColor: colors.background, borderRadius: radius.pill, paddingHorizontal: spacing.base, color: colors.textPrimary, fontFamily: 'Inter', marginHorizontal: spacing.sm, borderWidth: 1, borderColor: colors.border },
+  input: { flex: 1, height: 36, backgroundColor: colors.background, borderRadius: radius.pill, paddingHorizontal: spacing.base, color: colors.textPrimary, fontFamily: 'Manrope', marginHorizontal: spacing.sm, borderWidth: 1, borderColor: colors.border },
   sendBtn: { width: 32, height: 32, backgroundColor: colors.primary, borderRadius: radius.pill, justifyContent: 'center', alignItems: 'center' },
   attachBtn: { width: 32, height: 32, justifyContent: 'center', alignItems: 'center' },
 
@@ -1277,17 +1277,17 @@ const getStyles = ({ colors, typography, spacing, radius }: Theme) => StyleSheet
   // New Event Widget Styles
   eventCard: { width: '85%', borderRadius: radius.xl, overflow: 'hidden', shadowColor: colors.shadow, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.15, shadowRadius: 8, elevation: 5 },
   eventHeader: { padding: spacing.lg, paddingBottom: spacing.md, flexDirection: 'row', alignItems: 'flex-start' },
-  eventProposer: { color: colors.onPrimary, fontSize: typography.micro.fontSize, fontWeight: '700', letterSpacing: 1, marginBottom: spacing.xs },
-  eventTitle: { color: colors.onPrimary, fontSize: typography.title.fontSize, fontWeight: '700', marginBottom: spacing.xs },
-  eventTime: { color: colors.onPrimary, fontSize: typography.label.fontSize, fontWeight: '600' },
+  eventProposer: { color: colors.onColor, fontSize: typography.micro.fontSize, fontWeight: '700', letterSpacing: 1, marginBottom: spacing.xs },
+  eventTitle: { color: colors.onColor, fontSize: typography.title.fontSize, fontWeight: '700', marginBottom: spacing.xs },
+  eventTime: { color: colors.onColor, fontSize: typography.label.fontSize, fontWeight: '600' },
   eventMenuBtn: { padding: spacing.xs },
   
   eventParticipants: { paddingHorizontal: spacing.lg, paddingBottom: spacing.lg },
-  invitedLabel: { color: colors.onPrimary, fontSize: typography.micro.fontSize, fontWeight: '700', marginBottom: spacing.md, letterSpacing: 0.5, textAlign: 'center' },
+  invitedLabel: { color: colors.onColor, fontSize: typography.micro.fontSize, fontWeight: '700', marginBottom: spacing.md, letterSpacing: 0.5, textAlign: 'center' },
   avatarRow: { flexDirection: 'row', justifyContent: 'center', gap: spacing.base, flexWrap: 'wrap' },
   avatarContainer: { alignItems: 'center' },
   participantAvatar: { width: 40, height: 40, borderRadius: radius.pill, marginBottom: spacing.xs, borderWidth: 2, borderColor: colors.onPrimaryMuted },
-  participantName: { color: colors.onPrimary, fontSize: typography.caption.fontSize, fontWeight: '600' },
+  participantName: { color: colors.onColor, fontSize: typography.caption.fontSize, fontWeight: '600' },
   statusBadgeGreen: { position: 'absolute', bottom: 16, right: -4, width: 16, height: 16, borderRadius: radius.pill, backgroundColor: colors.primary, justifyContent: 'center', alignItems: 'center', borderWidth: 1.5, borderColor: colors.onPrimary },
   statusBadgeRed: { position: 'absolute', bottom: 16, right: -4, width: 16, height: 16, borderRadius: radius.pill, backgroundColor: colors.danger, justifyContent: 'center', alignItems: 'center', borderWidth: 1.5, borderColor: colors.onPrimary },
 
@@ -1312,7 +1312,7 @@ const getStyles = ({ colors, typography, spacing, radius }: Theme) => StyleSheet
   
   // Vote Creator Modal
   label: { fontSize: typography.label.fontSize, fontWeight: '600', color: colors.textSecondary, marginBottom: spacing.sm, textTransform: 'uppercase', letterSpacing: 0.5 },
-  voteInput: { height: 56, borderRadius: radius.lg, paddingHorizontal: spacing.base, fontSize: typography.body.fontSize, color: colors.textPrimary, fontFamily: 'Inter', marginBottom: spacing.base, shadowColor: colors.shadow, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 2 },
+  voteInput: { height: 56, borderRadius: radius.lg, paddingHorizontal: spacing.base, fontSize: typography.body.fontSize, color: colors.textPrimary, fontFamily: 'Manrope', marginBottom: spacing.base, shadowColor: colors.shadow, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 2 },
   createVoteBtn: { backgroundColor: colors.primary, padding: spacing.base, borderRadius: radius.lg, alignItems: 'center', marginTop: spacing.xl },
   createVoteText: { color: colors.onPrimary, fontWeight: '700', fontSize: typography.body.fontSize },
 

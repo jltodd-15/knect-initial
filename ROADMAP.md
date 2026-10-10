@@ -69,9 +69,16 @@ until the app is connected (decided 2026-10-09); the reasons are there too.
   - *Built (4.4), not yet device-tested:* under the search bar, a Pending Requests section (hidden when there are none, with a red count badge) and (moved to its own screen by 4.6) a Friends section (close friends first, then A–Z, filled or outline star). Read-only. Both disappear while a search is showing. Checks are in `DEVICE_TESTS.md`.
   - *Nothing writes a Friends document yet* (Project 5), so the only way to see rows is to add documents by hand in the Console.
   - *Names are remembered for the session* in `services/userProfileCache.ts`: one `Users` read per person, re-read only on pull-down or after signing in as someone else. 15.2's sender names reuse it instead of building a second cache.
-  - *The badge's white number uses the `onPrimary` token:* there is no `onDanger`, and `theme/tokens.ts` wasn't 4.4's to change.
+  - *The badge's white number* used the `onPrimary` token until 4.5 added `onDanger`.
   - ❓ *No ticket owns this:* `App.tsx` throws a tab's screen away when you leave it and rebuilds it when you come back (`FocusedOnly`). That was a stopgap from 4.1 and isn't a long-term answer (it loses scroll position and typed text, and re-reads on every visit). The Search tab already reloads on real focus, so it keeps working when this is removed; the other tabs need checking.
-- [ ] 4.5 — Token, font & icon update *(placeholder: brings `theme/tokens.ts` up to Appendix A, links Manrope, adds Lucide, adds `onDanger`. No ticket file yet.)*
+- [ ] 4.5 — Token, font & icon update 📄 *(built after 4.6)*
+  - *Built (4.5), not yet device-tested:* `theme/tokens.ts` matches Appendix A and `docs/design/tokens.json` (a test compares them). Text on green buttons is dark green, not white. The app's font is Manrope. The tab bar, the Friends box, the friends list, the no-name avatar and the password eye use Lucide icons. Checks are in `DEVICE_TESTS.md`.
+  - *New dependency:* `lucide-react-native`.
+  - *The fonts are wired into both native projects but have never been built.* Nothing here can prove the phone draws Manrope; if it falls back to the system font, the wiring is the first place to look.
+  - *Left for the screens' own tickets:* about 75 hand-drawn icons in the Planner, the create-event modal, Circle, Discover and the Profile tab (18, 15–17, 11–12, D6).
+  - *Text that never named a font* still uses the phone's own font. ❓ No ticket owns finding and fixing those.
+  - *Tests run against a stand-in* for `lucide-react-native` (`jest.setup.js`), for the same reason as React Navigation in 4.1.
+  - ❓ *Found, not fixed:* `./gradlew :app:compileDebugKotlin --offline` fails on this Mac before compiling anything (`JvmVendorSpec ... IBM_SEMERU`, a Gradle and toolchain-plugin mismatch). It is not caused by 4.5, but it means the Android font change could not be compile-checked here.
 - [ ] 4.6 — Friends box & the friends list screen 📄 *(4.4 follow-up; built before 4.5)*
   - *Built (4.6), not yet device-tested:* the Search tab no longer lists friends. It shows a Friends box with two counts ("12 friends · 2 close friends"); tapping it opens the friends list on its own screen, with a back arrow. Opening Search now costs two count reads instead of one read per friend. Checks are in `DEVICE_TESTS.md`.
   - *Counts need a connection:* offline, the box shows "Friends" with no numbers and still opens the list.
