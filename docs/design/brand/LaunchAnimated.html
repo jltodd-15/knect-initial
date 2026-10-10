@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Knect launch animation</title>
+
+</head>
+<body>
+
+
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#ffffff}a:hover{color:#ecfdf5}
+.wm{display:flex;align-items:center;font-size:58px;font-weight:800;color:#fff}
+.kn{display:inline-block;letter-spacing:-7.2px;padding-right:7.2px}
+.ect{display:inline-block;position:relative;letter-spacing:-2px}
+.ln{position:absolute;width:4px;border-radius:2px;background:#fff;opacity:0;height:0}
+@keyframes fade{0%,70%{opacity:1}80%,100%{opacity:0}}
+@keyframes a2k{0%{transform:translate(-150px,-220px) rotate(-28deg);opacity:0}8%{opacity:1}30%{transform:translate(0,0) rotate(0)}35%{transform:translate(-10px,-3px) rotate(-2deg)}40%{transform:translate(0,0)}44%{transform:translate(-3px,0)}48%,100%{transform:none}}
+@keyframes a2e{0%,4%{transform:translate(160px,200px) rotate(22deg);opacity:0}12%{opacity:1}32%{transform:translate(0,0) rotate(0)}37%{transform:translate(10px,3px) rotate(2deg)}42%{transform:translate(0,0)}46%{transform:translate(3px,0)}50%,100%{transform:none}}
+@keyframes a2p{0%,32%{transform:scale(1)}37%{transform:scale(1.12) rotate(-1.5deg)}43%{transform:scale(0.95)}49%{transform:scale(1.02)}55%,100%{transform:scale(1)}}
+@keyframes a2l{0%,31%{opacity:0;height:0}34%{opacity:1;height:var(--h)}48%,100%{opacity:0;height:calc(var(--h) + 8px)}}
+.loop{animation:fade 2.8s ease-in-out infinite}
+.a2k{animation:a2k 2.8s cubic-bezier(.3,.9,.3,1) infinite}.a2e{animation:a2e 2.8s cubic-bezier(.3,.9,.3,1) infinite}
+.a2p{animation:a2p 2.8s ease-out infinite}.a2l{animation:a2l 2.8s ease-out infinite}
+@media (prefers-reduced-motion: reduce){.loop,.a2k,.a2e,.a2p,.a2l{animation:none}}
+</style>
+
+<div style="position: relative; width: 390px; height: 844px; background: #10b981; font-family: 'Manrope', system-ui, sans-serif; display: flex; align-items: center; justify-content: center; overflow: hidden">
+  <div class="loop" role="img" aria-label="Knect"><div class="wm a2p">
+    <span class="kn a2k">Kn</span><span class="ect a2e">ect<span class="ln a2l" aria-hidden="true" style="--h: 20px; left: 4px; bottom: 58px; transform-origin: bottom; transform: rotate(18deg)"></span><span class="ln a2l" aria-hidden="true" style="--h: 14px; left: 22px; bottom: 48px; transform-origin: bottom; transform: rotate(48deg)"></span><span class="ln a2l" aria-hidden="true" style="--h: 10px; left: -24px; bottom: 54px; transform-origin: bottom; transform: rotate(-30deg)"></span><span class="ln a2l" aria-hidden="true" style="--h: 15px; left: -8px; top: 58px; transform-origin: top; transform: rotate(24deg)"></span></span>
+  </div></div>
+  <div aria-hidden="true" style="position: absolute; top: 11px; left: 50%; transform: translateX(-50%); width: 125px; height: 37px; border-radius: 999px; background: #000000"></div>
+  <div aria-hidden="true" style="position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); width: 134px; height: 5px; border-radius: 3px; background: #ffffff"></div>
+</div>
+
+
+</body>
+</html>

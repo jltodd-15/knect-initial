@@ -21,6 +21,13 @@ the code.
 
 Hand-written and worth respecting: `CreateProfilePage.tsx`, `utils/storage.ts`.
 
+## Tickets, decisions and designs
+
+- [`docs/ROADMAP.md`](docs/ROADMAP.md) — every ticket's status, the standing rules, and the open decisions.
+- [`docs/tickets/`](docs/tickets/) — one file per ticket. Load only the one being worked.
+- [`docs/reference/`](docs/reference/) — the decision logs and planning docs. Open one only when a ticket points at it.
+- [`docs/design/`](docs/design/) — the design boards and logo files; its `README.md` is the index.
+
 ## Data conventions
 
 - Firestore field names are `snake_case`. Collections are `Users`, `Activities`, `Chats`, `Events`.
