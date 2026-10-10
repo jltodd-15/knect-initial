@@ -67,6 +67,20 @@ export const isStarFilled = (status: FriendStatus): boolean => status === 'close
 
 export const badgeCount = (pendingRows: FriendRow[]): string => String(pendingRows.length);
 
+export interface FriendCounts {
+  friends: number;
+  closeFriends: number;
+}
+
+const plural = (count: number, word: string): string => `${count} ${word}${count === 1 ? '' : 's'}`;
+
+// Ticket 4.6: the line under "Friends" in the Search tab's box.
+export const friendCountsLabel = ({friends, closeFriends}: FriendCounts): string => {
+  if (friends === 0) return 'No friends yet';
+  if (closeFriends === 0) return plural(friends, 'friend');
+  return `${plural(friends, 'friend')} · ${plural(closeFriends, 'close friend')}`;
+};
+
 // The first `pages` pages of an already sorted list, and whether there is more to show.
 export const pageOf = <T>(rows: T[], pages: number): {visible: T[]; hasMore: boolean} => {
   const visible = rows.slice(0, pages * PAGE_SIZE);

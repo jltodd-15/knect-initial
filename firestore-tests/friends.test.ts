@@ -11,6 +11,7 @@ import {
   collection,
   deleteDoc,
   doc,
+  getCountFromServer,
   getDoc,
   getDocs,
   query,
@@ -121,6 +122,24 @@ describe('allowed', () => {
       getDocs(query(friends, where('status', '==', 'pending'))),
     );
     expect(pending.docs.map(d => d.id)).toEqual(['dave']);
+  });
+
+  // Ticket 4.6: the two count queries behind the Search tab's Friends box.
+  test('a signed-in user counts their own Friends by status', async () => {
+    await seed('Users/alice/Friends/bob', { status: 'friend' });
+    await seed('Users/alice/Friends/carol', { status: 'close_friend' });
+    await seed('Users/alice/Friends/dave', { status: 'pending' });
+    const friends = collection(as('alice'), 'Users/alice/Friends');
+
+    const all = await assertSucceeds(
+      getCountFromServer(query(friends, where('status', 'in', ['friend', 'close_friend']))),
+    );
+    expect(all.data().count).toBe(2);
+
+    const close = await assertSucceeds(
+      getCountFromServer(query(friends, where('status', '==', 'close_friend'))),
+    );
+    expect(close.data().count).toBe(1);
   });
 });
 

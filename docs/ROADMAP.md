@@ -28,6 +28,8 @@ Status key: **reviewed** · **written-unreviewed** · **needs split** (the Restr
 | 4.2 | Theme, Tokens, Shared Components & Sweep | written-unreviewed [built — Likely] | | 4.1 | `theme/` + shared states; sweep onto Appendix A |
 | 4.3 | Search Tab & User Search | written-unreviewed [built — Likely] | | 4.1, 4.2, `*2.2`, `*3.2` | Prefix search on `name_lowercase` |
 | 4.4 | Friends List & Pending Requests | written-unreviewed [PR open, **not merged** — tickets after it are written as if it were done] | | 4.3, `*3.2` | Read-only friends + pending |
+| 4.5 | Token, font & icon update | unwritten | | 4.2 | `theme/tokens.ts` up to Appendix A; Manrope; Lucide; `on-danger` |
+| 4.6 | Friends Box & Friends List Screen | written-unreviewed [built, `ticket/4.6`] | | 4.4, 4.1 | Counts on Search; list on its own screen |
 | 5 | Friend Request Logic | needs edit pass | `*` | 4.4; own Functions setup + chat creation (§3.3) | Send/accept/decline/star/remove/block |
 | 6 | Profile Picture Uploads | needs edit pass | | `*2.2`, D9 | Pick, compress, upload |
 | 7 | Public Profile Routing | needs edit pass | | 4.1, 5 | Tap a person → their profile |
@@ -151,7 +153,7 @@ Each line names the winner. Apply the edit in the named ticket the next time it'
 - [ ] **`on-primary` = `#052e22`**, plus the other new and changed tokens. Appendix A was updated 2026-10-09 and matches `docs/design/tokens.json`. **Still to do: `theme/tokens.ts`** (4.2 is built with `#FFFFFF`). Needs the token follow-up ticket below.
 - [ ] **Event colors = base + solid 700 + text color each** (Appendix A.2.1, 2026-10-09) over 4.2's flat six. Amend `eventColors` in `theme/tokens.ts` before 18.1. Same follow-up ticket.
 - [ ] **Font = Manrope (OFL)**, weights 400–800; `display` drops from 900 to 800 (Appendix A.3). The five `.ttf` files are in `docs/design/fonts/`; they still need linking into the iOS and Android projects. **Icons = Lucide** via `lucide-react-native` (Appendix A.6), a new dependency (`react-native-svg` is already installed). Same follow-up ticket.
-- [ ] **Token follow-up ticket: unwritten, unnumbered.** Brings `theme/tokens.ts` up to Appendix A (colors, event colors, type scale, radius, sizes), links Manrope, adds Lucide, and updates the `CLAUDE.md` styling lines it makes stale (weight 900, the six event colors). Must land before any 18.x UI. Also answers Appendix B.1's `on-danger` bracket.
+- [ ] **Token follow-up ticket: 4.5, unwritten.** Brings `theme/tokens.ts` up to Appendix A (colors, event colors, type scale, radius, sizes), links Manrope, adds Lucide, and updates the `CLAUDE.md` styling lines it makes stale (weight 900, the six event colors). Must land before any 18.x UI. Also answers Appendix B.1's `on-danger` bracket.
 - [ ] **Split 16 and 17 using the Restructure Plan's numbering** (16.1–16.8, 17.1–17.8), because 18 — the newest ticket — depends on those numbers (16.4, 16.7, 16.8, 17.2 "creating a vote", 17.5–17.8). The written "16.1/16.2/17.1/17.2" docs become the source text for those splits. Rules work in the plan's `*16.1`/`*17.1` is **verify-and-extend** (`*3.3`'s whole-file ruling is newer than the plan).
 - [ ] **18's own rulings over its flags list:** RSVP carry-over and who can start are ruled in 18.5 (the flags list still calls them open); the busy field is one Boolean, no per-user map (18.2).
 - [ ] **Votes on confirmed events are allowed** (18.5, 2026-10-09) over 16.1, the 16 Phase 1 ledger and the Master Schema ("alternatives only while proposed"). Project 17 change — see 3.4.
@@ -183,7 +185,7 @@ From Project 18 (Kyson, 2026-10-09):
 
 From earlier rulings, not yet in the ticket text:
 
-- [ ] **4.4 / Search tab — Friends becomes a tap-in box (Kyson, 2026-10-09).** Under the search bar the Search tab shows Pending requests and one Friends box with counts; tapping it opens the friends list on its own screen (`docs/design/app-screens/Search`, `FriendsList`). Reason: opening Search must not read every friend, and it is cleaner. The open 4.4 PR shows the list itself under the search bar, so this is a follow-up to 4.4, not part of it. **Open:** how the counts are read without reading every `Friends` document.
+- [x] **4.4 / Search tab — Friends becomes a tap-in box (Kyson, 2026-10-09).** Built as ticket 4.6: two count queries for the box, the list on its own screen on the root stack.
 
 - [ ] **15.1** — add/remove member writes `Events.shared_with` + `rsvps` for every open proposal; use `recent_message_sender_id` for the subtitle; its "blocking restricts new sends only" line predates the receive-side ruling; its `Chats` update rule is now `*3.3`'s.
 - [ ] **12** — "Make This An Event" → chooser (Planner or chat). **11** — share affordance on the Discover card.

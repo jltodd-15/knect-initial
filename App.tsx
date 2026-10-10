@@ -6,6 +6,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Navigation from './components/Navigation';
 import SearchTab from './components/SearchTab';
+import FriendsListScreen from './components/FriendsListScreen';
 import DiscoveryFeed from './components/DiscoveryFeed';
 import EventPlanner from './components/EventPlanner';
 import SocialDashboard from './components/SocialDashboard';
@@ -81,6 +82,7 @@ type TabParamList = {
 
 type RootStackParamList = {
   Tabs: undefined;
+  Friends: undefined;
 };
 
 const RootStack = createNativeStackNavigator<RootStackParamList>();
@@ -471,7 +473,7 @@ const AppContent: React.FC = () => {
       <NavigationContainer theme={navigationTheme}>
         <RootStack.Navigator screenOptions={{ headerShown: false }}>
           <RootStack.Screen name="Tabs">
-            {() => (
+            {({ navigation: rootNavigation }) => (
               <Tab.Navigator
                 initialRouteName="Planner"
                 backBehavior="none"
@@ -500,7 +502,7 @@ const AppContent: React.FC = () => {
                 <Tab.Screen name="Search">
                   {() => (
                     <FocusedOnly>
-                      <SearchTab />
+                      <SearchTab onOpenFriends={() => rootNavigation.navigate('Friends')} />
                     </FocusedOnly>
                   )}
                 </Tab.Screen>
@@ -524,6 +526,9 @@ const AppContent: React.FC = () => {
                 </Tab.Screen>
               </Tab.Navigator>
             )}
+          </RootStack.Screen>
+          <RootStack.Screen name="Friends">
+            {({ navigation }) => <FriendsListScreen onBack={() => navigation.goBack()} />}
           </RootStack.Screen>
         </RootStack.Navigator>
       </NavigationContainer>

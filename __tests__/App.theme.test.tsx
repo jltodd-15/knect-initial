@@ -66,7 +66,11 @@ jest.mock('../services/UserSearchService', () => ({
 // Ticket 4.4: the Search tab's Friends and Pending Requests sections import the native Firestore
 // module the same way. No test here reads friends (see SearchTab.test.tsx), so cut that off too.
 jest.mock('../services/FriendsService', () => ({
-  FriendsService: {getFriends: jest.fn(async () => []), getPendingRequests: jest.fn(async () => [])},
+  FriendsService: {
+    getFriends: jest.fn(async () => []),
+    getPendingRequests: jest.fn(async () => []),
+    getFriendCounts: jest.fn(async () => ({friends: 0, closeFriends: 0})),
+  },
 }));
 jest.mock('../services/userProfileCache', () => ({
   userProfileCache: {get: jest.fn(async () => null), clear: jest.fn()},

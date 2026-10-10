@@ -1,5 +1,6 @@
 /**
- * Ticket 4.4: the Friends section of the Search tab, which is also the tab's scrolling list.
+ * Ticket 4.4: the friends list. Since ticket 4.6 it is the body of its own screen, not a section
+ * of the Search tab.
  *
  * The read is mocked: what it asks Firestore is pinned in FriendsService.test.ts and the order of
  * the rows in friendsList.test.ts. These tests cover which state the section shows, the stars,
@@ -7,7 +8,6 @@
  */
 
 import React from 'react';
-import {Text} from 'react-native';
 import {act, fireEvent, render, screen} from '@testing-library/react-native';
 
 const mockGetFriends = jest.fn();
@@ -49,11 +49,10 @@ beforeEach(() => {
   mockGetFriends.mockResolvedValue([]);
 });
 
-test('loading shows list-row skeletons under the Friends heading', async () => {
+test('loading shows list-row skeletons', async () => {
   mockGetFriends.mockReturnValue(deferred().promise);
   await render(<FriendsList {...props} />);
 
-  expect(screen.getByText('Friends')).toBeTruthy();
   expect(screen.getAllByTestId('skeleton-list-row').length).toBeGreaterThan(0);
 });
 
@@ -157,12 +156,13 @@ test('scrolling that is nowhere near the bottom loads nothing', async () => {
   expect(screen.getAllByTestId('friend-row')).toHaveLength(10);
 });
 
-test('whatever it is handed as a header stays on screen in every state, the error state included', async () => {
-  mockGetFriends.mockRejectedValueOnce(new Error('unavailable'));
-  await render(<FriendsList {...props} header={<Text>the pending section</Text>} />);
+// Ticket 4.6: the screen's title shows how many friends there are, from the rows already read.
+test('says how many friends it loaded', async () => {
+  const onLoaded = jest.fn();
+  mockGetFriends.mockResolvedValue([friend('a', 'Ana'), friend('b', 'Bo')]);
+  await render(<FriendsList {...props} onLoaded={onLoaded} />);
 
-  expect(screen.getByTestId('error-state')).toBeTruthy();
-  expect(screen.getByText('the pending section')).toBeTruthy();
+  expect(onLoaded).toHaveBeenLastCalledWith(2);
 });
 
 test('pulling down asks the screen to refresh', async () => {

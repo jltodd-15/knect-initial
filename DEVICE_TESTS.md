@@ -26,7 +26,74 @@ part.
 
 ---
 
+## 4.6: Friends box and the friends list screen
+
+Not yet run. `npm test` proves the Search tab asks only for the pending requests and two counts,
+what the box says for each count, and that the list screen shows 4.4's list; `npm run test:rules`
+proves the rules allow the count queries. Whether the real counts are right, and how the box and
+the new screen look, is only checkable here.
+
+**This changes where 4.4's friends checks happen.** Every 4.4 check below about friend rows, order,
+stars, pages and pulling down the friends list is now done on the friends list screen (Search tab →
+tap the Friends box), not on the Search tab. The pending-request checks are unchanged.
+
+**Setup.** As for 4.4: account A plus four others, Friends documents added by hand in the Console.
+
+**Screenshots wanted.** For every line marked 📸, one in light mode and one in dark mode.
+
+**The box**
+- [ ] 📸 With no Friends documents under A, open the Search tab. You should see: under the search
+  bar, one rounded box with a thin outline reading "Friends" and, under it in smaller gray text,
+  "No friends yet", with a gray arrow pointing right at its right edge. No list of people.
+- [ ] Set Ana = `friend`, bob = `close_friend`, Carol = `friend`, Dave = `close_friend`. Leave the
+  tab and come back. 📸 You should see: the box reads "4 friends · 2 close friends".
+- [ ] Delete Dave's and bob's documents. Leave and come back. You should see: "2 friends", with
+  nothing after it.
+- [ ] Delete Carol's. Leave and come back. You should see: "1 friend".
+- [ ] Add a document with `status` = `pending` and one with `request_sent`. Leave and come back.
+  You should see: the count does not change. The pending one shows in Pending Requests, above the box.
+- [ ] Press and hold the box. You should see: it turns slightly gray while held.
+
+**Opening the list**
+- [ ] Tap the box. 📸 You should see: a new screen slides in with a left-pointing arrow, the title
+  "Friends" and a gray number beside it matching how many friends are listed. Below, the friends,
+  close friends first with filled green stars. The tab bar at the bottom is not visible.
+- [ ] Tap the arrow. You should see: the Search tab again, with the box.
+- [ ] On Android, press the system back button on the list screen. You should see: the Search tab.
+- [ ] With no friends, tap the box. You should see: the title "Friends" with "0", the gray text
+  "No friends yet" and a green "Find friends" button. Tap it. You should see: the Search tab.
+
+**Pulling down**
+- [ ] On the Search tab, change a count in the Console (add a `friend` document), then pull down.
+  You should see: a green spinner for a moment, then the new number in the box.
+- [ ] On the list screen, rename a friend in the Console (`name` and `name_lowercase`), then pull
+  down. You should see: the new name, in its new alphabetical place.
+
+**While searching**
+- [ ] Type `zed` in the bar. You should see: the box and the pending section disappear. Clear the
+  bar. You should see: both come back.
+
+**Offline**
+- [ ] Go offline, then open the Search tab. You should see: the box reads "Friends" with no line
+  under it. No red circle, no "Try again" for the box. Tap it. You should see: the list screen
+  opens (showing either the friends from last time or the red circle with "Try again"; note which).
+
+**Read cost (Console)**
+- [ ] With 12 or more friends under A, open the Search tab a few times, then check **Firestore →
+  Usage**. You should see: reads go up by a handful per visit, not by a dozen or more.
+
+**Expected, not bugs**
+- The box briefly shows as a gray placeholder row while the counts load.
+- The fonts and icons are still the old ones; ticket 4.5 changes them.
+- The list screen hides the tab bar. The design board shows it; say so if you want it kept.
+
+---
+
 ## 4.4: Friends list and pending requests
+
+**Since ticket 4.6 the friends are on their own screen.** Where a check below says to look at the
+Friends section or its rows on the Search tab, open the Search tab and tap the Friends box first.
+The "No friends, no requests" check's Search-tab wording is replaced by 4.6's "The box" checks.
 
 Not yet run. `npm test` proves which section a person lands in, the order, the stars, the badge's
 number and when each read happens, against a fake Firebase; `npm run test:rules` proves the rules

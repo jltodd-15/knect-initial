@@ -1,10 +1,10 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { View, Text, TextInput, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, TextInput, ScrollView, RefreshControl, StyleSheet } from 'react-native';
 import { useIsFocused } from '@react-navigation/native';
 import { Theme } from '../theme/ThemeProvider';
 import { useTheme } from '../theme/useTheme';
 import InitialsAvatar from './InitialsAvatar';
-import FriendsList from './FriendsList';
+import FriendsBox from './FriendsBox';
 import PendingRequests from './PendingRequests';
 import EmptyState from './shared/EmptyState';
 import ErrorState from './shared/ErrorState';
@@ -16,16 +16,17 @@ import { userProfileCache } from '../services/userProfileCache';
 // Ticket 4.3: look people up by the start of their name. The rules for when a search runs and
 // which answer counts are in services/userSearch.ts; this screen shows the state they produce.
 //
-// Ticket 4.4: with no search showing, the Pending Requests and Friends sections sit under the bar.
-// A search works like opening a separate page: while it is loading or showing results they are
-// gone, and clearing it brings them back.
+// Tickets 4.4 and 4.6: with no search showing, the Pending Requests section and the Friends box sit
+// under the bar. The box holds two counts and opens the friends list on its own screen, so opening
+// this tab never reads the friends themselves. A search works like opening a separate page: while
+// it is loading or showing results both are gone, and clearing it brings them back.
 
 const PLACEHOLDER = 'Search for friends...';
 const SKELETON_ROWS = 3;
 // The skeleton row's avatar size, so a row doesn't shift when it replaces its skeleton.
 const AVATAR_SIZE = 48;
 
-// The two sections that each say when their read has finished.
+// The pending section and the Friends box each say when their read has finished.
 const SECTIONS = 2;
 
 type SearchState =
@@ -35,7 +36,11 @@ type SearchState =
   | { status: 'error' }
   | { status: 'results'; results: UserSearchResult[] };
 
-const SearchTab: React.FC = () => {
+interface Props {
+  onOpenFriends: () => void;
+}
+
+const SearchTab: React.FC<Props> = ({ onOpenFriends }) => {
   const theme = useTheme();
   const styles = useMemo(() => getStyles(theme), [theme]);
   const [text, setText] = useState('');
@@ -63,11 +68,9 @@ const SearchTab: React.FC = () => {
     tracker.invalidate();
   }, [scheduler, tracker]);
 
-  const inputRef = useRef<TextInput>(null);
-
-  // Both sections read again whenever this changes. They read once when they appear; after that,
-  // each time the tab comes back into focus (names come from the session cache) and each pull
-  // down. Today App.tsx rebuilds this screen on every visit, so the focus case is covered by
+  // The pending section and the Friends box read again whenever this changes. They read once when
+  // they appear; after that, each time the tab comes back into focus (names come from the session
+  // cache) and each pull down. Today App.tsx rebuilds this screen on every visit, so the focus case is covered by
   // "when they appear" - this keeps it true if the screen is ever kept alive between visits.
   const [reloadToken, setReloadToken] = useState(0);
   const isFocused = useIsFocused();
@@ -77,8 +80,8 @@ const SearchTab: React.FC = () => {
     wasFocused.current = isFocused;
   }, [isFocused]);
 
-  // Pull down: the cache is cleared first, so names are read again too. That is how a friend's
-  // changed name shows up. The spinner stays until both sections have answered.
+  // Pull down: the cache is cleared first, so names are read again too. That is how a changed
+  // name shows up. The spinner stays until both have answered.
   const [refreshing, setRefreshing] = useState(false);
   const sectionsToSettle = useRef(0);
   const handleRefresh = () => {
@@ -113,7 +116,6 @@ const SearchTab: React.FC = () => {
       </View>
 
       <TextInput
-        ref={inputRef}
         testID="search-input"
         style={styles.searchBar}
         value={text}
@@ -128,14 +130,16 @@ const SearchTab: React.FC = () => {
       />
 
       {state.status === 'idle' ? (
-        <FriendsList
-          reloadToken={reloadToken}
-          refreshing={refreshing}
-          onRefresh={handleRefresh}
-          onSettled={handleSectionSettled}
-          onFindFriends={() => inputRef.current?.focus()}
-          header={<PendingRequests reloadToken={reloadToken} onSettled={handleSectionSettled} />}
-        />
+        <ScrollView
+          testID="search-home"
+          keyboardShouldPersistTaps="handled"
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} tintColor={theme.colors.primary} />
+          }
+        >
+          <PendingRequests reloadToken={reloadToken} onSettled={handleSectionSettled} />
+          <FriendsBox reloadToken={reloadToken} onSettled={handleSectionSettled} onOpen={onOpenFriends} />
+        </ScrollView>
       ) : (
         <ScrollView testID="search-results" keyboardShouldPersistTaps="handled">
           {state.status === 'loading' &&

@@ -1,21 +1,28 @@
 import {getAuth} from '@react-native-firebase/auth';
-import {collection, getDocs, query, where} from '@react-native-firebase/firestore';
+import {collection, getCountFromServer, getDocs, query, where} from '@react-native-firebase/firestore';
 import {db} from './firestore';
 import {FriendDocument} from '../types';
-import {FriendEntry, FriendRow, sortFriends, sortPending, splitByStatus, toRow} from './friendsList';
+import {FriendCounts, FriendEntry, FriendRow, sortFriends, sortPending, splitByStatus, toRow} from './friendsList';
 import {userProfileCache} from './userProfileCache';
 
 const USERS = 'Users';
 const FRIENDS = 'Friends';
 
-// Ticket 4.4: the two reads behind the Search tab's Friends and Pending Requests sections. Reads
+// Ticket 4.4: the two reads behind the friends list and the Pending Requests section. Reads
 // only, and one-time reads rather than listeners. Every rule about which document goes where and
 // in what order is in services/friendsList.ts; this only asks Firestore.
 
-const readEntries = async (...constraints: Parameters<typeof query>[1][]): Promise<FriendEntry[]> => {
+type Constraint = Parameters<typeof query>[1];
+
+// The signed-in user's own Friends subcollection, narrowed by status.
+const myFriends = (...constraints: Constraint[]) => {
   const uid = getAuth().currentUser?.uid;
   if (!uid) throw new Error('Not signed in');
-  const snapshot = await getDocs(query(collection(db, USERS, uid, FRIENDS), ...constraints));
+  return query(collection(db, USERS, uid, FRIENDS), ...constraints);
+};
+
+const readEntries = async (...constraints: Constraint[]): Promise<FriendEntry[]> => {
+  const snapshot = await getDocs(myFriends(...constraints));
   return snapshot.docs.map(document => ({
     uid: document.id,
     status: (document.data() as FriendDocument).status,
@@ -38,5 +45,17 @@ export const FriendsService = {
   getPendingRequests: async (): Promise<FriendRow[]> => {
     const entries = await readEntries(where('status', '==', 'pending'));
     return sortPending(await toRows(splitByStatus(entries).pending));
+  },
+
+  // Ticket 4.6: how many friends and close friends I have. Count queries return numbers, not
+  // documents, so nobody's Friends or Users document is read. They need a connection.
+  getFriendCounts: async (): Promise<FriendCounts> => {
+    const count = async (...constraints: Constraint[]) =>
+      (await getCountFromServer(myFriends(...constraints))).data().count;
+    const [friends, closeFriends] = await Promise.all([
+      count(where('status', 'in', ['friend', 'close_friend'])),
+      count(where('status', '==', 'close_friend')),
+    ]);
+    return {friends, closeFriends};
   },
 };
