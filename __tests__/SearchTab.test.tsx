@@ -13,15 +13,18 @@ jest.mock('../services/UserSearchService', () => ({
   UserSearchService: {searchUsers: (...args: unknown[]) => mockSearchUsers(...args)},
 }));
 
-// Ticket 4.4: the two sections under the bar read through these. What each asks Firestore, and
-// each section's own states, are pinned in FriendsService, FriendsList and PendingRequests tests.
+// Tickets 4.4 and 4.6: the pending section and the Friends box under the bar read through these.
+// What each asks Firestore, and each one's own states, are pinned in the FriendsService,
+// PendingRequests and FriendsBox tests.
 const mockGetFriends = jest.fn();
+const mockGetFriendCounts = jest.fn();
 const mockGetPendingRequests = jest.fn();
 const mockClearCache = jest.fn();
 jest.mock('../services/FriendsService', () => ({
   FriendsService: {
     getFriends: (...args: unknown[]) => mockGetFriends(...args),
     getPendingRequests: (...args: unknown[]) => mockGetPendingRequests(...args),
+    getFriendCounts: (...args: unknown[]) => mockGetFriendCounts(...args),
   },
 }));
 jest.mock('../services/userProfileCache', () => ({
@@ -64,9 +67,10 @@ beforeEach(() => {
   jest.useFakeTimers();
   jest.clearAllMocks();
   mockSearchUsers.mockResolvedValue([]);
-  // One friend and no requests unless a test says otherwise, so the Friends section is neither
-  // loading nor empty and the search tests above it see only the search's own states.
+  // Three friends and no requests unless a test says otherwise, so the Friends box is not loading
+  // and the search tests above it see only the search's own states.
   mockGetFriends.mockResolvedValue([person('f', 'Fran Friend', 'friend')]);
+  mockGetFriendCounts.mockResolvedValue({friends: 3, closeFriends: 1});
   mockGetPendingRequests.mockResolvedValue([]);
 });
 
@@ -75,13 +79,13 @@ afterEach(() => {
 });
 
 test('shows the Search banner', async () => {
-  await render(<SearchTab />);
+  await render(<SearchTab onOpenFriends={jest.fn()} />);
 
   expect(screen.getByText('Search')).toBeTruthy();
 });
 
 test('the placeholder shows until the bar is selected, and comes back if it is left empty', async () => {
-  await render(<SearchTab />);
+  await render(<SearchTab onOpenFriends={jest.fn()} />);
   const input = screen.getByTestId('search-input');
   expect(input.props.placeholder).toBe(PLACEHOLDER);
 
@@ -97,7 +101,7 @@ test('the placeholder shows until the bar is selected, and comes back if it is l
 });
 
 test('fewer than 3 characters: no search and no results area of any kind', async () => {
-  await render(<SearchTab />);
+  await render(<SearchTab onOpenFriends={jest.fn()} />);
 
   await type('ky');
   await settle();
@@ -110,7 +114,7 @@ test('fewer than 3 characters: no search and no results area of any kind', async
 
 test('loading shows list-row skeletons, from the third character on', async () => {
   mockSearchUsers.mockReturnValue(deferred().promise);
-  await render(<SearchTab />);
+  await render(<SearchTab onOpenFriends={jest.fn()} />);
 
   await type('kys');
   expect(screen.getAllByTestId('skeleton-list-row').length).toBeGreaterThan(0);
@@ -125,7 +129,7 @@ test('success shows one row per person: their initials avatar and their name', a
     {uid: 'a', name: 'Kyson Able'},
     {uid: 'b', name: 'kyson baker'},
   ]);
-  await render(<SearchTab />);
+  await render(<SearchTab onOpenFriends={jest.fn()} />);
 
   await type('kys');
   await settle();
@@ -139,7 +143,7 @@ test('success shows one row per person: their initials avatar and their name', a
 
 test('a row is not pressable: tapping it does nothing until Project 7', async () => {
   mockSearchUsers.mockResolvedValue([{uid: 'a', name: 'Kyson Able'}]);
-  await render(<SearchTab />);
+  await render(<SearchTab onOpenFriends={jest.fn()} />);
 
   await type('kys');
   await settle();
@@ -149,7 +153,7 @@ test('a row is not pressable: tapping it does nothing until Project 7', async ()
 });
 
 test('no matches shows the empty state "No one found", not the error state', async () => {
-  await render(<SearchTab />);
+  await render(<SearchTab onOpenFriends={jest.fn()} />);
 
   await type('zzz');
   await settle();
@@ -161,7 +165,7 @@ test('no matches shows the empty state "No one found", not the error state', asy
 
 test('a failed search shows the error state, and retry runs the same search again', async () => {
   mockSearchUsers.mockRejectedValueOnce(new Error('unavailable'));
-  await render(<SearchTab />);
+  await render(<SearchTab onOpenFriends={jest.fn()} />);
 
   await type('kys');
   await settle();
@@ -182,7 +186,7 @@ test('an older search that answers after a newer one never reaches the screen', 
   const older = deferred<{uid: string; name: string}[]>();
   const newer = deferred<{uid: string; name: string}[]>();
   mockSearchUsers.mockReturnValueOnce(older.promise).mockReturnValueOnce(newer.promise);
-  await render(<SearchTab />);
+  await render(<SearchTab onOpenFriends={jest.fn()} />);
 
   await type('kys');
   await settle();
@@ -204,7 +208,7 @@ test('an older search that answers after a newer one never reaches the screen', 
 test('deleting back under 3 characters clears the results, even if an answer is still on its way', async () => {
   const slow = deferred<{uid: string; name: string}[]>();
   mockSearchUsers.mockReturnValueOnce(slow.promise);
-  await render(<SearchTab />);
+  await render(<SearchTab onOpenFriends={jest.fn()} />);
 
   await type('kys');
   await settle();
@@ -217,65 +221,92 @@ test('deleting back under 3 characters clears the results, even if an answer is 
   expect(screen.queryByText('Kyson Able')).toBeNull();
 });
 
-describe('the Pending Requests and Friends sections (ticket 4.4)', () => {
-  test('with no search, both sections sit under the bar', async () => {
+describe('the Pending Requests section and the Friends box (tickets 4.4 and 4.6)', () => {
+  const COUNTS = '3 friends · 1 close friend';
+  const openFriends = jest.fn();
+
+  test('with no search, the pending section and the Friends box sit under the bar', async () => {
     mockGetPendingRequests.mockResolvedValue([person('p', 'Pat Pending', 'pending')]);
-    mockGetFriends.mockResolvedValue([person('c', 'Cy Close', 'close_friend'), person('f', 'Fran Friend', 'friend')]);
-    await render(<SearchTab />);
+    await render(<SearchTab onOpenFriends={openFriends} />);
 
     expect(screen.getByText('Pending Requests')).toBeTruthy();
     expect(screen.getByTestId('pending-badge')).toHaveTextContent('1');
     expect(screen.getByText('Pat Pending')).toBeTruthy();
     expect(screen.getByText('Friends')).toBeTruthy();
-    expect(screen.getAllByTestId('friend-row')).toHaveLength(2);
-    expect(screen.getAllByTestId('friend-star-filled')).toHaveLength(1);
+    expect(screen.getByText(COUNTS)).toBeTruthy();
   });
 
-  test('zero pending requests: only the Friends section is on screen', async () => {
-    await render(<SearchTab />);
+  test('opening the tab never reads the friends themselves: no friend rows, no friends query', async () => {
+    await render(<SearchTab onOpenFriends={openFriends} />);
+
+    expect(mockGetFriends).not.toHaveBeenCalled();
+    expect(screen.queryByTestId('friend-row')).toBeNull();
+    expect(screen.queryByText('Fran Friend')).toBeNull();
+  });
+
+  test('tapping the Friends box asks to open the friends list', async () => {
+    await render(<SearchTab onOpenFriends={openFriends} />);
+
+    fireEvent.press(screen.getByTestId('friends-box'));
+
+    expect(openFriends).toHaveBeenCalledTimes(1);
+  });
+
+  test('zero pending requests: only the Friends box is on screen', async () => {
+    await render(<SearchTab onOpenFriends={openFriends} />);
 
     expect(screen.queryByText('Pending Requests')).toBeNull();
     expect(screen.queryByTestId('pending-section')).toBeNull();
-    expect(screen.getByText('Fran Friend')).toBeTruthy();
+    expect(screen.getByText(COUNTS)).toBeTruthy();
   });
 
-  test('one section failing does not blank the other', async () => {
+  test('the pending read failing does not blank the Friends box', async () => {
     mockGetPendingRequests.mockRejectedValue(new Error('unavailable'));
-    await render(<SearchTab />);
+    await render(<SearchTab onOpenFriends={openFriends} />);
 
     expect(screen.getAllByTestId('error-state')).toHaveLength(1);
-    expect(screen.getByText('Fran Friend')).toBeTruthy();
+    expect(screen.getByText(COUNTS)).toBeTruthy();
   });
 
-  test('typing fewer than 3 characters leaves both sections where they are', async () => {
-    await render(<SearchTab />);
+  test('the counts failing does not blank the pending section, and shows no error', async () => {
+    mockGetPendingRequests.mockResolvedValue([person('p', 'Pat Pending', 'pending')]);
+    mockGetFriendCounts.mockRejectedValue(new Error('unavailable'));
+    await render(<SearchTab onOpenFriends={openFriends} />);
+
+    expect(screen.getByText('Pat Pending')).toBeTruthy();
+    expect(screen.getByTestId('friends-box')).toBeTruthy();
+    expect(screen.queryByTestId('error-state')).toBeNull();
+  });
+
+  test('typing fewer than 3 characters leaves both where they are', async () => {
+    await render(<SearchTab onOpenFriends={openFriends} />);
 
     await type('ky');
     await settle();
 
-    expect(screen.getByText('Fran Friend')).toBeTruthy();
+    expect(screen.getByText(COUNTS)).toBeTruthy();
   });
 
-  test('while a search is loading or showing results, neither section is on screen', async () => {
+  test('while a search is loading or showing results, neither is on screen', async () => {
     mockGetPendingRequests.mockResolvedValue([person('p', 'Pat Pending', 'pending')]);
     mockSearchUsers.mockResolvedValue([{uid: 'a', name: 'Kyson Able'}]);
-    await render(<SearchTab />);
+    await render(<SearchTab onOpenFriends={openFriends} />);
 
     await type('kys');
-    expect(screen.queryByText('Friends')).toBeNull();
+    expect(screen.queryByTestId('friends-box')).toBeNull();
     expect(screen.queryByText('Pending Requests')).toBeNull();
 
     await settle();
     expect(screen.getByText('Kyson Able')).toBeTruthy();
-    expect(screen.queryByText('Friends')).toBeNull();
-    expect(screen.queryByText('Fran Friend')).toBeNull();
+    expect(screen.queryByTestId('friends-box')).toBeNull();
+    expect(screen.queryByText(COUNTS)).toBeNull();
     expect(screen.queryByText('Pending Requests')).toBeNull();
     expect(screen.queryByText('Pat Pending')).toBeNull();
   });
 
-  test('clearing the search brings both sections back', async () => {
+  test('clearing the search brings both back', async () => {
     mockGetPendingRequests.mockResolvedValue([person('p', 'Pat Pending', 'pending')]);
-    await render(<SearchTab />);
+    await render(<SearchTab onOpenFriends={openFriends} />);
 
     await type('kys');
     await settle();
@@ -284,44 +315,44 @@ describe('the Pending Requests and Friends sections (ticket 4.4)', () => {
 
     expect(screen.queryByTestId('search-results')).toBeNull();
     expect(screen.getByText('Pat Pending')).toBeTruthy();
-    expect(screen.getByText('Fran Friend')).toBeTruthy();
+    expect(screen.getByText(COUNTS)).toBeTruthy();
   });
 
-  test('opening the tab runs each query once and leaves the name cache alone', async () => {
-    await render(<SearchTab />);
+  test('opening the tab runs the pending query and the counts once, and leaves the name cache alone', async () => {
+    await render(<SearchTab onOpenFriends={openFriends} />);
 
-    expect(mockGetFriends).toHaveBeenCalledTimes(1);
+    expect(mockGetFriendCounts).toHaveBeenCalledTimes(1);
     expect(mockGetPendingRequests).toHaveBeenCalledTimes(1);
     expect(mockClearCache).not.toHaveBeenCalled();
   });
 
-  test('coming back into focus runs both queries again, without clearing the name cache', async () => {
+  test('coming back into focus runs both again, without clearing the name cache', async () => {
     const tab = (focused: boolean) => (
       <FocusContext.Provider value={focused}>
-        <SearchTab />
+        <SearchTab onOpenFriends={openFriends} />
       </FocusContext.Provider>
     );
     const view = await render(tab(true));
 
     await view.rerender(tab(false));
-    expect(mockGetFriends).toHaveBeenCalledTimes(1);
+    expect(mockGetFriendCounts).toHaveBeenCalledTimes(1);
 
-    mockGetFriends.mockResolvedValue([person('f', 'Fran Friend', 'close_friend')]);
+    mockGetFriendCounts.mockResolvedValue({friends: 4, closeFriends: 1});
     await view.rerender(tab(true));
 
-    expect(mockGetFriends).toHaveBeenCalledTimes(2);
+    expect(mockGetFriendCounts).toHaveBeenCalledTimes(2);
     expect(mockGetPendingRequests).toHaveBeenCalledTimes(2);
     expect(mockClearCache).not.toHaveBeenCalled();
-    expect(screen.getAllByTestId('friend-star-filled')).toHaveLength(1);
+    expect(screen.getByText('4 friends · 1 close friend')).toBeTruthy();
   });
 
-  test('pulling down clears the name cache, then runs both queries again', async () => {
-    await render(<SearchTab />);
+  test('pulling down clears the name cache, then runs both again', async () => {
+    await render(<SearchTab onOpenFriends={openFriends} />);
     const order: string[] = [];
     mockClearCache.mockImplementation(() => order.push('clear'));
-    mockGetFriends.mockImplementation(async () => {
-      order.push('friends');
-      return [person('f', 'Fran Renamed', 'friend')];
+    mockGetFriendCounts.mockImplementation(async () => {
+      order.push('counts');
+      return {friends: 5, closeFriends: 0};
     });
     mockGetPendingRequests.mockImplementation(async () => {
       order.push('pending');
@@ -329,29 +360,29 @@ describe('the Pending Requests and Friends sections (ticket 4.4)', () => {
     });
 
     await act(async () => {
-      screen.getByTestId('friends-list').props.refreshControl.props.onRefresh();
+      screen.getByTestId('search-home').props.refreshControl.props.onRefresh();
     });
 
     expect(order[0]).toBe('clear');
-    expect(order.slice().sort()).toEqual(['clear', 'friends', 'pending']);
-    expect(screen.getByText('Fran Renamed')).toBeTruthy();
+    expect(order.slice().sort()).toEqual(['clear', 'counts', 'pending']);
+    expect(screen.getByText('5 friends')).toBeTruthy();
   });
 
-  test('the pull-down spinner shows until both sections have answered', async () => {
-    await render(<SearchTab />);
-    const friends = deferred<ReturnType<typeof person>[]>();
+  test('the pull-down spinner shows until both have answered', async () => {
+    await render(<SearchTab onOpenFriends={openFriends} />);
+    const counts = deferred<{friends: number; closeFriends: number}>();
     const pending = deferred<ReturnType<typeof person>[]>();
-    mockGetFriends.mockReturnValue(friends.promise);
+    mockGetFriendCounts.mockReturnValue(counts.promise);
     mockGetPendingRequests.mockReturnValue(pending.promise);
-    const spinning = () => screen.getByTestId('friends-list').props.refreshControl.props.refreshing;
+    const spinning = () => screen.getByTestId('search-home').props.refreshControl.props.refreshing;
 
     await act(async () => {
-      screen.getByTestId('friends-list').props.refreshControl.props.onRefresh();
+      screen.getByTestId('search-home').props.refreshControl.props.onRefresh();
     });
     expect(spinning()).toBe(true);
 
     await act(async () => {
-      friends.resolve([]);
+      counts.resolve({friends: 0, closeFriends: 0});
     });
     expect(spinning()).toBe(true);
 
@@ -359,15 +390,5 @@ describe('the Pending Requests and Friends sections (ticket 4.4)', () => {
       pending.reject(new Error('unavailable'));
     });
     expect(spinning()).toBe(false);
-  });
-
-  test('with no friends, the empty state offers a way toward searching', async () => {
-    mockGetFriends.mockResolvedValue([]);
-    await render(<SearchTab />);
-
-    expect(screen.getByText('No friends yet')).toBeTruthy();
-    await act(async () => {
-      fireEvent.press(screen.getByText('Find friends'));
-    });
   });
 });

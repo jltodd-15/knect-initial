@@ -20,9 +20,8 @@ import { FriendsService } from '../services/FriendsService';
 import { FriendRow, isStarFilled, pageOf } from '../services/friendsList';
 import { createLatestTracker } from '../services/userSearch';
 
-// Ticket 4.4: my friends, on the Search tab. Display only: starring is Project 5 and opening a
-// person is Project 7. This is also the tab's scrolling list, so whatever sits above the friends
-// (the Pending Requests section) is handed in as `header` and scrolls with them.
+// Ticket 4.4: my friends. Display only: starring is Project 5 and opening a person is Project 7.
+// Since ticket 4.6 this is the body of its own screen (FriendsListScreen), not part of the Search tab.
 
 const SKELETON_ROWS = 3;
 // The skeleton row's avatar size, so a row doesn't shift when it replaces its skeleton.
@@ -37,13 +36,14 @@ type LoadState =
   | { status: 'loaded'; rows: FriendRow[] };
 
 interface Props {
-  // A new value reads again: the tab came back into focus, or was pulled down.
+  // A new value reads again: the list was pulled down.
   reloadToken: number;
   refreshing: boolean;
   onRefresh: () => void;
   onFindFriends: () => void;
   onSettled?: () => void;
-  header?: React.ReactNode;
+  // How many friends the last successful read found.
+  onLoaded?: (count: number) => void;
 }
 
 // Filled for a close friend, outline for a friend. Not a button: starring is Project 5.
@@ -62,7 +62,7 @@ const Star: React.FC<{ filled: boolean; color: string }> = ({ filled, color }) =
   </Svg>
 );
 
-const FriendsList: React.FC<Props> = ({ reloadToken, refreshing, onRefresh, onFindFriends, onSettled, header }) => {
+const FriendsList: React.FC<Props> = ({ reloadToken, refreshing, onRefresh, onFindFriends, onSettled, onLoaded }) => {
   const theme = useTheme();
   const styles = useMemo(() => getStyles(theme), [theme]);
   const [state, setState] = useState<LoadState>({ status: 'loading' });
@@ -71,6 +71,8 @@ const FriendsList: React.FC<Props> = ({ reloadToken, refreshing, onRefresh, onFi
   const tracker = useRef(createLatestTracker()).current;
   const onSettledRef = useRef(onSettled);
   onSettledRef.current = onSettled;
+  const onLoadedRef = useRef(onLoaded);
+  onLoadedRef.current = onLoaded;
 
   const load = useCallback(async () => {
     const ticket = tracker.start();
@@ -80,6 +82,7 @@ const FriendsList: React.FC<Props> = ({ reloadToken, refreshing, onRefresh, onFi
       const rows = await FriendsService.getFriends();
       if (!tracker.isLatest(ticket)) return;
       setState({ status: 'loaded', rows });
+      onLoadedRef.current?.(rows.length);
     } catch {
       if (!tracker.isLatest(ticket)) return;
       setState({ status: 'error' });
@@ -123,10 +126,6 @@ const FriendsList: React.FC<Props> = ({ reloadToken, refreshing, onRefresh, onFi
       onContentSizeChange={handleContentSizeChange}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={theme.colors.primary} />}
     >
-      {header}
-      <View style={styles.heading}>
-        <Text style={styles.headingText}>Friends</Text>
-      </View>
       {state.status === 'loading' &&
         Array.from({ length: SKELETON_ROWS }, (_, index) => <SkeletonCard key={index} variant="list-row" />)}
       {state.status === 'error' && <ErrorState onRetry={load} />}
@@ -146,8 +145,6 @@ const FriendsList: React.FC<Props> = ({ reloadToken, refreshing, onRefresh, onFi
 };
 
 const getStyles = ({ colors, typography, spacing }: Theme) => StyleSheet.create({
-  heading: { paddingHorizontal: spacing.base, paddingTop: spacing.md, paddingBottom: spacing.xs },
-  headingText: { ...typography.label, color: colors.textSecondary, fontFamily: 'Inter' },
   row: { flexDirection: 'row', alignItems: 'center', padding: spacing.base, gap: spacing.md },
   rowName: { ...typography.body, flex: 1, color: colors.textPrimary, fontFamily: 'Inter' },
 });

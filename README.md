@@ -20,12 +20,14 @@ an Auth account with no profile document behind it.
   looks people up in Firebase, in any capitalization, and lists up to 10 of them by initials and
   name. It matches the start of the name only ("smith" does not find "John Smith"), and tapping a
   result does nothing yet. Under the search bar it lists your pending friend requests (with a count)
-  and your friends, close friends first. Both lists are read-only, and nothing in the app creates a
-  friendship yet, so they are empty unless Friends documents are added by hand in the Console.
+  and a Friends box showing how many friends and close friends you have. Tapping the box opens the
+  friends list on its own screen, close friends first. Everything is read-only, and nothing in the
+  app creates a friendship yet, so it is all empty unless Friends documents are added by hand in
+  the Console.
 - **Reachable but not real yet:** the Planner, Discover, Circle and Profile tabs. They open without
   crashing, but show sample data. Anything changed there is saved only on that phone, never to
   Firebase. The Profile tab shows "Alex Rivera", not the profile created at signup.
-- **Not verified on a device:** tickets 2.3, 1.4, 4.1 (the move to React Navigation), 4.3 (search) and 4.4 (the friends lists). Their checks are in `DEVICE_TESTS.md`. What has been seen on a phone so far, and what is wanted changed, is in [`DEVICE_FINDINGS.md`](DEVICE_FINDINGS.md).
+- **Not verified on a device:** tickets 2.3, 1.4, 4.1 (the move to React Navigation), 4.3 (search), 4.4 (the friends lists) and 4.6 (the Friends box and the friends list screen). Their checks are in `DEVICE_TESTS.md`. What has been seen on a phone so far, and what is wanted changed, is in [`DEVICE_FINDINGS.md`](DEVICE_FINDINGS.md).
 - **Known bugs** that belong to other tickets are listed in [`CLAUDE.md`](CLAUDE.md), under
   "Known bugs that are somebody else's ticket".
 

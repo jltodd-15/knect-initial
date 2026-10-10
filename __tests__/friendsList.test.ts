@@ -16,8 +16,7 @@ import {
   sortFriends,
   sortPending,
   splitByStatus,
-  toRow,
-} from '../services/friendsList';
+  toRow, friendCountsLabel} from '../services/friendsList';
 
 const profile = (name: string) => ({name, name_lowercase: name.toLowerCase()});
 
@@ -140,4 +139,21 @@ test('a page is 10 rows; each further page shows 10 more', () => {
   expect(pageOf(rows, 2)).toEqual({visible: rows.slice(0, 20), hasMore: true});
   expect(pageOf(rows, 3)).toEqual({visible: rows, hasMore: false});
   expect(pageOf(rows, 9)).toEqual({visible: rows, hasMore: false});
+});
+
+// Ticket 4.6: the line under "Friends" in the Search tab's box.
+test('the counts line: friends, then close friends', () => {
+  expect(friendCountsLabel({friends: 12, closeFriends: 2})).toBe('12 friends · 2 close friends');
+});
+
+test('the counts line is singular at one', () => {
+  expect(friendCountsLabel({friends: 1, closeFriends: 1})).toBe('1 friend · 1 close friend');
+});
+
+test('with no close friends the second half is left off', () => {
+  expect(friendCountsLabel({friends: 3, closeFriends: 0})).toBe('3 friends');
+});
+
+test('with no friends the counts line says so', () => {
+  expect(friendCountsLabel({friends: 0, closeFriends: 0})).toBe('No friends yet');
 });

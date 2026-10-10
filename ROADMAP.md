@@ -66,11 +66,17 @@ until the app is connected (decided 2026-10-09); the reasons are there too.
   - *Prefix-only on purpose:* "smith" does not find "John Smith". Substring search needs a search service; revisit if real users keep searching by last name.
   - *Uses `components/InitialsAvatar.tsx`* (from 1.4) for any person with no uploaded picture, or who no longer exists ("Deleted user"). Don't build a second placeholder.
 - [ ] 4.4 — Friends list & pending requests
-  - *Built (4.4), not yet device-tested:* under the search bar, a Pending Requests section (hidden when there are none, with a red count badge) and a Friends section (close friends first, then A–Z, filled or outline star). Read-only. Both disappear while a search is showing. Checks are in `DEVICE_TESTS.md`.
+  - *Built (4.4), not yet device-tested:* under the search bar, a Pending Requests section (hidden when there are none, with a red count badge) and (moved to its own screen by 4.6) a Friends section (close friends first, then A–Z, filled or outline star). Read-only. Both disappear while a search is showing. Checks are in `DEVICE_TESTS.md`.
   - *Nothing writes a Friends document yet* (Project 5), so the only way to see rows is to add documents by hand in the Console.
   - *Names are remembered for the session* in `services/userProfileCache.ts`: one `Users` read per person, re-read only on pull-down or after signing in as someone else. 15.2's sender names reuse it instead of building a second cache.
   - *The badge's white number uses the `onPrimary` token:* there is no `onDanger`, and `theme/tokens.ts` wasn't 4.4's to change.
   - ❓ *No ticket owns this:* `App.tsx` throws a tab's screen away when you leave it and rebuilds it when you come back (`FocusedOnly`). That was a stopgap from 4.1 and isn't a long-term answer (it loses scroll position and typed text, and re-reads on every visit). The Search tab already reloads on real focus, so it keeps working when this is removed; the other tabs need checking.
+- [ ] 4.5 — Token, font & icon update *(placeholder: brings `theme/tokens.ts` up to Appendix A, links Manrope, adds Lucide, adds `onDanger`. No ticket file yet.)*
+- [ ] 4.6 — Friends box & the friends list screen 📄 *(4.4 follow-up; built before 4.5)*
+  - *Built (4.6), not yet device-tested:* the Search tab no longer lists friends. It shows a Friends box with two counts ("12 friends · 2 close friends"); tapping it opens the friends list on its own screen, with a back arrow. Opening Search now costs two count reads instead of one read per friend. Checks are in `DEVICE_TESTS.md`.
+  - *Counts need a connection:* offline, the box shows "Friends" with no numbers and still opens the list.
+  - *The list screen covers the tab bar.* The design board keeps the tab bar visible; 4.1 pushes screens on the root stack, above the tabs. ❓ Kyson to decide whether that matters.
+  - *"Find friends" on an empty list goes back to Search;* it no longer puts the cursor in the search bar.
 
 ## Project 5 — Friend requests
 - [ ] 5 — Friend request logic 📄 *depends on D2 and 15.1 — see Running Order F1*

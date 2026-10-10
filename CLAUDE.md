@@ -54,8 +54,11 @@ Hand-written and worth respecting: `CreateProfilePage.tsx`, `utils/storage.ts`.
 - No denormalized names or profile pictures anywhere. A screen showing a person reads the person.
 - A name read for a uid goes through `services/userProfileCache.ts`: one `Users` read per person
   per session, emptied when the signed-in uid changes. Don't build a second name cache.
-- The Search tab's Friends and Pending Requests sections are one-time reads, not listeners, and
-  show the signed-in user's own copy of `status`. Their split, sort and paging rules are the pure
+- The Search tab shows Pending Requests and a Friends box, never the friends themselves. The box's
+  two numbers are count queries (`FriendsService.getFriendCounts`); the list is its own screen
+  (`components/FriendsListScreen.tsx`) on the root stack. Don't put a read that grows with the
+  number of friends on the Search tab. All of these are one-time reads, not listeners, and show the
+  signed-in user's own copy of `status`. Their split, sort, paging and wording rules are the pure
   functions in `services/friendsList.ts`.
 - A person with no uploaded picture, or who resolves to nothing ("Deleted user"), renders
   `components/InitialsAvatar.tsx`. Don't build a second placeholder.
@@ -114,7 +117,7 @@ ticket that hasn't been built yet, even if you know it's coming.
 
 - Every tab except Search still runs on sample data and on-device storage, not Firestore. The
   Profile tab shows "Alex Rivera", not the profile written at signup (D6). Chats and activities are sample
-  data, and so are friends everywhere except the Search tab: the Planner, Circle and the Profile
+  data, and so are friends everywhere except the Search tab and the friends list screen: the Planner, Circle and the Profile
   tab's friends modal still use `MOCK_FRIENDS` and the old `Friend` type (Projects 5, 9, 11 and 15).
   Nothing writes a `Friends` document yet (Project 5).
 - The signed-in screens don't fit the phone: titles are drawn under the status bar, and the layout

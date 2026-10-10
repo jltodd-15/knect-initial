@@ -9,6 +9,7 @@
 
 const mockDb = {__brand: 'firestore-instance'};
 const mockGetDocs = jest.fn();
+const mockGetCount = jest.fn();
 const mockCacheGet = jest.fn();
 let mockCurrentUser: {uid: string} | null = {uid: 'me'};
 
@@ -17,6 +18,7 @@ jest.mock('@react-native-firebase/firestore', () => ({
   where: (field: string, op: string, value: unknown) => ({type: 'where', field, op, value}),
   query: (source: unknown, ...constraints: unknown[]) => ({source, constraints}),
   getDocs: (...args: unknown[]) => mockGetDocs(...args),
+  getCountFromServer: (...args: unknown[]) => mockGetCount(...args),
 }));
 jest.mock('@react-native-firebase/auth', () => ({
   getAuth: () => ({
@@ -132,4 +134,53 @@ test('with nobody signed in, both reads reject without asking Firestore anything
   await expect(FriendsService.getFriends()).rejects.toThrow();
   await expect(FriendsService.getPendingRequests()).rejects.toThrow();
   expect(mockGetDocs).not.toHaveBeenCalled();
+});
+
+// Ticket 4.6: the Friends box's two numbers come from count queries, not from reading friends.
+describe('friend counts (ticket 4.6)', () => {
+  const countOf = (count: number) => ({data: () => ({count})});
+  const isCloseOnly = (q: {constraints: {op: string}[]}) => q.constraints[0].op === '==';
+
+  beforeEach(() => {
+    mockGetCount.mockImplementation(async q => countOf(isCloseOnly(q) ? 2 : 12));
+  });
+
+  test('two count queries of my own Friends: all friends, and close friends', async () => {
+    const counts = await FriendsService.getFriendCounts();
+
+    expect(counts).toEqual({friends: 12, closeFriends: 2});
+    expect(mockGetCount).toHaveBeenCalledTimes(2);
+    expect(mockGetCount.mock.calls.map(call => call[0])).toEqual(
+      expect.arrayContaining([
+        {
+          source: {db: mockDb, path: 'Users/me/Friends'},
+          constraints: [{type: 'where', field: 'status', op: 'in', value: ['friend', 'close_friend']}],
+        },
+        {
+          source: {db: mockDb, path: 'Users/me/Friends'},
+          constraints: [{type: 'where', field: 'status', op: '==', value: 'close_friend'}],
+        },
+      ]),
+    );
+  });
+
+  test('counting reads no Friends documents and no names', async () => {
+    await FriendsService.getFriendCounts();
+
+    expect(mockGetDocs).not.toHaveBeenCalled();
+    expect(mockCacheGet).not.toHaveBeenCalled();
+  });
+
+  test('a failed count rejects, so the box can show without numbers', async () => {
+    mockGetCount.mockRejectedValue(new Error('unavailable'));
+
+    await expect(FriendsService.getFriendCounts()).rejects.toThrow('unavailable');
+  });
+
+  test('with nobody signed in, counting rejects without asking Firestore anything', async () => {
+    mockCurrentUser = null;
+
+    await expect(FriendsService.getFriendCounts()).rejects.toThrow();
+    expect(mockGetCount).not.toHaveBeenCalled();
+  });
 });
