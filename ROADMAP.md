@@ -86,7 +86,7 @@ until the app is connected (decided 2026-10-09); the reasons are there too.
   - *"Find friends" on an empty list goes back to Search;* it no longer puts the cursor in the search bar.
 
 ## Project 5 — Friend requests
-- [ ] 5 — Friend requests 📄 *(parent page; split into four on 2026-10-10. Each sub-ticket still has open decisions in its file.)*
+- [ ] 5 — Friend requests 📄 *(parent page; split into four on 2026-10-10)*
 - [ ] 5.1 — Cloud Functions setup & test harness 📄 *(absorbs D2; needs the Blaze plan)*
 - [ ] 5.2 — `acceptFriendRequest` & the 1-on-1 chat 📄 ⭐ *writes past the rules with the Admin SDK*
 - [ ] 5.3 — Friend actions: the app's data layer 📄 ⭐ *writes `blocked_users`; adds `@react-native-firebase/functions`*

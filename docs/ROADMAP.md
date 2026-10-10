@@ -31,10 +31,10 @@ Status key: **reviewed** · **written-unreviewed** · **needs split** (the Restr
 | 4.5 | Token, Font & Icon Update | written-unreviewed [built, `ticket/4.5`] | | 4.2, 4.6 | `theme/tokens.ts` up to Appendix A; Manrope; Lucide; `on-danger` |
 | 4.6 | Friends Box & Friends List Screen | written-unreviewed [built, `ticket/4.6`] | | 4.4, 4.1 | Counts on Search; list on its own screen |
 | 5 | Friend Requests (parent) | edit pass done 2026-10-10; split into 5.1–5.4 | | 4.4, 4.6 | Parent page; build from the sub-tickets |
-| 5.1 | Cloud Functions Setup & Test Harness | written-unreviewed, open brackets | | `*3.1` | `functions/` project and its test command. Absorbs D2 |
-| 5.2 | `acceptFriendRequest` & the 1-on-1 Chat | written-unreviewed, open brackets | `*` | 5.1, `*3.2`, `*3.3` | Block check, both friendship writes, chat find-or-create |
+| 5.1 | Cloud Functions Setup & Test Harness | written-unreviewed | | `*3.1` | `functions/` project and its test command. Absorbs D2 |
+| 5.2 | `acceptFriendRequest` & the 1-on-1 Chat | written-unreviewed | `*` | 5.1, `*3.2`, `*3.3` | Block check, both friendship writes, chat find-or-create |
 | 5.3 | Friend Actions — Data Layer | written-unreviewed | `*` | 4.4, 4.6, `*5.2` | Send, accept, decline, star, remove, block, unblock |
-| 5.4 | Friend Buttons | written-unreviewed, open brackets | | `*5.3`, 4.5 | Accept/Decline, star toggle, shared action button |
+| 5.4 | Friend Buttons | written-unreviewed | | `*5.3`, 4.5 | Accept/Decline, star toggle, shared action button |
 | 6 | Profile Picture Uploads | needs edit pass | | `*2.2`, D9 | Pick, compress, upload |
 | 7 | Public Profile Routing | needs edit pass | | 4.1, 5 | Tap a person → their profile |
 | 8 | Define Activity Schema | needs edit pass | | `*3.2` | Activity document in code |
@@ -127,9 +127,6 @@ With 4.4 in PR, the next tickets by number are 5, 6 and 7. **None of them is rea
 
 ### 3.2 Open brackets, by ticket
 
-- [ ] **5.1** — Node version for Functions; the Functions region (look up the Firestore database's region first); whether the harness is proved with an `acceptFriendRequest` shell. — **blocks build (5.1)**
-- [ ] **5.2** — `chat_name` for a direct chat. — **blocks build (5.2)**
-- [ ] **5.4** — where the action button is mounted before ticket 7; whether a starred row moves at once; stay on Search or open the chat after Accept; the failure message wording. — **blocks build (5.4)**
 - [ ] **0.2** — iOS bundle ID (`com.knect`?). Only open if 0.2 isn't built.
 - [ ] **D11** — what analytics events get logged.
 - [ ] **16.1** — Events listener date bound. — **blocks build (16.x)**
