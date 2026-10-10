@@ -145,7 +145,7 @@ const DiscoveryFeed: React.FC<Props> = ({ onPlanActivity }) => {
                   <ScrollView style={styles.detailScroll}>
                       <Image source={{ uri: selectedItem.image }} style={styles.detailImage} />
                       <TouchableOpacity style={styles.closeBtn} onPress={() => setSelectedItem(null)}>
-                          <Svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={colors.onPrimary} strokeWidth="2"><Path d="M18 6L6 18M6 6l12 12" /></Svg>
+                          <Svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={colors.onColor} strokeWidth="2"><Path d="M18 6L6 18M6 6l12 12" /></Svg>
                       </TouchableOpacity>
                       
                       <View style={styles.detailContent}>
@@ -207,8 +207,8 @@ const getStyles = ({ colors, typography, spacing, radius }: Theme) => StyleSheet
   cardContent: { position: 'absolute', bottom: 0, left: 0, right: 0, padding: spacing['2xl'], paddingBottom: spacing['2xl'] },
   tag: { alignSelf: 'flex-start', backgroundColor: colors.primary, paddingHorizontal: spacing.md, paddingVertical: spacing.sm, borderRadius: radius.sm, marginBottom: spacing.base },
   tagText: { color: colors.onPrimary, fontSize: typography.micro.fontSize, fontWeight: '700', textTransform: 'uppercase', fontFamily: 'Inter' },
-  cardTitle: { ...typography.display, color: colors.onPrimary, marginBottom: spacing.md, fontFamily: 'Inter' },
-  cardDesc: { color: colors.onPrimary, fontSize: typography.label.fontSize, fontWeight: '600', marginBottom: spacing['2xl'], fontFamily: 'Inter', opacity: 0.9 },
+  cardTitle: { ...typography.display, color: colors.onColor, marginBottom: spacing.md, fontFamily: 'Inter' },
+  cardDesc: { color: colors.onColor, fontSize: typography.label.fontSize, fontWeight: '600', marginBottom: spacing['2xl'], fontFamily: 'Inter', opacity: 0.9 },
   viewButton: { backgroundColor: colors.surface, padding: spacing.lg, borderRadius: radius.xl, alignItems: 'center' },
   viewButtonText: { color: colors.textPrimary, fontWeight: '700', fontSize: typography.caption.fontSize, textTransform: 'uppercase', letterSpacing: 1, fontFamily: 'Inter' },
 

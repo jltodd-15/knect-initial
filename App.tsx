@@ -564,7 +564,7 @@ const getStyles = ({ colors, typography, spacing, radius }: Theme) => StyleSheet
     fontFamily: 'Anonymous Pro',
     fontSize: 42,
     fontWeight: '700',
-    color: colors.onPrimary,
+    color: colors.onColor,
     letterSpacing: -2
   },
 

@@ -64,7 +64,7 @@ const EventPlanner: React.FC<Props> = ({ initialProposal, initialParticipants })
               endTime: now.getTime() + (2 * 60 * 60 * 1000), // 2 hours default
               type: 'group',
               participants: [],
-              color: eventColors[0],
+              color: eventColors[0].base,
               status: 'proposed',
               isAllDay: false
           };
@@ -87,7 +87,7 @@ const EventPlanner: React.FC<Props> = ({ initialProposal, initialParticipants })
         type: 'personal', // Changed to personal since no participants
         location: 'TBD', 
         participants: [], 
-        color: eventColors[0],
+        color: eventColors[0].base,
         status: 'confirmed', // Changed to confirmed
         isAllDay: false
     }];
@@ -508,13 +508,13 @@ const EventPlanner: React.FC<Props> = ({ initialProposal, initialParticipants })
                          <TouchableOpacity onPress={() => {
                              handlePopupAction(); // Edit/Propose
                          }} style={styles.popupHeaderBtn}>
-                             <Svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={colors.onPrimary} strokeWidth="2"><Path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><Path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></Svg>
+                             <Svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={colors.onColor} strokeWidth="2"><Path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><Path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></Svg>
                          </TouchableOpacity>
                          <TouchableOpacity onPress={() => handleDeleteEvent(popupEvent.event.id)} style={styles.popupHeaderBtn}>
-                             <Svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={colors.onPrimary} strokeWidth="2"><Path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></Svg>
+                             <Svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={colors.onColor} strokeWidth="2"><Path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></Svg>
                          </TouchableOpacity>
                          <TouchableOpacity onPress={() => setPopupEvent(null)} style={styles.popupHeaderBtn}>
-                             <Svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={colors.onPrimary} strokeWidth="2"><Path d="M18 6L6 18M6 6l12 12"/></Svg>
+                             <Svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={colors.onColor} strokeWidth="2"><Path d="M18 6L6 18M6 6l12 12"/></Svg>
                          </TouchableOpacity>
                     </View>
                 </View>
@@ -642,13 +642,13 @@ const getStyles = ({ colors, typography, spacing, radius }: Theme) => StyleSheet
   dayNumberContainer: { width: 44, height: 44, borderRadius: radius.lg, backgroundColor: colors.surface, justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: colors.border },
   activeDayNumberContainer: { backgroundColor: colors.primary, borderColor: colors.primary },
   dayNumber: { fontSize: typography.body.fontSize, fontWeight: '700', color: colors.textSecondary, fontFamily: 'Inter' },
-  activeDot: { width: 4, height: 4, backgroundColor: colors.onPrimary, borderRadius: radius.pill, marginTop: spacing.xs },
+  activeDot: { width: 4, height: 4, backgroundColor: colors.onColor, borderRadius: radius.pill, marginTop: spacing.xs },
   
   allDayContainer: { paddingHorizontal: spacing.xl, marginBottom: spacing.base, flexDirection: 'column' },
   allDayLabel: { fontSize: typography.micro.fontSize, fontWeight: '700', color: colors.textSecondary, fontFamily: 'Inter', marginBottom: spacing.sm },
   allDayEventsList: { gap: spacing.xs },
   allDayEventRow: { width: '100%', paddingHorizontal: spacing.md, paddingVertical: spacing.md, borderRadius: radius.md },
-  allDayEventText: { color: colors.onPrimary, fontSize: typography.label.fontSize, fontWeight: '700', fontFamily: 'Inter' },
+  allDayEventText: { color: colors.onColor, fontSize: typography.label.fontSize, fontWeight: '700', fontFamily: 'Inter' },
 
   agenda: { flex: 1 },
   gridContainer: { flexDirection: 'row' },
@@ -708,7 +708,7 @@ const getStyles = ({ colors, typography, spacing, radius }: Theme) => StyleSheet
 
   // Toast
   toastContainer: { position: 'absolute', bottom: 100, left: '20%', right: '20%', backgroundColor: colors.scrim, padding: spacing.md, borderRadius: radius.xl, alignItems: 'center', zIndex: 300 },
-  toastText: { color: colors.onPrimary, fontSize: typography.caption.fontSize, fontWeight: '600', fontFamily: 'Inter', textAlign: 'center' },
+  toastText: { color: colors.onColor, fontSize: typography.caption.fontSize, fontWeight: '600', fontFamily: 'Inter', textAlign: 'center' },
 });
 
 export default EventPlanner;

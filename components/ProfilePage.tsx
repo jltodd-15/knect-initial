@@ -86,7 +86,7 @@ const ProfilePage: React.FC<Props> = ({ onLogout }) => {
                  <Image source={{ uri: avatar }} style={styles.avatar} />
                  {isEditing && (
                      <View style={styles.cameraOverlay}>
-                        <Svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={colors.onPrimary} strokeWidth="2">
+                        <Svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={colors.onColor} strokeWidth="2">
                             <Path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
                             <Path d="M12 13a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" />
                         </Svg>
@@ -206,7 +206,7 @@ const ProfilePage: React.FC<Props> = ({ onLogout }) => {
                     value={theme.mode === 'dark'} 
                     onValueChange={(on) => theme.setOverride(on ? 'dark' : 'light')}
                     trackColor={{false: colors.border, true: colors.primary}}
-                    thumbColor={colors.onPrimary} 
+                    thumbColor={colors.onColor} 
                 />
              </View>
              <View style={styles.divider} />

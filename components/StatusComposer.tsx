@@ -70,7 +70,7 @@ const StatusComposer: React.FC = () => {
             value={status.isAvailable} 
             onValueChange={handleToggle}
             trackColor={{ false: colors.border, true: colors.primary }}
-            thumbColor={colors.onPrimary}
+            thumbColor={colors.onColor}
             style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }] }}
         />
       </View>

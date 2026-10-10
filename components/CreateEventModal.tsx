@@ -22,7 +22,7 @@ interface Props {
 }
 
 // A new event starts on the first of the event colors.
-const DEFAULT_EVENT_COLOR = eventColors[0];
+const DEFAULT_EVENT_COLOR = eventColors[0].base;
 const HOURS = Array.from({ length: 24 }, (_, i) => i);
 
 const CreateEventModal: React.FC<Props> = ({ visible, onClose, onSave, friends, initialStartTime, initialEvent, initialParticipants }) => {
@@ -225,7 +225,7 @@ const CreateEventModal: React.FC<Props> = ({ visible, onClose, onSave, friends, 
                     value={isAllDay} 
                     onValueChange={setIsAllDay}
                     trackColor={{ false: colors.border, true: color }}
-                    thumbColor={colors.onPrimary}
+                    thumbColor={colors.onColor}
                 />
             </View>
         </View>
@@ -270,14 +270,14 @@ const CreateEventModal: React.FC<Props> = ({ visible, onClose, onSave, friends, 
         <View style={[styles.card, { marginTop: spacing.base }]}>
             <Text style={[styles.cardLabel, { marginBottom: spacing.md }]}>COLOR</Text>
             <View style={styles.colorRow}>
-                {eventColors.map(c => (
+                {eventColors.map(({ base: c }) => (
                     <TouchableOpacity 
                         key={c} 
                         style={[styles.colorCircle, { backgroundColor: c }, color === c && styles.colorSelected]}
                         onPress={() => setColor(c)}
                     >
                         {color === c && (
-                            <Svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={colors.onPrimary} strokeWidth="4">
+                            <Svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={colors.onColor} strokeWidth="4">
                                 <Path d="M20 6L9 17l-5-5" />
                             </Svg>
                         )}
@@ -413,7 +413,7 @@ const CreateEventModal: React.FC<Props> = ({ visible, onClose, onSave, friends, 
                             style={[styles.calCell, isSelected && styles.calCellSelected, { backgroundColor: isSelected ? color : 'transparent' }]}
                             onPress={() => handleDateSelect(d)}
                         >
-                            <Text style={[styles.calDateText, isSelected && { color: colors.onPrimary }]}>{d}</Text>
+                            <Text style={[styles.calDateText, isSelected && { color: colors.onColor }]}>{d}</Text>
                         </TouchableOpacity>
                     );
                 })}
@@ -521,7 +521,7 @@ const CreateEventModal: React.FC<Props> = ({ visible, onClose, onSave, friends, 
                         disabled={!title || !pickedStartTime}
                         onPress={handleSave}
                     >
-                        <Text style={[styles.saveText, { color: (!title || !pickedStartTime) ? colors.textDisabled : colors.onPrimary }]}>
+                        <Text style={[styles.saveText, { color: (!title || !pickedStartTime) ? colors.textDisabled : colors.onColor }]}>
                             {selectedFriends.length > 0 ? 'PROPOSE EVENT' : 'CREATE EVENT'}
                         </Text>
                     </TouchableOpacity>
@@ -535,7 +535,7 @@ const CreateEventModal: React.FC<Props> = ({ visible, onClose, onSave, friends, 
                         style={[styles.saveBtn, { backgroundColor: color }]}
                         onPress={() => setStep('info')}
                     >
-                        <Text style={[styles.saveText, { color: colors.onPrimary }]}>
+                        <Text style={[styles.saveText, { color: colors.onColor }]}>
                             DONE
                         </Text>
                     </TouchableOpacity>
@@ -589,7 +589,7 @@ const getStyles = ({ colors, typography, spacing, radius }: Theme) => StyleSheet
   friendAvatar: { width: 48, height: 48, borderRadius: radius.pill, marginRight: spacing.base },
   friendName: { fontSize: typography.label.fontSize, fontWeight: '700', color: colors.textPrimary, fontFamily: 'Inter' },
   busyLabel: { fontSize: typography.micro.fontSize, fontWeight: '700', color: colors.danger, marginTop: spacing.xs, letterSpacing: 0.5 },
-  checkCircle: { width: 24, height: 24, borderRadius: radius.pill, backgroundColor: colors.onPrimary, justifyContent: 'center', alignItems: 'center' },
+  checkCircle: { width: 24, height: 24, borderRadius: radius.pill, backgroundColor: colors.onColor, justifyContent: 'center', alignItems: 'center' },
 
   // Calendar Styles
   calendarHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing.xl },
