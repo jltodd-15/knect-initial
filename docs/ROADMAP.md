@@ -27,7 +27,7 @@ Status key: **reviewed** · **written-unreviewed** · **needs split** (the Restr
 | 4.1 | React Navigation Migration | written-unreviewed [built, `ticket/4.1`] | | 0.1, 1.1 | Five-tab navigator + root stack |
 | 4.2 | Theme, Tokens, Shared Components & Sweep | written-unreviewed [built — Likely] | | 4.1 | `theme/` + shared states; sweep onto Appendix A |
 | 4.3 | Search Tab & User Search | written-unreviewed [built — Likely] | | 4.1, 4.2, `*2.2`, `*3.2` | Prefix search on `name_lowercase` |
-| 4.4 | Friends List & Pending Requests | written-unreviewed [PR open — Kyson] | | 4.3, `*3.2` | Read-only friends + pending |
+| 4.4 | Friends List & Pending Requests | written-unreviewed [PR open, **not merged** — tickets after it are written as if it were done] | | 4.3, `*3.2` | Read-only friends + pending |
 | 5 | Friend Request Logic | needs edit pass | `*` | 4.4; own Functions setup + chat creation (§3.3) | Send/accept/decline/star/remove/block |
 | 6 | Profile Picture Uploads | needs edit pass | | `*2.2`, D9 | Pick, compress, upload |
 | 7 | Public Profile Routing | needs edit pass | | 4.1, 5 | Tap a person → their profile |
@@ -100,7 +100,8 @@ Project 18 §0, applied to **every** ticket that writes UI.
 3. No guesses — no approximated layouts, placeholder colors, or stock icons.
 4. **Boards labeled "Potential" count as missing** until Kyson approves them.
 5. Data-layer work may proceed while waiting. Screens may not.
-6. Design source of truth: the **Knect Visual Directions** canvas (Direction A, "Refined Emerald"), plus what Kyson attaches in-session. The export of that canvas is in `docs/design/`; its `README.md` lists every board and its status. Where it disagrees with Appendix A, the canvas/Project 18 is newer and wins (section 3.3).
+6. Design source of truth: the export of the Knect Design canvas in `docs/design/` (Direction A, "Refined Emerald"); its `README.md` lists every board. **Ruled (Kyson, 2026-10-09): the boards are guidance for look and overall choices. On specifics, the ticket and the code win.** Where a board and a ticket disagree, build what the ticket says and tell Kyson. Example: the `Interests` board shows a sample list; the fixed `INTERESTS` list in the code stays. For token values, Appendix A and `docs/design/tokens.json` are the same thing; if they ever differ, stop and ask.
+7. **Ruled (Kyson, 2026-10-09): treat every board in `docs/design/` as approved for now**, including those whose HTML title still says "potential". The two chat boards (`ChatProposal`, `ChatVoteClosed`) stay "ask first", per ticket 18.
 
 ---
 
@@ -135,6 +136,7 @@ With 4.4 in PR, the next tickets by number are 5, 6 and 7. **None of them is rea
 - [ ] **17.2** — on vote close, the event's clock restarts fresh or with the remainder.
 - [ ] **17.2** — rewrite `Free_Busy` when a winning option moves a confirmed event. Now reachable — 18.5 opened confirmed-event votes.
 - [ ] **17.2 / Q9** — build the vote-cancel button for MVP; if yes, `close_reason` gets a fourth value or none.
+- [ ] **Appendix B.1** — text color on `danger` fills now that `on-primary` is dark: add `on-danger: #ffffff`, or reuse another token.
 - [ ] **18.2** — all-day `end_time`: inclusive end-of-day or exclusive next midnight. Pin it in the Master Schema. — **blocks build (18.2)**
 - [ ] **18.2** — multi-day: separate toggle or tap the end date.
 - [ ] **18.2** — confirm itineraries are deferred out of 18.
@@ -146,9 +148,10 @@ With 4.4 in PR, the next tickets by number are 5, 6 and 7. **None of them is rea
 
 Each line names the winner. Apply the edit in the named ticket the next time it's opened; don't re-ask.
 
-- [ ] **`on-primary` = `#052E22`** (Project 18, 2026-10-09) over Appendix A's `#FFFFFF` (2026-10-08). Edit Appendix A and `theme/tokens.ts` (4.2 is built).
-- [ ] **Event colors = base + 700 "poster" shade + text color each** (18's D-0.2) over 4.2's flat "unchanged" six. Amend `eventColors` in `theme/tokens.ts` before 18.1. Needs a small follow-up ticket; 4.2 is built.
-- [ ] **Font = Manrope (OFL)** (18's D-0.4) over the code's `'Inter'` / `'Anonymous Pro'` (no files exist). Font files + per-platform linking need an owner (0.2 owned iOS asset linking).
+- [ ] **`on-primary` = `#052e22`**, plus the other new and changed tokens. Appendix A was updated 2026-10-09 and matches `docs/design/tokens.json`. **Still to do: `theme/tokens.ts`** (4.2 is built with `#FFFFFF`). Needs the token follow-up ticket below.
+- [ ] **Event colors = base + solid 700 + text color each** (Appendix A.2.1, 2026-10-09) over 4.2's flat six. Amend `eventColors` in `theme/tokens.ts` before 18.1. Same follow-up ticket.
+- [ ] **Font = Manrope (OFL)**, weights 400–800; `display` drops from 900 to 800 (Appendix A.3). The five `.ttf` files are in `docs/design/fonts/`; they still need linking into the iOS and Android projects. **Icons = Lucide** via `lucide-react-native` (Appendix A.6), a new dependency (`react-native-svg` is already installed). Same follow-up ticket.
+- [ ] **Token follow-up ticket: unwritten, unnumbered.** Brings `theme/tokens.ts` up to Appendix A (colors, event colors, type scale, radius, sizes), links Manrope, adds Lucide, and updates the `CLAUDE.md` styling lines it makes stale (weight 900, the six event colors). Must land before any 18.x UI. Also answers Appendix B.1's `on-danger` bracket.
 - [ ] **Split 16 and 17 using the Restructure Plan's numbering** (16.1–16.8, 17.1–17.8), because 18 — the newest ticket — depends on those numbers (16.4, 16.7, 16.8, 17.2 "creating a vote", 17.5–17.8). The written "16.1/16.2/17.1/17.2" docs become the source text for those splits. Rules work in the plan's `*16.1`/`*17.1` is **verify-and-extend** (`*3.3`'s whole-file ruling is newer than the plan).
 - [ ] **18's own rulings over its flags list:** RSVP carry-over and who can start are ruled in 18.5 (the flags list still calls them open); the busy field is one Boolean, no per-user map (18.2).
 - [ ] **Votes on confirmed events are allowed** (18.5, 2026-10-09) over 16.1, the 16 Phase 1 ledger and the Master Schema ("alternatives only while proposed"). Project 17 change — see 3.4.

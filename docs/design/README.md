@@ -1,20 +1,46 @@
 # Knect design handoff
 
-Exported from the Knect Design canvas on 2026-10-09. Direction A, "Refined Emerald", dark theme.
+Exported from the Knect Design canvas on 2026-10-09. Direction A, "Refined Emerald". Boards are drawn in dark mode.
 
 ## How to use this folder (for Claude Code)
 
 - **Each board has two files with the same name.** The `.html` is the source of truth for exact values: hex colors, sizes, spacing, font weights and copy. The `.png` (2x) is how it should look. Read both.
-- **The HTML is a picture of the screen, not app code.** Rebuild it in React Native using the tokens and shared components from 4.2 (Appendix A/B). Do not copy inline styles or web-only CSS.
+- **The HTML is a picture of the screen, not app code.** Rebuild it in React Native using the tokens and shared components from 4.2. Do not copy inline styles or web-only CSS.
 - **Status matters.** `approved` boards can be built. `potential` boards are **not approved**: treat them as missing and ask Kyson before building from them.
 - **Ask when something is missing.** If a ticket needs a screen or state that isn't in this folder, stop and send Kyson the full list of what's missing. Never guess a design.
-- **Logo files are in `assets/`.** Use those SVGs; never rebuild the logo from a font. The activity photo in `assets/` is placeholder content only.
-- **Fixed rules across every screen:**
-  - Primary buttons are emerald `#10b981` with dark text `#052e22` (not white).
-  - Confirmed and personal events are solid in their color's 700 shade with white text.
-  - Proposed events are a dashed outline.
-  - Friends' busy times are gray stripes with initials.
-  - Activities with no photo use their event color (700 shade) with white text.
+
+## Shared files every screen uses
+
+| What | Where | Notes |
+|---|---|---|
+| Tokens (machine-readable) | `tokens.json` | Light and dark colors, event colors, type, spacing, radius, fixed sizes, icon names. Feeds `theme/tokens.ts` |
+| Tokens (visual) | `brand/TokenSheet.png` / `.html` | Same values, one page |
+| Fonts | `fonts/Manrope_400Regular.ttf` … `Manrope_800ExtraBold.ttf` | Five static weights, 400–800. SIL Open Font License (`fonts/OFL.txt`): free to bundle in the app. **Manrope has no 900; anything specced 900 uses 800.** |
+| Icons | `icons/*.svg` | Lucide (ISC license). In app code use `lucide-react-native` with the same names, `strokeWidth={2.4}`. Sizes: 24 tabs/nav, 18 inline, 16 small |
+| Logo | `assets/knect-*.svg/png` | Real outlines, never rebuilt from a font |
+
+## Light mode
+
+Every board is drawn dark. **Light mode is defined by the tokens, not separate boards:** build each screen from token names, and the `light` values in `tokens.json` give the light version. Rules that hold in both themes:
+
+- Primary buttons: `primary` fill with `on-primary` (#052e22) text. Never white text on emerald.
+- Confirmed and personal events: solid event color (the `solid` 700 shade) with white text, same in light and dark.
+- Proposed events: 2px dashed `base` border, `proposedFill` (base at 8%), `text-strong` text.
+- Friends' busy: 135° stripes of `busy-stripe-a` / `busy-stripe-b` with initials. Never titles.
+- Sheets sit on `backdrop`. In dark it is black; in light it is black at 35% over the screen.
+
+## Event colors
+
+Six colors; the event stores the **base** hex. See `tokens.json` → `eventColors` and the token sheet.
+
+| Name | Base (swatch, dashed outline) | Solid 700 (event fill) | Text on base | Text on solid |
+|---|---|---|---|---|
+| emerald | `#10b981` | `#047857` | `#0d0d12` | `#ffffff` |
+| blue | `#3b82f6` | `#1d4ed8` | `#0d0d12` | `#ffffff` |
+| violet | `#8b5cf6` | `#6d28d9` | `#0d0d12` | `#ffffff` |
+| pink | `#ec4899` | `#be185d` | `#0d0d12` | `#ffffff` |
+| orange | `#f97316` | `#c2410c` | `#0d0d12` | `#ffffff` |
+| yellow | `#eab308` | `#a16207` | `#0d0d12` | `#ffffff` |
 
 ## Index
 
@@ -25,6 +51,7 @@ Exported from the Knect Design canvas on 2026-10-09. Direction A, "Refined Emera
 |---|---|---|---|
 | `VectorMasters` | Vector masters (final files) | brand | approved |
 | `Lockups` | Logo on every background | brand | approved |
+| `TokenSheet` | Tokens · final (light + dark, event colors, type, spacing, radius, icons) | 4.2 (all screens) | approved |
 | `AppIcon` | App icon | brand | approved |
 | `LaunchAnimated` | Launch screen · A2 springy (plays once) | brand (launch) | approved |
 
@@ -72,15 +99,26 @@ Exported from the Knect Design canvas on 2026-10-09. Direction A, "Refined Emera
 | `EventProposed` | Tap a friend’s proposal (vote open) | 18 | approved |
 | `EditPlan` | Edit / delete your plan | 18 | approved |
 | `CreateTimedMultiDay` | Timed multi-day plan | 18 | approved |
-| `FriendsBusyFilter` | Choose whose busy to show | 18 | approved |
+| `FriendsBusyFilter` | Choose whose busy to show | 18.4 | approved |
 | `MultiDayPlanner` | Multi-day plan across its days | 18 | approved |
 | `VoteCards` | Vote card states (with 17.5) | 17 (17.5) | approved |
 | `ChatProposal` | Chat: plan card + open vote | 15–17 | potential |
 | `ChatVoteClosed` | Chat: vote closed, plan moved | 15–17 | potential |
+| `PlannerWeekSwipe` | Week strip mid-swipe | 18 | approved |
+| `PlannerAllDay3` | All-day row · three events | 18 | approved |
+| `PlannerAllDayOverflow` | All-day row · +2 overflow | 18 | approved |
+| `PlannerAllDayExpanded` | All-day · +2 tapped | 18 | approved |
+| `PlannerFriendsOverlay` | Friends’ busy on the Planner (on) | 18.4 | approved |
+| `PlannerFriendsPicker` | Friends’ busy · turn on/off, pick friends | 18.4 | approved |
+| `PlannerConfirmedVote` | Confirmed plan with a vote open | 18.5 | approved |
+| `EventConfirmedVote` | Confirmed plan detail · vote open | 18.5 | approved |
+| `EventProposedCantMake` | Proposed plan · Can’t make it → Suggest a new time | 18.5 | approved |
+| `DeleteConfirm` | Delete confirmation | 18 | approved |
+| `CreateTimeRequired` | Time required error | 18 | approved |
 
 ## Spec notes per board
 
-These are the canvas notes that sit under each board. They are the "what changed and why" for each screen.
+The canvas notes that sit under each board: what changed and why.
 
 ### app-screens/SignIn
 
@@ -257,3 +295,17 @@ TAPPING AN EVENT
 • Your plan: details incl. Busy / Free, Edit, Invite friends, Delete
 • Confirmed group plan: who's coming with statuses, Open chat, Suggest a new time, Can't make it
 • Friend's proposal: Going / Can't make it, plus a 'Vote open' banner when a new time is being voted on
+
+### planner-and-plans/PlannerFriendsPicker
+
+FRIENDS' BUSY ON THE PLANNER
+• The people button in the Planner header turns it on (emerald when on)
+• Pick up to 5 friends; the row under All day shows who and has Edit
+• Gray stripes with initials, behind your own events. Never titles or details
+• Reads: one Free_Busy get per picked friend per visible day, cached for the session
+
+### planner-and-plans/PlannerConfirmedVote
+
+VOTES ON CONFIRMED AND PROPOSED PLANS
+• Confirmed plan with a vote: stays solid at its current time, tagged 'Vote open · new time?'; detail shows the banner with Vote
+• Proposed plan: tapping Can't make it reveals Suggest a new time (17.1's unlock); the sheet is flows/SuggestTime

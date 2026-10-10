@@ -1,0 +1,657 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Knect tokens — final</title></head><body>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"><style>body{margin:0} code{font-family: ui-monospace, Menlo, monospace; font-size: 12px; color: #e4e4e7} table{border-collapse: collapse} tr{border-bottom: 1px solid #27272a} h2{margin: 0; font-size: 24px; font-weight: 800; color: #ffffff}</style>
+<div style="width: 1600px; box-sizing: border-box; padding: 48px; background: #121212; color: #f4f4f5; font-family: 'Manrope', system-ui, sans-serif; display: flex; flex-direction: column; gap: 40px">
+<div><h1 style="margin: 0; font-size: 40px; font-weight: 800; color: #ffffff">Knect tokens · final</h1><span style="font-size: 16px; color: #a1a1aa">Source of truth for 4.2. Machine-readable copy: tokens.json. Names match Appendix A, which is updated to match this sheet.</span></div>
+<section style="display: flex; flex-direction: column; gap: 14px"><h2>Color · light and dark</h2><table style="font-size: 14px"><tr style="color: #a1a1aa; font-size: 12px"><td style="padding: 6px 10px">TOKEN</td><td style="padding: 6px 10px">LIGHT</td><td style="padding: 6px 10px">DARK</td><td style="padding: 6px 10px">USED FOR</td></tr><tr><td style="padding: 6px 10px; font-weight: 700; color: #ffffff; white-space: nowrap">primary</td><td style="padding: 6px 10px"><span style="display: flex; align-items: center; gap: 8px"><span style="display: inline-block; width: 40px; height: 28px; border-radius: 8px; background: #10b981; box-shadow: inset 0 0 0 1px #3f3f46"></span><code>#10b981</code></span></td><td style="padding: 6px 10px"><span style="display: flex; align-items: center; gap: 8px"><span style="display: inline-block; width: 40px; height: 28px; border-radius: 8px; background: #10b981; box-shadow: inset 0 0 0 1px #3f3f46"></span><code>#10b981</code></span></td><td style="padding: 6px 10px; color: #a1a1aa">Buttons, selected states, now-line, links</td></tr><tr><td style="padding: 6px 10px; font-weight: 700; color: #ffffff; white-space: nowrap">primary-pressed</td><td style="padding: 6px 10px"><span style="display: flex; align-items: center; gap: 8px"><span style="display: inline-block; width: 40px; height: 28px; border-radius: 8px; background: #059669; box-shadow: inset 0 0 0 1px #3f3f46"></span><code>#059669</code></span></td><td style="padding: 6px 10px"><span style="display: flex; align-items: center; gap: 8px"><span style="display: inline-block; width: 40px; height: 28px; border-radius: 8px; background: #059669; box-shadow: inset 0 0 0 1px #3f3f46"></span><code>#059669</code></span></td><td style="padding: 6px 10px; color: #a1a1aa">Pressed primary</td></tr><tr><td style="padding: 6px 10px; font-weight: 700; color: #ffffff; white-space: nowrap">primary-surface</td><td style="padding: 6px 10px"><span style="display: flex; align-items: center; gap: 8px"><span style="display: inline-block; width: 40px; height: 28px; border-radius: 8px; background: #ecfdf5; box-shadow: inset 0 0 0 1px #3f3f46"></span><code>#ecfdf5</code></span></td><td style="padding: 6px 10px"><span style="display: flex; align-items: center; gap: 8px"><span style="display: inline-block; width: 40px; height: 28px; border-radius: 8px; background: #064e3b; box-shadow: inset 0 0 0 1px #3f3f46"></span><code>#064e3b</code></span></td><td style="padding: 6px 10px; color: #a1a1aa">Tinted selected backgrounds</td></tr><tr><td style="padding: 6px 10px; font-weight: 700; color: #ffffff; white-space: nowrap">on-primary</td><td style="padding: 6px 10px"><span style="display: flex; align-items: center; gap: 8px"><span style="display: inline-block; width: 40px; height: 28px; border-radius: 8px; background: #052e22; box-shadow: inset 0 0 0 1px #3f3f46"></span><code>#052e22</code></span></td><td style="padding: 6px 10px"><span style="display: flex; align-items: center; gap: 8px"><span style="display: inline-block; width: 40px; height: 28px; border-radius: 8px; background: #052e22; box-shadow: inset 0 0 0 1px #3f3f46"></span><code>#052e22</code></span></td><td style="padding: 6px 10px; color: #a1a1aa">Text/icons on primary. NOT white (5.83:1)</td></tr><tr><td style="padding: 6px 10px; font-weight: 700; color: #ffffff; white-space: nowrap">danger</td><td style="padding: 6px 10px"><span style="display: flex; align-items: center; gap: 8px"><span style="display: inline-block; width: 40px; height: 28px; border-radius: 8px; background: #ef4444; box-shadow: inset 0 0 0 1px #3f3f46"></span><code>#ef4444</code></span></td><td style="padding: 6px 10px"><span style="display: flex; align-items: center; gap: 8px"><span style="display: inline-block; width: 40px; height: 28px; border-radius: 8px; background: #ef4444; box-shadow: inset 0 0 0 1px #3f3f46"></span><code>#ef4444</code></span></td><td style="padding: 6px 10px; color: #a1a1aa">Destructive fills, error icon, badge</td></tr><tr><td style="padding: 6px 10px; font-weight: 700; color: #ffffff; white-space: nowrap">danger-text</td><td style="padding: 6px 10px"><span style="display: flex; align-items: center; gap: 8px"><span style="display: inline-block; width: 40px; height: 28px; border-radius: 8px; background: #dc2626; box-shadow: inset 0 0 0 1px #3f3f46"></span><code>#dc2626</code></span></td><td style="padding: 6px 10px"><span style="display: flex; align-items: center; gap: 8px"><span style="display: inline-block; width: 40px; height: 28px; border-radius: 8px; background: #f87171; box-shadow: inset 0 0 0 1px #3f3f46"></span><code>#f87171</code></span></td><td style="padding: 6px 10px; color: #a1a1aa">Red text: Delete, Can’t make it</td></tr><tr><td style="padding: 6px 10px; font-weight: 700; color: #ffffff; white-space: nowrap">danger-surface</td><td style="padding: 6px 10px"><span style="display: flex; align-items: center; gap: 8px"><span style="display: inline-block; width: 40px; height: 28px; border-radius: 8px; background: #fee2e2; box-shadow: inset 0 0 0 1px #3f3f46"></span><code>#fee2e2</code></span></td><td style="padding: 6px 10px"><span style="display: flex; align-items: center; gap: 8px"><span style="display: inline-block; width: 40px; height: 28px; border-radius: 8px; background: #450a0a; box-shadow: inset 0 0 0 1px #3f3f46"></span><code>#450a0a</code></span></td><td style="padding: 6px 10px; color: #a1a1aa">Error banner background</td></tr><tr><td style="padding: 6px 10px; font-weight: 700; color: #ffffff; white-space: nowrap">danger-border</td><td style="padding: 6px 10px"><span style="display: flex; align-items: center; gap: 8px"><span style="display: inline-block; width: 40px; height: 28px; border-radius: 8px; background: #fca5a5; box-shadow: inset 0 0 0 1px #3f3f46"></span><code>#fca5a5</code></span></td><td style="padding: 6px 10px"><span style="display: flex; align-items: center; gap: 8px"><span style="display: inline-block; width: 40px; height: 28px; border-radius: 8px; background: #7f1d1d; box-shadow: inset 0 0 0 1px #3f3f46"></span><code>#7f1d1d</code></span></td><td style="padding: 6px 10px; color: #a1a1aa">Error banner border</td></tr><tr><td style="padding: 6px 10px; font-weight: 700; color: #ffffff; white-space: nowrap">warning</td><td style="padding: 6px 10px"><span style="display: flex; align-items: center; gap: 8px"><span style="display: inline-block; width: 40px; height: 28px; border-radius: 8px; background: #eab308; box-shadow: inset 0 0 0 1px #3f3f46"></span><code>#eab308</code></span></td><td style="padding: 6px 10px"><span style="display: flex; align-items: center; gap: 8px"><span style="display: inline-block; width: 40px; height: 28px; border-radius: 8px; background: #eab308; box-shadow: inset 0 0 0 1px #3f3f46"></span><code>#eab308</code></span></td><td style="padding: 6px 10px; color: #a1a1aa">Busy-conflict icon</td></tr><tr><td style="padding: 6px 10px; font-weight: 700; color: #ffffff; white-space: nowrap">warning-text</td><td style="padding: 6px 10px"><span style="display: flex; align-items: center; gap: 8px"><span style="display: inline-block; width: 40px; height: 28px; border-radius: 8px; background: #854d0e; box-shadow: inset 0 0 0 1px #3f3f46"></span><code>#854d0e</code></span></td><td style="padding: 6px 10px"><span style="display: flex; align-items: center; gap: 8px"><span style="display: inline-block; width: 40px; height: 28px; border-radius: 8px; background: #fde68a; box-shadow: inset 0 0 0 1px #3f3f46"></span><code>#fde68a</code></span></td><td style="padding: 6px 10px; color: #a1a1aa">Busy-conflict text</td></tr><tr><td style="padding: 6px 10px; font-weight: 700; color: #ffffff; white-space: nowrap">warning-surface</td><td style="padding: 6px 10px"><span style="display: flex; align-items: center; gap: 8px"><span style="display: inline-block; width: 40px; height: 28px; border-radius: 8px; background: #fef9c3; box-shadow: inset 0 0 0 1px #3f3f46"></span><code>#fef9c3</code></span></td><td style="padding: 6px 10px"><span style="display: flex; align-items: center; gap: 8px"><span style="display: inline-block; width: 40px; height: 28px; border-radius: 8px; background: #2b2410; box-shadow: inset 0 0 0 1px #3f3f46"></span><code>#2b2410</code></span></td><td style="padding: 6px 10px; color: #a1a1aa">Busy-conflict banner</td></tr><tr><td style="padding: 6px 10px; font-weight: 700; color: #ffffff; white-space: nowrap">warning-border</td><td style="padding: 6px 10px"><span style="display: flex; align-items: center; gap: 8px"><span style="display: inline-block; width: 40px; height: 28px; border-radius: 8px; background: #fde047; box-shadow: inset 0 0 0 1px #3f3f46"></span><code>#fde047</code></span></td><td style="padding: 6px 10px"><span style="display: flex; align-items: center; gap: 8px"><span style="display: inline-block; width: 40px; height: 28px; border-radius: 8px; background: #a16207; box-shadow: inset 0 0 0 1px #3f3f46"></span><code>#a16207</code></span></td><td style="padding: 6px 10px; color: #a1a1aa">Busy-conflict border</td></tr><tr><td style="padding: 6px 10px; font-weight: 700; color: #ffffff; white-space: nowrap">background</td><td style="padding: 6px 10px"><span style="display: flex; align-items: center; gap: 8px"><span style="display: inline-block; width: 40px; height: 28px; border-radius: 8px; background: #FDFCFB; box-shadow: inset 0 0 0 1px #3f3f46"></span><code>#FDFCFB</code></span></td><td style="padding: 6px 10px"><span style="display: flex; align-items: center; gap: 8px"><span style="display: inline-block; width: 40px; height: 28px; border-radius: 8px; background: #121212; box-shadow: inset 0 0 0 1px #3f3f46"></span><code>#121212</code></span></td><td style="padding: 6px 10px; color: #a1a1aa">App background</td></tr><tr><td style="padding: 6px 10px; font-weight: 700; color: #ffffff; white-space: nowrap">surface</td><td style="padding: 6px 10px"><span style="display: flex; align-items: center; gap: 8px"><span style="display: inline-block; width: 40px; height: 28px; border-radius: 8px; background: #FFFFFF; box-shadow: inset 0 0 0 1px #3f3f46"></span><code>#FFFFFF</code></span></td><td style="padding: 6px 10px"><span style="display: flex; align-items: center; gap: 8px"><span style="display: inline-block; width: 40px; height: 28px; border-radius: 8px; background: #1E1E1E; box-shadow: inset 0 0 0 1px #3f3f46"></span><code>#1E1E1E</code></span></td><td style="padding: 6px 10px; color: #a1a1aa">Cards, grouped rows, sheet rows</td></tr><tr><td style="padding: 6px 10px; font-weight: 700; color: #ffffff; white-space: nowrap">surface-alt</td><td style="padding: 6px 10px"><span style="display: flex; align-items: center; gap: 8px"><span style="display: inline-block; width: 40px; height: 28px; border-radius: 8px; background: #f4f4f5; box-shadow: inset 0 0 0 1px #3f3f46"></span><code>#f4f4f5</code></span></td><td style="padding: 6px 10px"><span style="display: flex; align-items: center; gap: 8px"><span style="display: inline-block; width: 40px; height: 28px; border-radius: 8px; background: #27272a; box-shadow: inset 0 0 0 1px #3f3f46"></span><code>#27272a</code></span></td><td style="padding: 6px 10px; color: #a1a1aa">Chips, inset areas, skeletons, others’ chat bubbles</td></tr><tr><td style="padding: 6px 10px; font-weight: 700; color: #ffffff; white-space: nowrap">backdrop</td><td style="padding: 6px 10px"><span style="display: flex; align-items: center; gap: 8px"><span style="display: inline-block; width: 40px; height: 28px; border-radius: 8px; background: #00000059; box-shadow: inset 0 0 0 1px #3f3f46"></span><code>#00000059</code></span></td><td style="padding: 6px 10px"><span style="display: flex; align-items: center; gap: 8px"><span style="display: inline-block; width: 40px; height: 28px; border-radius: 8px; background: #000000; box-shadow: inset 0 0 0 1px #3f3f46"></span><code>#000000</code></span></td><td style="padding: 6px 10px; color: #a1a1aa">Behind a sheet (light = black 35%)</td></tr><tr><td style="padding: 6px 10px; font-weight: 700; color: #ffffff; white-space: nowrap">tab-bar</td><td style="padding: 6px 10px"><span style="display: flex; align-items: center; gap: 8px"><span style="display: inline-block; width: 40px; height: 28px; border-radius: 8px; background: #FFFFFF; box-shadow: inset 0 0 0 1px #3f3f46"></span><code>#FFFFFF</code></span></td><td style="padding: 6px 10px"><span style="display: flex; align-items: center; gap: 8px"><span style="display: inline-block; width: 40px; height: 28px; border-radius: 8px; background: #1a1a1a; box-shadow: inset 0 0 0 1px #3f3f46"></span><code>#1a1a1a</code></span></td><td style="padding: 6px 10px; color: #a1a1aa">Bottom tab bar</td></tr><tr><td style="padding: 6px 10px; font-weight: 700; color: #ffffff; white-space: nowrap">border</td><td style="padding: 6px 10px"><span style="display: flex; align-items: center; gap: 8px"><span style="display: inline-block; width: 40px; height: 28px; border-radius: 8px; background: #e4e4e7; box-shadow: inset 0 0 0 1px #3f3f46"></span><code>#e4e4e7</code></span></td><td style="padding: 6px 10px"><span style="display: flex; align-items: center; gap: 8px"><span style="display: inline-block; width: 40px; height: 28px; border-radius: 8px; background: #3f3f46; box-shadow: inset 0 0 0 1px #3f3f46"></span><code>#3f3f46</code></span></td><td style="padding: 6px 10px; color: #a1a1aa">Input outlines, ghost buttons</td></tr><tr><td style="padding: 6px 10px; font-weight: 700; color: #ffffff; white-space: nowrap">divider</td><td style="padding: 6px 10px"><span style="display: flex; align-items: center; gap: 8px"><span style="display: inline-block; width: 40px; height: 28px; border-radius: 8px; background: #e4e4e7; box-shadow: inset 0 0 0 1px #3f3f46"></span><code>#e4e4e7</code></span></td><td style="padding: 6px 10px"><span style="display: flex; align-items: center; gap: 8px"><span style="display: inline-block; width: 40px; height: 28px; border-radius: 8px; background: #27272a; box-shadow: inset 0 0 0 1px #3f3f46"></span><code>#27272a</code></span></td><td style="padding: 6px 10px; color: #a1a1aa">Hairlines between rows, hour lines</td></tr><tr><td style="padding: 6px 10px; font-weight: 700; color: #ffffff; white-space: nowrap">text-strong</td><td style="padding: 6px 10px"><span style="display: flex; align-items: center; gap: 8px"><span style="display: inline-block; width: 40px; height: 28px; border-radius: 8px; background: #18181b; box-shadow: inset 0 0 0 1px #3f3f46"></span><code>#18181b</code></span></td><td style="padding: 6px 10px"><span style="display: flex; align-items: center; gap: 8px"><span style="display: inline-block; width: 40px; height: 28px; border-radius: 8px; background: #ffffff; box-shadow: inset 0 0 0 1px #3f3f46"></span><code>#ffffff</code></span></td><td style="padding: 6px 10px; color: #a1a1aa">Titles, selected values</td></tr><tr><td style="padding: 6px 10px; font-weight: 700; color: #ffffff; white-space: nowrap">text-primary</td><td style="padding: 6px 10px"><span style="display: flex; align-items: center; gap: 8px"><span style="display: inline-block; width: 40px; height: 28px; border-radius: 8px; background: #27272a; box-shadow: inset 0 0 0 1px #3f3f46"></span><code>#27272a</code></span></td><td style="padding: 6px 10px"><span style="display: flex; align-items: center; gap: 8px"><span style="display: inline-block; width: 40px; height: 28px; border-radius: 8px; background: #f4f4f5; box-shadow: inset 0 0 0 1px #3f3f46"></span><code>#f4f4f5</code></span></td><td style="padding: 6px 10px; color: #a1a1aa">Body text</td></tr><tr><td style="padding: 6px 10px; font-weight: 700; color: #ffffff; white-space: nowrap">text-secondary</td><td style="padding: 6px 10px"><span style="display: flex; align-items: center; gap: 8px"><span style="display: inline-block; width: 40px; height: 28px; border-radius: 8px; background: #71717a; box-shadow: inset 0 0 0 1px #3f3f46"></span><code>#71717a</code></span></td><td style="padding: 6px 10px"><span style="display: flex; align-items: center; gap: 8px"><span style="display: inline-block; width: 40px; height: 28px; border-radius: 8px; background: #a1a1aa; box-shadow: inset 0 0 0 1px #3f3f46"></span><code>#a1a1aa</code></span></td><td style="padding: 6px 10px; color: #a1a1aa">Labels, sublines, timestamps</td></tr><tr><td style="padding: 6px 10px; font-weight: 700; color: #ffffff; white-space: nowrap">text-disabled</td><td style="padding: 6px 10px"><span style="display: flex; align-items: center; gap: 8px"><span style="display: inline-block; width: 40px; height: 28px; border-radius: 8px; background: #a1a1aa; box-shadow: inset 0 0 0 1px #3f3f46"></span><code>#a1a1aa</code></span></td><td style="padding: 6px 10px"><span style="display: flex; align-items: center; gap: 8px"><span style="display: inline-block; width: 40px; height: 28px; border-radius: 8px; background: #52525b; box-shadow: inset 0 0 0 1px #3f3f46"></span><code>#52525b</code></span></td><td style="padding: 6px 10px; color: #a1a1aa">Disabled, other-month days</td></tr><tr><td style="padding: 6px 10px; font-weight: 700; color: #ffffff; white-space: nowrap">placeholder</td><td style="padding: 6px 10px"><span style="display: flex; align-items: center; gap: 8px"><span style="display: inline-block; width: 40px; height: 28px; border-radius: 8px; background: #a1a1aa; box-shadow: inset 0 0 0 1px #3f3f46"></span><code>#a1a1aa</code></span></td><td style="padding: 6px 10px"><span style="display: flex; align-items: center; gap: 8px"><span style="display: inline-block; width: 40px; height: 28px; border-radius: 8px; background: #71717a; box-shadow: inset 0 0 0 1px #3f3f46"></span><code>#71717a</code></span></td><td style="padding: 6px 10px; color: #a1a1aa">Input placeholders</td></tr><tr><td style="padding: 6px 10px; font-weight: 700; color: #ffffff; white-space: nowrap">busy-stripe-a</td><td style="padding: 6px 10px"><span style="display: flex; align-items: center; gap: 8px"><span style="display: inline-block; width: 40px; height: 28px; border-radius: 8px; background: #e4e4e7; box-shadow: inset 0 0 0 1px #3f3f46"></span><code>#e4e4e7</code></span></td><td style="padding: 6px 10px"><span style="display: flex; align-items: center; gap: 8px"><span style="display: inline-block; width: 40px; height: 28px; border-radius: 8px; background: #2a2a2e; box-shadow: inset 0 0 0 1px #3f3f46"></span><code>#2a2a2e</code></span></td><td style="padding: 6px 10px; color: #a1a1aa">Friends’ busy hatch, stripe 1 (135°, 6px)</td></tr><tr><td style="padding: 6px 10px; font-weight: 700; color: #ffffff; white-space: nowrap">busy-stripe-b</td><td style="padding: 6px 10px"><span style="display: flex; align-items: center; gap: 8px"><span style="display: inline-block; width: 40px; height: 28px; border-radius: 8px; background: #f4f4f5; box-shadow: inset 0 0 0 1px #3f3f46"></span><code>#f4f4f5</code></span></td><td style="padding: 6px 10px"><span style="display: flex; align-items: center; gap: 8px"><span style="display: inline-block; width: 40px; height: 28px; border-radius: 8px; background: #1f1f22; box-shadow: inset 0 0 0 1px #3f3f46"></span><code>#1f1f22</code></span></td><td style="padding: 6px 10px; color: #a1a1aa">Friends’ busy hatch, stripe 2</td></tr><tr><td style="padding: 6px 10px; font-weight: 700; color: #ffffff; white-space: nowrap">busy-initials</td><td style="padding: 6px 10px"><span style="display: flex; align-items: center; gap: 8px"><span style="display: inline-block; width: 40px; height: 28px; border-radius: 8px; background: #a1a1aa; box-shadow: inset 0 0 0 1px #3f3f46"></span><code>#a1a1aa</code></span></td><td style="padding: 6px 10px"><span style="display: flex; align-items: center; gap: 8px"><span style="display: inline-block; width: 40px; height: 28px; border-radius: 8px; background: #52525b; box-shadow: inset 0 0 0 1px #3f3f46"></span><code>#52525b</code></span></td><td style="padding: 6px 10px; color: #a1a1aa">Initials chip on a busy block</td></tr></table></section>
+<section style="display: flex; flex-direction: column; gap: 14px"><h2>Event colors · same in light and dark</h2><span style="font-size: 14px; color: #a1a1aa">Six colors, stored on the event as the base hex. Confirmed and personal events render solid (700) with white text. Proposed render dashed. Discover posters for activities without a photo use the solid shade with white text.</span><div style="display: flex; gap: 16px; flex-wrap: wrap"><div style="width: 230px; border-radius: 16px; background: #1e1e1e; padding: 14px; display: flex; flex-direction: column; gap: 10px">
+<span style="font-size: 16px; font-weight: 800; color: #ffffff">emerald</span>
+<div style="height: 44px; border-radius: 10px; background: #10b981; color: #0d0d12; display: flex; align-items: center; padding: 0 10px; font-weight: 800">Base #10b981</div>
+<span style="font-size: 12px; color: #a1a1aa">Swatch, dashed outline · dark text 7.6:1</span>
+<div style="height: 44px; border-radius: 10px; background: #047857; color: #ffffff; display: flex; align-items: center; padding: 0 10px; font-weight: 800">Solid #047857</div>
+<span style="font-size: 12px; color: #a1a1aa">Confirmed/personal events · white text 5.5:1</span>
+<div style="height: 44px; border-radius: 10px; background: #10b98114; border: 2px dashed #10b981; color: #ffffff; display: flex; align-items: center; padding: 0 10px; font-weight: 700; box-sizing: border-box">Proposed</div>
+<div style="height: 44px; border-radius: 10px; background: #ffffff; display: flex; align-items: center; padding: 0 8px"><div style="flex: 1; height: 32px; border-radius: 8px; background: #047857; color: #ffffff; display: flex; align-items: center; padding: 0 8px; font-size: 13px; font-weight: 700">On light bg</div></div>
+</div><div style="width: 230px; border-radius: 16px; background: #1e1e1e; padding: 14px; display: flex; flex-direction: column; gap: 10px">
+<span style="font-size: 16px; font-weight: 800; color: #ffffff">blue</span>
+<div style="height: 44px; border-radius: 10px; background: #3b82f6; color: #0d0d12; display: flex; align-items: center; padding: 0 10px; font-weight: 800">Base #3b82f6</div>
+<span style="font-size: 12px; color: #a1a1aa">Swatch, dashed outline · dark text 5.3:1</span>
+<div style="height: 44px; border-radius: 10px; background: #1d4ed8; color: #ffffff; display: flex; align-items: center; padding: 0 10px; font-weight: 800">Solid #1d4ed8</div>
+<span style="font-size: 12px; color: #a1a1aa">Confirmed/personal events · white text 6.7:1</span>
+<div style="height: 44px; border-radius: 10px; background: #3b82f614; border: 2px dashed #3b82f6; color: #ffffff; display: flex; align-items: center; padding: 0 10px; font-weight: 700; box-sizing: border-box">Proposed</div>
+<div style="height: 44px; border-radius: 10px; background: #ffffff; display: flex; align-items: center; padding: 0 8px"><div style="flex: 1; height: 32px; border-radius: 8px; background: #1d4ed8; color: #ffffff; display: flex; align-items: center; padding: 0 8px; font-size: 13px; font-weight: 700">On light bg</div></div>
+</div><div style="width: 230px; border-radius: 16px; background: #1e1e1e; padding: 14px; display: flex; flex-direction: column; gap: 10px">
+<span style="font-size: 16px; font-weight: 800; color: #ffffff">violet</span>
+<div style="height: 44px; border-radius: 10px; background: #8b5cf6; color: #0d0d12; display: flex; align-items: center; padding: 0 10px; font-weight: 800">Base #8b5cf6</div>
+<span style="font-size: 12px; color: #a1a1aa">Swatch, dashed outline · dark text 4.6:1</span>
+<div style="height: 44px; border-radius: 10px; background: #6d28d9; color: #ffffff; display: flex; align-items: center; padding: 0 10px; font-weight: 800">Solid #6d28d9</div>
+<span style="font-size: 12px; color: #a1a1aa">Confirmed/personal events · white text 7.1:1</span>
+<div style="height: 44px; border-radius: 10px; background: #8b5cf614; border: 2px dashed #8b5cf6; color: #ffffff; display: flex; align-items: center; padding: 0 10px; font-weight: 700; box-sizing: border-box">Proposed</div>
+<div style="height: 44px; border-radius: 10px; background: #ffffff; display: flex; align-items: center; padding: 0 8px"><div style="flex: 1; height: 32px; border-radius: 8px; background: #6d28d9; color: #ffffff; display: flex; align-items: center; padding: 0 8px; font-size: 13px; font-weight: 700">On light bg</div></div>
+</div><div style="width: 230px; border-radius: 16px; background: #1e1e1e; padding: 14px; display: flex; flex-direction: column; gap: 10px">
+<span style="font-size: 16px; font-weight: 800; color: #ffffff">pink</span>
+<div style="height: 44px; border-radius: 10px; background: #ec4899; color: #0d0d12; display: flex; align-items: center; padding: 0 10px; font-weight: 800">Base #ec4899</div>
+<span style="font-size: 12px; color: #a1a1aa">Swatch, dashed outline · dark text 5.5:1</span>
+<div style="height: 44px; border-radius: 10px; background: #be185d; color: #ffffff; display: flex; align-items: center; padding: 0 10px; font-weight: 800">Solid #be185d</div>
+<span style="font-size: 12px; color: #a1a1aa">Confirmed/personal events · white text 6.0:1</span>
+<div style="height: 44px; border-radius: 10px; background: #ec489914; border: 2px dashed #ec4899; color: #ffffff; display: flex; align-items: center; padding: 0 10px; font-weight: 700; box-sizing: border-box">Proposed</div>
+<div style="height: 44px; border-radius: 10px; background: #ffffff; display: flex; align-items: center; padding: 0 8px"><div style="flex: 1; height: 32px; border-radius: 8px; background: #be185d; color: #ffffff; display: flex; align-items: center; padding: 0 8px; font-size: 13px; font-weight: 700">On light bg</div></div>
+</div><div style="width: 230px; border-radius: 16px; background: #1e1e1e; padding: 14px; display: flex; flex-direction: column; gap: 10px">
+<span style="font-size: 16px; font-weight: 800; color: #ffffff">orange</span>
+<div style="height: 44px; border-radius: 10px; background: #f97316; color: #0d0d12; display: flex; align-items: center; padding: 0 10px; font-weight: 800">Base #f97316</div>
+<span style="font-size: 12px; color: #a1a1aa">Swatch, dashed outline · dark text 6.9:1</span>
+<div style="height: 44px; border-radius: 10px; background: #c2410c; color: #ffffff; display: flex; align-items: center; padding: 0 10px; font-weight: 800">Solid #c2410c</div>
+<span style="font-size: 12px; color: #a1a1aa">Confirmed/personal events · white text 5.2:1</span>
+<div style="height: 44px; border-radius: 10px; background: #f9731614; border: 2px dashed #f97316; color: #ffffff; display: flex; align-items: center; padding: 0 10px; font-weight: 700; box-sizing: border-box">Proposed</div>
+<div style="height: 44px; border-radius: 10px; background: #ffffff; display: flex; align-items: center; padding: 0 8px"><div style="flex: 1; height: 32px; border-radius: 8px; background: #c2410c; color: #ffffff; display: flex; align-items: center; padding: 0 8px; font-size: 13px; font-weight: 700">On light bg</div></div>
+</div><div style="width: 230px; border-radius: 16px; background: #1e1e1e; padding: 14px; display: flex; flex-direction: column; gap: 10px">
+<span style="font-size: 16px; font-weight: 800; color: #ffffff">yellow</span>
+<div style="height: 44px; border-radius: 10px; background: #eab308; color: #0d0d12; display: flex; align-items: center; padding: 0 10px; font-weight: 800">Base #eab308</div>
+<span style="font-size: 12px; color: #a1a1aa">Swatch, dashed outline · dark text 10.1:1</span>
+<div style="height: 44px; border-radius: 10px; background: #a16207; color: #ffffff; display: flex; align-items: center; padding: 0 10px; font-weight: 800">Solid #a16207</div>
+<span style="font-size: 12px; color: #a1a1aa">Confirmed/personal events · white text 4.9:1</span>
+<div style="height: 44px; border-radius: 10px; background: #eab30814; border: 2px dashed #eab308; color: #ffffff; display: flex; align-items: center; padding: 0 10px; font-weight: 700; box-sizing: border-box">Proposed</div>
+<div style="height: 44px; border-radius: 10px; background: #ffffff; display: flex; align-items: center; padding: 0 8px"><div style="flex: 1; height: 32px; border-radius: 8px; background: #a16207; color: #ffffff; display: flex; align-items: center; padding: 0 8px; font-size: 13px; font-weight: 700">On light bg</div></div>
+</div></div></section>
+<div style="display: flex; gap: 48px">
+<section style="flex: 1; display: flex; flex-direction: column; gap: 10px"><h2>Type · Manrope</h2><span style="font-size: 14px; color: #a1a1aa">Weights 400–800. Manrope has no 900: Appendix A’s 900 becomes 800.</span><div style="display: flex; align-items: baseline; gap: 16px; padding: 8px 0; border-bottom: 1px solid #27272a"><span style="width: 110px; font-size: 13px; color: #a1a1aa">display<br>32 / 800</span><span style="font-size: 32px; font-weight: 800; letter-spacing: -0.8px; color: #ffffff">Screen titles: Planner, Discover</span></div><div style="display: flex; align-items: baseline; gap: 16px; padding: 8px 0; border-bottom: 1px solid #27272a"><span style="width: 110px; font-size: 13px; color: #a1a1aa">title<br>24 / 800</span><span style="font-size: 24px; font-weight: 800; letter-spacing: -0.4px; color: #ffffff">Event detail title</span></div><div style="display: flex; align-items: baseline; gap: 16px; padding: 8px 0; border-bottom: 1px solid #27272a"><span style="width: 110px; font-size: 13px; color: #a1a1aa">headline<br>20 / 800</span><span style="font-size: 20px; font-weight: 800; letter-spacing: -0.3px; color: #ffffff">Title input, big card names</span></div><div style="display: flex; align-items: baseline; gap: 16px; padding: 8px 0; border-bottom: 1px solid #27272a"><span style="width: 110px; font-size: 13px; color: #a1a1aa">nav-title<br>17 / 800</span><span style="font-size: 17px; font-weight: 800; letter-spacing: 0px; color: #ffffff">Sheet/nav titles, card titles</span></div><div style="display: flex; align-items: baseline; gap: 16px; padding: 8px 0; border-bottom: 1px solid #27272a"><span style="width: 110px; font-size: 13px; color: #a1a1aa">button<br>16 / 800</span><span style="font-size: 16px; font-weight: 800; letter-spacing: 0px; color: #ffffff">Primary buttons</span></div><div style="display: flex; align-items: baseline; gap: 16px; padding: 8px 0; border-bottom: 1px solid #27272a"><span style="width: 110px; font-size: 13px; color: #a1a1aa">body<br>16 / 400</span><span style="font-size: 16px; font-weight: 400; letter-spacing: 0px; color: #ffffff">Inputs, message text</span></div><div style="display: flex; align-items: baseline; gap: 16px; padding: 8px 0; border-bottom: 1px solid #27272a"><span style="width: 110px; font-size: 13px; color: #a1a1aa">body-sm<br>15 / 500</span><span style="font-size: 15px; font-weight: 500; letter-spacing: 0px; color: #ffffff">Row labels and values</span></div><div style="display: flex; align-items: baseline; gap: 16px; padding: 8px 0; border-bottom: 1px solid #27272a"><span style="width: 110px; font-size: 13px; color: #a1a1aa">label<br>14 / 700</span><span style="font-size: 14px; font-weight: 700; letter-spacing: 0px; color: #ffffff">Chips, small buttons, day numbers</span></div><div style="display: flex; align-items: baseline; gap: 16px; padding: 8px 0; border-bottom: 1px solid #27272a"><span style="width: 110px; font-size: 13px; color: #a1a1aa">caption<br>13 / 500</span><span style="font-size: 13px; font-weight: 500; letter-spacing: 0px; color: #ffffff">Sublines, event block titles</span></div><div style="display: flex; align-items: baseline; gap: 16px; padding: 8px 0; border-bottom: 1px solid #27272a"><span style="width: 110px; font-size: 13px; color: #a1a1aa">footnote<br>12 / 500</span><span style="font-size: 12px; font-weight: 500; letter-spacing: 0px; color: #ffffff">Timestamps, hour labels, legends</span></div><div style="display: flex; align-items: baseline; gap: 16px; padding: 8px 0; border-bottom: 1px solid #27272a"><span style="width: 110px; font-size: 13px; color: #a1a1aa">micro<br>11 / 800</span><span style="font-size: 11px; font-weight: 800; letter-spacing: 0px; color: #ffffff">Tags (Vote open), event sublines</span></div><div style="display: flex; align-items: baseline; gap: 16px; padding: 8px 0; border-bottom: 1px solid #27272a"><span style="width: 110px; font-size: 13px; color: #a1a1aa">avatar<br>10 / 800</span><span style="font-size: 10px; font-weight: 800; letter-spacing: 0px; color: #ffffff">Initials in small avatars</span></div></section>
+<section style="width: 560px; display: flex; flex-direction: column; gap: 24px"><div style="display: flex; flex-direction: column; gap: 10px"><h2>Spacing · 4pt grid</h2><div style="display: flex; align-items: center; gap: 12px"><span style="width: 50px; font-size: 13px; color: #a1a1aa">xs 4</span><span style="width: 16px; height: 16px; background: #10b981; border-radius: 3px"></span></div><div style="display: flex; align-items: center; gap: 12px"><span style="width: 50px; font-size: 13px; color: #a1a1aa">sm 8</span><span style="width: 32px; height: 16px; background: #10b981; border-radius: 3px"></span></div><div style="display: flex; align-items: center; gap: 12px"><span style="width: 50px; font-size: 13px; color: #a1a1aa">md 12</span><span style="width: 48px; height: 16px; background: #10b981; border-radius: 3px"></span></div><div style="display: flex; align-items: center; gap: 12px"><span style="width: 50px; font-size: 13px; color: #a1a1aa">base 16</span><span style="width: 64px; height: 16px; background: #10b981; border-radius: 3px"></span></div><div style="display: flex; align-items: center; gap: 12px"><span style="width: 50px; font-size: 13px; color: #a1a1aa">lg 20</span><span style="width: 80px; height: 16px; background: #10b981; border-radius: 3px"></span></div><div style="display: flex; align-items: center; gap: 12px"><span style="width: 50px; font-size: 13px; color: #a1a1aa">xl 24</span><span style="width: 96px; height: 16px; background: #10b981; border-radius: 3px"></span></div><div style="display: flex; align-items: center; gap: 12px"><span style="width: 50px; font-size: 13px; color: #a1a1aa">2xl 32</span><span style="width: 128px; height: 16px; background: #10b981; border-radius: 3px"></span></div></div><div style="display: flex; flex-direction: column; gap: 10px"><h2>Radius</h2><div style="display: flex; flex-wrap: wrap; gap: 12px"><div style="display: flex; flex-direction: column; align-items: center; gap: 6px; width: 110px"><span style="width: 72px; height: 52px; background: #27272a; border: 2px solid #10b981; border-radius: 8px"></span><span style="font-size: 13px; font-weight: 700">sm · 8</span><span style="font-size: 11px; color: #a1a1aa; text-align: center">Chips, all-day chips, small tags</span></div><div style="display: flex; flex-direction: column; align-items: center; gap: 6px; width: 110px"><span style="width: 72px; height: 52px; background: #27272a; border: 2px solid #10b981; border-radius: 10px"></span><span style="font-size: 13px; font-weight: 700">event · 10</span><span style="font-size: 11px; color: #a1a1aa; text-align: center">Event blocks on the planner</span></div><div style="display: flex; flex-direction: column; align-items: center; gap: 6px; width: 110px"><span style="width: 72px; height: 52px; background: #27272a; border: 2px solid #10b981; border-radius: 12px"></span><span style="font-size: 13px; font-weight: 700">md · 12</span><span style="font-size: 11px; color: #a1a1aa; text-align: center">Buttons, inputs, the + button</span></div><div style="display: flex; flex-direction: column; align-items: center; gap: 6px; width: 110px"><span style="width: 72px; height: 52px; background: #27272a; border: 2px solid #10b981; border-radius: 16px"></span><span style="font-size: 13px; font-weight: 700">lg · 16</span><span style="font-size: 11px; color: #a1a1aa; text-align: center">Cards, grouped rows, sheet top corners</span></div><div style="display: flex; flex-direction: column; align-items: center; gap: 6px; width: 110px"><span style="width: 72px; height: 52px; background: #27272a; border: 2px solid #10b981; border-radius: 24px"></span><span style="font-size: 13px; font-weight: 700">xl · 24</span><span style="font-size: 11px; color: #a1a1aa; text-align: center">Large cards</span></div><div style="display: flex; flex-direction: column; align-items: center; gap: 6px; width: 110px"><span style="width: 72px; height: 52px; background: #27272a; border: 2px solid #10b981; border-radius: 26px"></span><span style="font-size: 13px; font-weight: 700">pill · 999</span><span style="font-size: 11px; color: #a1a1aa; text-align: center">Avatars, toggles, pills</span></div></div></div><div style="display: flex; flex-direction: column; gap: 10px"><h2>Fixed sizes</h2><ul style="margin: 0; padding-left: 18px; font-size: 14px; line-height: 1.8"><li><b>hour-height</b> 48 <span style="color: #a1a1aa">Planner hour row</span></li><li><b>button-height</b> 52 <span style="color: #a1a1aa">Primary button</span></li><li><b>row-height</b> 52 <span style="color: #a1a1aa">Grouped row (min)</span></li><li><b>touch-min</b> 44 <span style="color: #a1a1aa">Smallest tap target</span></li><li><b>tab-bar-height</b> 84 <span style="color: #a1a1aa">Incl. home indicator</span></li><li><b>avatar-sm</b> 26 <span style="color: #a1a1aa"></span></li><li><b>avatar-md</b> 32 <span style="color: #a1a1aa"></span></li><li><b>snap-minutes</b> 15 <span style="color: #a1a1aa">Drag/resize snap</span></li></ul></div></section></div>
+<section style="display: flex; flex-direction: column; gap: 14px"><h2>Icons · Lucide (lucide-react-native), stroke 2.4</h2><span style="font-size: 14px; color: #a1a1aa">Sizes: 24 tabs and nav, 18 inline, 16 small. SVGs in icons/. Tab bar: calendar (Planner), compass (Discover), search (Search), users (Circle), user (Profile).</span><div style="display: flex; flex-wrap: wrap"><div style="width: 112px; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 0">
+<svg
+  class="lucide lucide-bookmark"
+  xmlns="http://www.w3.org/2000/svg"
+  width="26"
+  height="26"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="#f4f4f5"
+  stroke-width="2.4"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M17 3a2 2 0 0 1 2 2v15a1 1 0 0 1-1.496.868l-4.512-2.578a2 2 0 0 0-1.984 0l-4.512 2.578A1 1 0 0 1 5 20V5a2 2 0 0 1 2-2z" />
+</svg>
+<span style="font-size: 11px; color: #a1a1aa">bookmark</span></div><div style="width: 112px; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 0">
+<svg
+  class="lucide lucide-calendar"
+  xmlns="http://www.w3.org/2000/svg"
+  width="26"
+  height="26"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="#f4f4f5"
+  stroke-width="2.4"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M8 2v3" />
+  <path d="M16 2v3" />
+  <rect x="3" y="3" width="18" height="18" rx="2" />
+  <path d="M3 9h18" />
+</svg>
+<span style="font-size: 11px; color: #a1a1aa">calendar</span></div><div style="width: 112px; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 0">
+<svg
+  class="lucide lucide-calendar-check"
+  xmlns="http://www.w3.org/2000/svg"
+  width="26"
+  height="26"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="#f4f4f5"
+  stroke-width="2.4"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M8 2v3" />
+  <path d="M16 2v3" />
+  <rect x="3" y="3" width="18" height="18" rx="2" />
+  <path d="M3 9h18" />
+  <path d="m9 15 2 2 4-4" />
+</svg>
+<span style="font-size: 11px; color: #a1a1aa">calendar-check</span></div><div style="width: 112px; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 0">
+<svg
+  class="lucide lucide-camera"
+  xmlns="http://www.w3.org/2000/svg"
+  width="26"
+  height="26"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="#f4f4f5"
+  stroke-width="2.4"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M13.997 4a2 2 0 0 1 1.76 1.05l.486.9A2 2 0 0 0 18.003 7H20a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h1.997a2 2 0 0 0 1.759-1.048l.489-.904A2 2 0 0 1 10.004 4z" />
+  <circle cx="12" cy="13" r="3" />
+</svg>
+<span style="font-size: 11px; color: #a1a1aa">camera</span></div><div style="width: 112px; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 0">
+<svg
+  class="lucide lucide-check"
+  xmlns="http://www.w3.org/2000/svg"
+  width="26"
+  height="26"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="#f4f4f5"
+  stroke-width="2.4"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M20 6 9 17l-5-5" />
+</svg>
+<span style="font-size: 11px; color: #a1a1aa">check</span></div><div style="width: 112px; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 0">
+<svg
+  class="lucide lucide-chevron-down"
+  xmlns="http://www.w3.org/2000/svg"
+  width="26"
+  height="26"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="#f4f4f5"
+  stroke-width="2.4"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m6 9 6 6 6-6" />
+</svg>
+<span style="font-size: 11px; color: #a1a1aa">chevron-down</span></div><div style="width: 112px; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 0">
+<svg
+  class="lucide lucide-chevron-left"
+  xmlns="http://www.w3.org/2000/svg"
+  width="26"
+  height="26"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="#f4f4f5"
+  stroke-width="2.4"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m15 18-6-6 6-6" />
+</svg>
+<span style="font-size: 11px; color: #a1a1aa">chevron-left</span></div><div style="width: 112px; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 0">
+<svg
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="26"
+  height="26"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="#f4f4f5"
+  stroke-width="2.4"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+<span style="font-size: 11px; color: #a1a1aa">chevron-right</span></div><div style="width: 112px; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 0">
+<svg
+  class="lucide lucide-circle-alert"
+  xmlns="http://www.w3.org/2000/svg"
+  width="26"
+  height="26"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="#f4f4f5"
+  stroke-width="2.4"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="12" cy="12" r="10" />
+  <line x1="12" x2="12" y1="8" y2="12" />
+  <line x1="12" x2="12.01" y1="16" y2="16" />
+</svg>
+<span style="font-size: 11px; color: #a1a1aa">circle-alert</span></div><div style="width: 112px; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 0">
+<svg
+  class="lucide lucide-circle-dollar-sign"
+  xmlns="http://www.w3.org/2000/svg"
+  width="26"
+  height="26"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="#f4f4f5"
+  stroke-width="2.4"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="12" cy="12" r="10" />
+  <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8" />
+  <path d="M12 18V6" />
+</svg>
+<span style="font-size: 11px; color: #a1a1aa">circle-dollar-sign</span></div><div style="width: 112px; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 0">
+<svg
+  class="lucide lucide-clock"
+  xmlns="http://www.w3.org/2000/svg"
+  width="26"
+  height="26"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="#f4f4f5"
+  stroke-width="2.4"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="12" cy="12" r="10" />
+  <path d="M12 6v6l4 2" />
+</svg>
+<span style="font-size: 11px; color: #a1a1aa">clock</span></div><div style="width: 112px; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 0">
+<svg
+  class="lucide lucide-compass"
+  xmlns="http://www.w3.org/2000/svg"
+  width="26"
+  height="26"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="#f4f4f5"
+  stroke-width="2.4"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="12" cy="12" r="10" />
+  <path d="m16.24 7.76-1.804 5.411a2 2 0 0 1-1.265 1.265L7.76 16.24l1.804-5.411a2 2 0 0 1 1.265-1.265z" />
+</svg>
+<span style="font-size: 11px; color: #a1a1aa">compass</span></div><div style="width: 112px; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 0">
+<svg
+  class="lucide lucide-ellipsis-vertical"
+  xmlns="http://www.w3.org/2000/svg"
+  width="26"
+  height="26"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="#f4f4f5"
+  stroke-width="2.4"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="12" cy="12" r="1" />
+  <circle cx="12" cy="5" r="1" />
+  <circle cx="12" cy="19" r="1" />
+</svg>
+<span style="font-size: 11px; color: #a1a1aa">ellipsis-vertical</span></div><div style="width: 112px; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 0">
+<svg
+  class="lucide lucide-eye"
+  xmlns="http://www.w3.org/2000/svg"
+  width="26"
+  height="26"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="#f4f4f5"
+  stroke-width="2.4"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" />
+  <circle cx="12" cy="12" r="3" />
+</svg>
+<span style="font-size: 11px; color: #a1a1aa">eye</span></div><div style="width: 112px; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 0">
+<svg
+  class="lucide lucide-eye-off"
+  xmlns="http://www.w3.org/2000/svg"
+  width="26"
+  height="26"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="#f4f4f5"
+  stroke-width="2.4"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49" />
+  <path d="M14.084 14.158a3 3 0 0 1-4.242-4.242" />
+  <path d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143" />
+  <path d="m2 2 20 20" />
+</svg>
+<span style="font-size: 11px; color: #a1a1aa">eye-off</span></div><div style="width: 112px; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 0">
+<svg
+  class="lucide lucide-grip-horizontal"
+  xmlns="http://www.w3.org/2000/svg"
+  width="26"
+  height="26"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="#f4f4f5"
+  stroke-width="2.4"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="12" cy="9" r="1" />
+  <circle cx="19" cy="9" r="1" />
+  <circle cx="5" cy="9" r="1" />
+  <circle cx="12" cy="15" r="1" />
+  <circle cx="19" cy="15" r="1" />
+  <circle cx="5" cy="15" r="1" />
+</svg>
+<span style="font-size: 11px; color: #a1a1aa">grip-horizontal</span></div><div style="width: 112px; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 0">
+<svg
+  class="lucide lucide-heart"
+  xmlns="http://www.w3.org/2000/svg"
+  width="26"
+  height="26"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="#f4f4f5"
+  stroke-width="2.4"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5" />
+</svg>
+<span style="font-size: 11px; color: #a1a1aa">heart</span></div><div style="width: 112px; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 0">
+<svg
+  class="lucide lucide-house"
+  xmlns="http://www.w3.org/2000/svg"
+  width="26"
+  height="26"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="#f4f4f5"
+  stroke-width="2.4"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" />
+  <path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+</svg>
+<span style="font-size: 11px; color: #a1a1aa">house</span></div><div style="width: 112px; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 0">
+<svg
+  class="lucide lucide-lock"
+  xmlns="http://www.w3.org/2000/svg"
+  width="26"
+  height="26"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="#f4f4f5"
+  stroke-width="2.4"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+  <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+</svg>
+<span style="font-size: 11px; color: #a1a1aa">lock</span></div><div style="width: 112px; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 0">
+<svg
+  class="lucide lucide-map-pin"
+  xmlns="http://www.w3.org/2000/svg"
+  width="26"
+  height="26"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="#f4f4f5"
+  stroke-width="2.4"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0" />
+  <circle cx="12" cy="10" r="3" />
+</svg>
+<span style="font-size: 11px; color: #a1a1aa">map-pin</span></div><div style="width: 112px; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 0">
+<svg
+  class="lucide lucide-message-square"
+  xmlns="http://www.w3.org/2000/svg"
+  width="26"
+  height="26"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="#f4f4f5"
+  stroke-width="2.4"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z" />
+</svg>
+<span style="font-size: 11px; color: #a1a1aa">message-square</span></div><div style="width: 112px; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 0">
+<svg
+  class="lucide lucide-moon"
+  xmlns="http://www.w3.org/2000/svg"
+  width="26"
+  height="26"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="#f4f4f5"
+  stroke-width="2.4"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401" />
+</svg>
+<span style="font-size: 11px; color: #a1a1aa">moon</span></div><div style="width: 112px; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 0">
+<svg
+  class="lucide lucide-pencil"
+  xmlns="http://www.w3.org/2000/svg"
+  width="26"
+  height="26"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="#f4f4f5"
+  stroke-width="2.4"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" />
+  <path d="m15 5 4 4" />
+</svg>
+<span style="font-size: 11px; color: #a1a1aa">pencil</span></div><div style="width: 112px; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 0">
+<svg
+  class="lucide lucide-plus"
+  xmlns="http://www.w3.org/2000/svg"
+  width="26"
+  height="26"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="#f4f4f5"
+  stroke-width="2.4"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M5 12h14" />
+  <path d="M12 5v14" />
+</svg>
+<span style="font-size: 11px; color: #a1a1aa">plus</span></div><div style="width: 112px; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 0">
+<svg
+  class="lucide lucide-search"
+  xmlns="http://www.w3.org/2000/svg"
+  width="26"
+  height="26"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="#f4f4f5"
+  stroke-width="2.4"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m21 21-4.34-4.34" />
+  <circle cx="11" cy="11" r="8" />
+</svg>
+<span style="font-size: 11px; color: #a1a1aa">search</span></div><div style="width: 112px; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 0">
+<svg
+  class="lucide lucide-send"
+  xmlns="http://www.w3.org/2000/svg"
+  width="26"
+  height="26"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="#f4f4f5"
+  stroke-width="2.4"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z" />
+  <path d="m21.854 2.147-10.94 10.939" />
+</svg>
+<span style="font-size: 11px; color: #a1a1aa">send</span></div><div style="width: 112px; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 0">
+<svg
+  class="lucide lucide-share"
+  xmlns="http://www.w3.org/2000/svg"
+  width="26"
+  height="26"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="#f4f4f5"
+  stroke-width="2.4"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 2v13" />
+  <path d="m16 6-4-4-4 4" />
+  <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
+</svg>
+<span style="font-size: 11px; color: #a1a1aa">share</span></div><div style="width: 112px; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 0">
+<svg
+  class="lucide lucide-smartphone"
+  xmlns="http://www.w3.org/2000/svg"
+  width="26"
+  height="26"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="#f4f4f5"
+  stroke-width="2.4"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <rect width="14" height="20" x="5" y="2" rx="2" ry="2" />
+  <path d="M12 18h.01" />
+</svg>
+<span style="font-size: 11px; color: #a1a1aa">smartphone</span></div><div style="width: 112px; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 0">
+<svg
+  class="lucide lucide-star"
+  xmlns="http://www.w3.org/2000/svg"
+  width="26"
+  height="26"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="#f4f4f5"
+  stroke-width="2.4"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z" />
+</svg>
+<span style="font-size: 11px; color: #a1a1aa">star</span></div><div style="width: 112px; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 0">
+<svg
+  class="lucide lucide-sun"
+  xmlns="http://www.w3.org/2000/svg"
+  width="26"
+  height="26"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="#f4f4f5"
+  stroke-width="2.4"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="12" cy="12" r="4" />
+  <path d="M12 2v2" />
+  <path d="M12 20v2" />
+  <path d="m4.93 4.93 1.41 1.41" />
+  <path d="m17.66 17.66 1.41 1.41" />
+  <path d="M2 12h2" />
+  <path d="M20 12h2" />
+  <path d="m6.34 17.66-1.41 1.41" />
+  <path d="m19.07 4.93-1.41 1.41" />
+</svg>
+<span style="font-size: 11px; color: #a1a1aa">sun</span></div><div style="width: 112px; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 0">
+<svg
+  class="lucide lucide-trash-2"
+  xmlns="http://www.w3.org/2000/svg"
+  width="26"
+  height="26"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="#f4f4f5"
+  stroke-width="2.4"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M10 11v6" />
+  <path d="M14 11v6" />
+  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
+  <path d="M3 6h18" />
+  <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+</svg>
+<span style="font-size: 11px; color: #a1a1aa">trash-2</span></div><div style="width: 112px; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 0">
+<svg
+  class="lucide lucide-triangle-alert"
+  xmlns="http://www.w3.org/2000/svg"
+  width="26"
+  height="26"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="#f4f4f5"
+  stroke-width="2.4"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3" />
+  <path d="M12 9v4" />
+  <path d="M12 17h.01" />
+</svg>
+<span style="font-size: 11px; color: #a1a1aa">triangle-alert</span></div><div style="width: 112px; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 0">
+<svg
+  class="lucide lucide-user"
+  xmlns="http://www.w3.org/2000/svg"
+  width="26"
+  height="26"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="#f4f4f5"
+  stroke-width="2.4"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+  <circle cx="12" cy="7" r="4" />
+</svg>
+<span style="font-size: 11px; color: #a1a1aa">user</span></div><div style="width: 112px; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 0">
+<svg
+  class="lucide lucide-user-plus"
+  xmlns="http://www.w3.org/2000/svg"
+  width="26"
+  height="26"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="#f4f4f5"
+  stroke-width="2.4"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+  <circle cx="9" cy="7" r="4" />
+  <line x1="19" x2="19" y1="8" y2="14" />
+  <line x1="22" x2="16" y1="11" y2="11" />
+</svg>
+<span style="font-size: 11px; color: #a1a1aa">user-plus</span></div><div style="width: 112px; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 0">
+<svg
+  class="lucide lucide-users"
+  xmlns="http://www.w3.org/2000/svg"
+  width="26"
+  height="26"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="#f4f4f5"
+  stroke-width="2.4"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+  <path d="M16 3.128a4 4 0 0 1 0 7.744" />
+  <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+  <circle cx="9" cy="7" r="4" />
+</svg>
+<span style="font-size: 11px; color: #a1a1aa">users</span></div><div style="width: 112px; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 0">
+<svg
+  class="lucide lucide-x"
+  xmlns="http://www.w3.org/2000/svg"
+  width="26"
+  height="26"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="#f4f4f5"
+  stroke-width="2.4"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M18 6 6 18" />
+  <path d="m6 6 12 12" />
+</svg>
+<span style="font-size: 11px; color: #a1a1aa">x</span></div></div></section>
+</div></body></html>

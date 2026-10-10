@@ -6,12 +6,12 @@ Every Knect ticket, plus the decisions and reference docs they depend on, in one
 
 ## How this was split (2026-10-09)
 
-The assembled file was 9,931 lines. It now lives as separate files, with the text between its markers unchanged:
+The assembled file was 9,931 lines. It now lives as separate files, with the text between its markers unchanged. Two files were replaced the same day with newer versions from Kyson: `tickets/18.md` and `tickets/appendix-a-b.md`.
 
 - [`ROADMAP.md`](ROADMAP.md) — sections 1–3: the roadmap table, the standing rules, and the open decisions and required edits. "Section 3" in any ticket means section 3 of that file.
 - [`tickets/`](tickets/) — section 4 (34 written tickets, including `appendix-a-b.md`) and section 5 (16 stubs). File names drop the `*` star (`*2.2` → `2.2.md`).
 - [`reference/`](reference/) — section 6 (17 reference docs).
-- [`design/`](design/) — the design handoff exported from the Knect Design canvas. Its own `README.md` is the index. Where a ticket names a canvas board (`screens/Planner`, `flows/CreateAllDay`), the board is the file of the same name in `design/app-screens/` or `design/planner-and-plans/`.
+- [`design/`](design/) — the design handoff exported from the Knect Design canvas. Its own `README.md` is the index. It also holds `tokens.json`, the Manrope font files and the Lucide icon SVGs. The boards are guidance: on specifics the ticket and the code win (`ROADMAP.md`, design-input gate). Where a ticket names a canvas board (`screens/Planner`, `flows/CreateAllDay`), the board is the file of the same name in `design/app-screens/` or `design/planner-and-plans/`.
 
 Nothing was dropped: every line of the assembled file is in one of these files or on this page. Edit tickets in place from here on; there is no second copy to keep in sync.
 
