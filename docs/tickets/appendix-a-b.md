@@ -38,6 +38,7 @@ Most values were **extracted from the existing code**. Tokens marked 🆕 were p
 | `primary-surface` | `#ecfdf5` | `#064e3b` | emerald-50 / emerald-900 |
 | `on-primary` | `#052e22` | `#052e22` | ✏️ **Changed 2026-10-09 from `#FFFFFF`.** White on emerald is 2.54:1 and fails contrast; `#052e22` is 5.83:1 |
 | `danger` | `#ef4444` | `#ef4444` | red-500. Destructive fills, error icon, badge |
+| `on-danger` ➕ | `#ffffff` | `#ffffff` | Text and icons on a `danger` fill. Ruled by Kyson 2026-10-09, added by 4.5 |
 | `danger-text` ➕ | `#dc2626` | `#f87171` | Red text: Delete, "Can't make it" |
 | `danger-surface` | `#fee2e2` | `#450a0a` | Error banner background |
 | `danger-border` ➕ | `#fca5a5` | `#7f1d1d` | Error banner border |
@@ -182,12 +183,12 @@ Three tickets currently describe this button with three different sets of copy. 
 | Not friends | "Send a Friend Request" | `primary` bg, `on-primary` text |
 | Request sent | "Sent" | `text-disabled` bg, `text-secondary` text. Disabled |
 | Request received | "Accept Request" + "Decline" | Two buttons: `primary`, and `danger` |
-| Already friends | "Unfriend" | `danger` bg, `on-primary` text |
+| Already friends | "Unfriend" | `danger` bg, `on-danger` text |
 | Blocked (viewer is the blocker) | "Unblock" | `surface-alt` bg, `text-primary` text |
 
 **Failure behavior:** the button updates optimistically and reverts on write failure, matching the heart-icon rule in Project 11. Projects 4, 5, and 7 currently don't specify this at all.
 
-> ⚠️ **Flag (2026-10-09):** "Already friends → `danger` bg, `on-primary` text" now means dark-green text on red, because `on-primary` changed. Use **white** text on `danger` fills instead. [DECISION for 4.2: add an `on-danger: #ffffff` token, or reuse `text-strong` dark.]
+> **Resolved 2026-10-09 (Kyson): text on a `danger` fill is white.** No existing token is white in both themes, so 4.5 added `on-danger: #ffffff` (A.2). The "Decline" button uses it too.
 
 ## B.2 — Error vs. empty — the distinction tickets keep blurring
 

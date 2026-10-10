@@ -26,6 +26,80 @@ part.
 
 ---
 
+## 4.5: New colors, the Manrope font and Lucide icons
+
+Not yet run. `npm test` proves the token values match the design file, that no screen names another
+font, that both native projects have the five font files and register them, and which icon each
+swapped spot asks for. It cannot prove the phone draws Manrope or the icons: the native font wiring
+has never been built, and the tests use a stand-in for the icon library.
+
+**This ticket needs a fresh native build** on each platform (not just a reload): new font files and
+a new library with native parts already installed (`react-native-svg`).
+
+**Screenshots wanted.** For every line marked 📸, one in light mode and one in dark mode.
+
+**The app still builds and opens**
+- [ ] Build and open on Android. You should see: the app opens to sign-in (or your tabs) with no
+  red error screen. If the build fails mentioning `R.font.manrope` or `ReactFontManager`, copy the
+  message: that is this ticket's Android font wiring.
+- [ ] Build and open on iOS. You should see: the same. A build error mentioning a `Manrope_…ttf`
+  file is this ticket's iOS font wiring.
+
+**The font**
+- [ ] 📸 Open the sign-in screen. You should see: the letters are Manrope, not the phone's default.
+  The quickest tell: Manrope's lowercase "a" and "g" are round and geometric, and the capital "K"
+  in "Knect" has straight, even strokes. On iPhone the default (San Francisco) has a narrower "a";
+  on Android the default (Roboto) has a more upright "g".
+- [ ] Look at one screen with light, medium and heavy text together (the Search tab with a pending
+  request works: heading, name, count). You should see: clearly different weights. If every line
+  is the same weight, or bold text looks smeared and fake, note which platform.
+- [ ] 📸 Open each tab once. Note any text that is plainly in a different font from the rest; that
+  text never named a font and still uses the phone's own.
+
+**Green buttons**
+- [ ] 📸 Sign-in screen. You should see: the SIGN IN button is green with dark green lettering, not
+  white. The "Kn" in the logo tile is still white.
+- [ ] 📸 Sign up to the interests step and pick two. You should see: picked chips are green with
+  dark green words. The finish button is green with dark green words.
+- [ ] Search tab with no friends → tap the Friends box → "Find friends". You should see: a green
+  button with dark green words.
+- [ ] 📸 Any row with initials (a search result, a pending request). You should see: a green circle
+  with dark green initials, not white.
+
+**Things that must still be white**
+- [ ] 📸 Search tab with a pending request. You should see: the red count pill has a white number.
+- [ ] 📸 Planner with an event on it. You should see: the words on a colored event block are white.
+- [ ] Discover. You should see: the title and description over the photo are white. The small tag
+  above the title is green with dark green words.
+- [ ] Profile tab → Dark Mode switch. You should see: the round thumb of the switch is white.
+- [ ] Circle → open a chat with a plan card. You should see: words on the colored plan card are
+  white. If you tap GOING, that button turns green with dark green words; NO turns red with white.
+- [ ] Circle → send a message. You should see: your own bubble is green with dark green text.
+
+**Icons**
+- [ ] 📸 Look at the tab bar. You should see, left to right: a calendar, a compass, a magnifying
+  glass, two people, one person. Slightly bolder lines than before. The current tab's is green.
+- [ ] Search tab. You should see: the Friends box ends in a small right-pointing chevron.
+- [ ] Open the friends list. You should see: a left chevron at the top left; filled green stars for
+  close friends and outline stars for the rest.
+- [ ] A pending request or friend whose account is gone ("Deleted user"). You should see: a person
+  outline in the green circle.
+- [ ] Signup, password field. You should see: an open eye. Tap it. You should see: the password
+  shows and the eye is crossed out. Tap again: hidden, open eye.
+
+**Dark mode**
+- [ ] 📸 Switch the phone to dark mode and open the Search tab. You should see: the "Search for
+  friends..." hint is a readable mid-gray, lighter than it was.
+
+**Expected, not bugs**
+- Many icons in the Planner, Circle, Discover and Profile tabs are still the old hand-drawn ones.
+  They change when those screens are rebuilt.
+- Text sizes shifted slightly in places (small captions are 13 instead of 12, tiny labels 11
+  instead of 10, labels a little bolder). Say so if anything now looks cramped or cut off.
+- No screen was rearranged to match the design boards. That comes with each screen's own ticket.
+
+---
+
 ## 4.6: Friends box and the friends list screen
 
 Not yet run. `npm test` proves the Search tab asks only for the pending requests and two counts,
@@ -84,7 +158,7 @@ tap the Friends box), not on the Search tab. The pending-request checks are unch
 
 **Expected, not bugs**
 - The box briefly shows as a gray placeholder row while the counts load.
-- The fonts and icons are still the old ones; ticket 4.5 changes them.
+- The fonts and icons on these two screens changed with ticket 4.5; see its checks above.
 - The list screen hides the tab bar. The design board shows it; say so if you want it kept.
 
 ---

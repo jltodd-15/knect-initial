@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native';
-import Svg, { Rect, Line, Circle, Path } from 'react-native-svg';
+import { Calendar, Compass, Search, User, Users, LucideIcon } from 'lucide-react-native';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { Theme } from '../theme/ThemeProvider';
 import { useTheme } from '../theme/useTheme';
@@ -9,50 +9,13 @@ import { useTheme } from '../theme/useTheme';
 // navigator's own routes (App.tsx); this file only draws them.
 type NavigationProps = BottomTabBarProps;
 
-const renderIcon = (routeName: string, color: string) => {
-  switch (routeName) {
-    case 'Planner':
-      return (
-        <Svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5">
-          <Rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-          <Line x1="16" y1="2" x2="16" y2="6" />
-          <Line x1="8" y1="2" x2="8" y2="6" />
-          <Line x1="3" y1="10" x2="21" y2="10" />
-        </Svg>
-      );
-    case 'Discover':
-      return (
-        <Svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinejoin="round">
-          <Circle cx="12" cy="12" r="10" />
-          <Path d="M16.24 7.76l-2.12 6.36-6.36 2.12 2.12-6.36 6.36-2.12z" />
-        </Svg>
-      );
-    case 'Search':
-      return (
-        <Svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5">
-          <Circle cx="11" cy="11" r="8" />
-          <Line x1="21" y1="21" x2="16.65" y2="16.65" />
-        </Svg>
-      );
-    case 'Circle':
-      return (
-        <Svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5">
-          <Path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-          <Circle cx="9" cy="7" r="4" />
-          <Path d="M22 21v-2a4 4 0 0 0-3-3.87" />
-          <Path d="M16 3.13a4 4 0 0 1 0 7.75" />
-        </Svg>
-      );
-    case 'Profile':
-      return (
-        <Svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5">
-          <Path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-          <Circle cx="12" cy="7" r="4" />
-        </Svg>
-      );
-    default:
-      return null;
-  }
+// A.6: the tab bar's five Lucide icons.
+const TAB_ICONS: Record<string, LucideIcon> = {
+  Planner: Calendar,
+  Discover: Compass,
+  Search,
+  Circle: Users,
+  Profile: User,
 };
 
 const Navigation: React.FC<NavigationProps> = ({ state, navigation }) => {
@@ -66,6 +29,7 @@ const Navigation: React.FC<NavigationProps> = ({ state, navigation }) => {
         {state.routes.map((route, index) => {
           const isActive = state.index === index;
           const color = isActive ? colors.primary : colors.textDisabled;
+          const TabIcon = TAB_ICONS[route.name];
           const onPress = () => {
             const event = navigation.emit({ type: 'tabPress', target: route.key, canPreventDefault: true });
             if (!isActive && !event.defaultPrevented) {
@@ -83,7 +47,14 @@ const Navigation: React.FC<NavigationProps> = ({ state, navigation }) => {
               accessibilityState={{ selected: isActive }}
             >
               <View style={[styles.iconContainer, isActive && styles.activeIconContainer]}>
-                {renderIcon(route.name, color)}
+                {TabIcon && (
+                  <TabIcon
+                    testID={`tab-icon-${route.name}`}
+                    size={theme.icons.sizes.tab}
+                    color={color}
+                    strokeWidth={theme.icons.strokeWidth}
+                  />
+                )}
               </View>
               <Text style={[styles.label, { color }]}>
                 {route.name}

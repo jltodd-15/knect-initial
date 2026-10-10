@@ -26,13 +26,12 @@ const HEX = /^#([0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/;
 const camel = (name: string) => name.replace(/-([a-z0-9])/g, (_, c: string) => c.toUpperCase());
 
 // Not in Appendix A's table or tokens.json. shadow, scrim and onPrimaryMuted were approved during
-// 4.2. onDanger was ruled on 2026-10-09 (white text on a danger fill). onColor is 4.5's: white on a
-// photo, an event color or a dark toast, which is what onPrimary used to mean.
+// 4.2. onColor is 4.5's: white on a photo, an event color or a dark toast, which is what onPrimary
+// used to mean.
 const CODE_ONLY = {
   shadow: {light: '#000000', dark: '#000000'},
   scrim: {light: '#00000080', dark: '#00000080'},
   onPrimaryMuted: {light: '#FFFFFF33', dark: '#FFFFFF33'},
-  onDanger: {light: '#ffffff', dark: '#ffffff'},
   onColor: {light: '#ffffff', dark: '#ffffff'},
 };
 

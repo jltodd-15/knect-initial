@@ -148,3 +148,32 @@ jest.mock('@react-navigation/native-stack', () => {
   };
   return {createNativeStackNavigator: () => ({Navigator, Screen})};
 });
+
+// Ticket 4.5: lucide-react-native ships in the same format React Navigation does, which this Jest
+// config doesn't load. This stand-in gives every icon as a plain view carrying the props it was
+// given plus `name`, the icon's Lucide name (ChevronRight -> "chevron-right"). Tests prove which
+// icon a screen asks for and at what size and stroke; the drawing is checked on a device
+// (DEVICE_TESTS.md, 4.5).
+jest.mock('lucide-react-native', () => {
+  const mockReact = require('react');
+  const {View} = require('react-native');
+  const toName = exportName =>
+    exportName
+      .replace(/([a-z0-9])([A-Z])/g, '$1-$2')
+      .replace(/([a-zA-Z])([0-9])/g, '$1-$2')
+      .toLowerCase();
+  const made = new Map();
+  return new Proxy(
+    {},
+    {
+      get: (_target, exportName) => {
+        if (exportName === '__esModule') return true;
+        if (typeof exportName !== 'string') return undefined;
+        if (!made.has(exportName)) {
+          made.set(exportName, props => mockReact.createElement(View, {...props, name: toName(exportName)}));
+        }
+        return made.get(exportName);
+      },
+    },
+  );
+});

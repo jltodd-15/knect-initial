@@ -27,7 +27,7 @@ an Auth account with no profile document behind it.
 - **Reachable but not real yet:** the Planner, Discover, Circle and Profile tabs. They open without
   crashing, but show sample data. Anything changed there is saved only on that phone, never to
   Firebase. The Profile tab shows "Alex Rivera", not the profile created at signup.
-- **Not verified on a device:** tickets 2.3, 1.4, 4.1 (the move to React Navigation), 4.3 (search), 4.4 (the friends lists) and 4.6 (the Friends box and the friends list screen). Their checks are in `DEVICE_TESTS.md`. What has been seen on a phone so far, and what is wanted changed, is in [`DEVICE_FINDINGS.md`](DEVICE_FINDINGS.md).
+- **Not verified on a device:** tickets 2.3, 1.4, 4.1 (the move to React Navigation), 4.3 (search), 4.4 (the friends lists), 4.6 (the Friends box and the friends list screen) and 4.5 (the new colors, the Manrope font and the Lucide icons). Their checks are in `DEVICE_TESTS.md`. What has been seen on a phone so far, and what is wanted changed, is in [`DEVICE_FINDINGS.md`](DEVICE_FINDINGS.md).
 - **Known bugs** that belong to other tickets are listed in [`CLAUDE.md`](CLAUDE.md), under
   "Known bugs that are somebody else's ticket".
 

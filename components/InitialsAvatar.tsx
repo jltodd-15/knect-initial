@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import Svg, { Circle, Path } from 'react-native-svg';
+import { User } from 'lucide-react-native';
 import { useTheme } from '../theme/useTheme';
 
 // Ticket 1.4: the picture every user has, whether or not they ever upload one. Drawn on the
@@ -24,7 +24,7 @@ interface Props {
 }
 
 const InitialsAvatar: React.FC<Props> = ({ name, size }) => {
-  const { colors } = useTheme();
+  const { colors, icons } = useTheme();
   const initials = getInitials(name);
   const circle = { width: size, height: size, borderRadius: size / 2 };
 
@@ -35,10 +35,7 @@ const InitialsAvatar: React.FC<Props> = ({ name, size }) => {
           {initials}
         </Text>
       ) : (
-        <Svg testID="initials-avatar-fallback" width={size * 0.5} height={size * 0.5} viewBox="0 0 24 24" fill="none" stroke={colors.onPrimary} strokeWidth="2">
-          <Circle cx="12" cy="8" r="4" />
-          <Path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8" />
-        </Svg>
+        <User testID="initials-avatar-fallback" size={size * 0.5} color={colors.onPrimary} strokeWidth={icons.strokeWidth} />
       )}
     </View>
   );

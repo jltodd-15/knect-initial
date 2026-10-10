@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Svg, { Circle, Path } from 'react-native-svg';
+import Svg, { Path } from 'react-native-svg';
+import { Eye, EyeOff } from 'lucide-react-native';
 import InitialsAvatar from './InitialsAvatar';
 import { Theme } from '../theme/ThemeProvider';
 import { useTheme } from '../theme/useTheme';
@@ -72,7 +73,7 @@ interface Props {
 
 const CreateProfilePage: React.FC<Props> = ({ onComplete, submitting, identity, signupError }) => {
   const theme = useTheme();
-  const { colors } = theme;
+  const { colors, icons } = theme;
   const styles = useMemo(() => getStyles(theme), [theme]);
   const [step, setStep] = useState<'credentials' | 'profile'>(identity ? 'profile' : 'credentials');
 
@@ -82,6 +83,8 @@ const CreateProfilePage: React.FC<Props> = ({ onComplete, submitting, identity, 
   const [bio, setBio] = useState('');
   const [interests, setInterests] = useState<string[]>([]);
   const [hideText, setHideText] = useState(true);
+  // The open eye offers to show the password; the crossed eye offers to hide it again.
+  const PasswordIcon = hideText ? Eye : EyeOff;
 
   // The password lives here, in component state, and nowhere else. It is handed to onComplete as
   // a credential, never as part of the profile.
@@ -171,10 +174,7 @@ const CreateProfilePage: React.FC<Props> = ({ onComplete, submitting, identity, 
                     onPress={() => setHideText(!hideText)}
                     accessibilityLabel={hideText ? 'Show password' : 'Hide password'}
                 >
-                  <Svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={colors.textSecondary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <Path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                    <Circle cx="12" cy="12" r="3" />
-                  </Svg>
+                  <PasswordIcon size={22} color={colors.textSecondary} strokeWidth={icons.strokeWidth} />
                 </TouchableOpacity>
               </View>
               <View style={styles.ruleList}>
