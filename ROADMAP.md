@@ -9,6 +9,10 @@ placeholder for a new one as soon as it's known. Per [`CLAUDE.md`](CLAUDE.md)'s 
 note, only describe a ticket's *scope* once it's actually been decided — a placeholder title
 is fine well ahead of time, invented implementation detail isn't.
 
+**Ticket specs and open decisions:** every ticket's text is in [`docs/tickets/`](docs/tickets/), and
+the status table, standing rules and open decisions are in [`docs/ROADMAP.md`](docs/ROADMAP.md). This
+file keeps the build notes for what has landed; the two get merged in a later session.
+
 **Seen on a phone:** issues found and changes wanted from device runs are collected in
 [`DEVICE_FINDINGS.md`](DEVICE_FINDINGS.md), waiting to become tickets. Device testing is paused
 until the app is connected (decided 2026-10-09); the reasons are there too.
