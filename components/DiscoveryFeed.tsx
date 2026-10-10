@@ -190,13 +190,13 @@ const getStyles = ({ colors, typography, spacing, radius }: Theme) => StyleSheet
   stickyHeader: { position: 'absolute', bottom: 0, left: 0, right: 0, height: HEADER_MIN_HEIGHT, justifyContent: 'center', alignItems: 'center', borderBottomWidth: 1, borderColor: colors.border, backgroundColor: colors.background },
   stickyRow: { flexDirection: 'row', alignItems: 'center' },
   stickyArrow: { marginLeft: spacing.sm },
-  stickyTitle: { fontSize: typography.body.fontSize, fontWeight: '700', color: colors.textPrimary, fontFamily: 'Inter' },
+  stickyTitle: { fontSize: typography.body.fontSize, fontWeight: '700', color: colors.textPrimary, fontFamily: 'Manrope' },
   
-  title: { ...typography.display, color: colors.primary, fontFamily: 'Inter' },
-  subtitle: { fontSize: typography.caption.fontSize, fontWeight: '700', color: colors.textSecondary, marginTop: spacing.xs, fontFamily: 'Inter' },
+  title: { ...typography.display, color: colors.primary, fontFamily: 'Manrope' },
+  subtitle: { fontSize: typography.caption.fontSize, fontWeight: '700', color: colors.textSecondary, marginTop: spacing.xs, fontFamily: 'Manrope' },
   filterRow: { marginTop: spacing.base, flexDirection: 'row' },
   filterChip: { paddingHorizontal: spacing.base, paddingVertical: spacing.md, backgroundColor: colors.surfaceAlt, borderRadius: radius.md, marginRight: spacing.sm, borderWidth: 1, borderColor: colors.border },
-  filterText: { fontSize: typography.micro.fontSize, fontWeight: '700', textTransform: 'uppercase', color: colors.textPrimary, fontFamily: 'Inter', letterSpacing: 0.5 },
+  filterText: { fontSize: typography.micro.fontSize, fontWeight: '700', textTransform: 'uppercase', color: colors.textPrimary, fontFamily: 'Manrope', letterSpacing: 0.5 },
   
   list: { padding: spacing.xl, paddingBottom: 100, paddingTop: spacing.xl },
   skeletons: { padding: spacing.xl, gap: spacing.xl },
@@ -206,11 +206,11 @@ const getStyles = ({ colors, typography, spacing, radius }: Theme) => StyleSheet
   cardOverlay: { position: 'absolute', bottom: 0, left: 0, right: 0, height: '60%', backgroundColor: colors.scrim }, 
   cardContent: { position: 'absolute', bottom: 0, left: 0, right: 0, padding: spacing['2xl'], paddingBottom: spacing['2xl'] },
   tag: { alignSelf: 'flex-start', backgroundColor: colors.primary, paddingHorizontal: spacing.md, paddingVertical: spacing.sm, borderRadius: radius.sm, marginBottom: spacing.base },
-  tagText: { color: colors.onPrimary, fontSize: typography.micro.fontSize, fontWeight: '700', textTransform: 'uppercase', fontFamily: 'Inter' },
-  cardTitle: { ...typography.display, color: colors.onColor, marginBottom: spacing.md, fontFamily: 'Inter' },
-  cardDesc: { color: colors.onColor, fontSize: typography.label.fontSize, fontWeight: '600', marginBottom: spacing['2xl'], fontFamily: 'Inter', opacity: 0.9 },
+  tagText: { color: colors.onPrimary, fontSize: typography.micro.fontSize, fontWeight: '700', textTransform: 'uppercase', fontFamily: 'Manrope' },
+  cardTitle: { ...typography.display, color: colors.onColor, marginBottom: spacing.md, fontFamily: 'Manrope' },
+  cardDesc: { color: colors.onColor, fontSize: typography.label.fontSize, fontWeight: '600', marginBottom: spacing['2xl'], fontFamily: 'Manrope', opacity: 0.9 },
   viewButton: { backgroundColor: colors.surface, padding: spacing.lg, borderRadius: radius.xl, alignItems: 'center' },
-  viewButtonText: { color: colors.textPrimary, fontWeight: '700', fontSize: typography.caption.fontSize, textTransform: 'uppercase', letterSpacing: 1, fontFamily: 'Inter' },
+  viewButtonText: { color: colors.textPrimary, fontWeight: '700', fontSize: typography.caption.fontSize, textTransform: 'uppercase', letterSpacing: 1, fontFamily: 'Manrope' },
 
   // Detail Styles
   detailContainer: { flex: 1, backgroundColor: colors.surface },
@@ -218,14 +218,14 @@ const getStyles = ({ colors, typography, spacing, radius }: Theme) => StyleSheet
   detailImage: { width: '100%', height: 400 },
   closeBtn: { position: 'absolute', top: 40, right: spacing.xl, width: 40, height: 40, borderRadius: radius.pill, backgroundColor: colors.scrim, justifyContent: 'center', alignItems: 'center' },
   detailContent: { padding: spacing.xl, paddingBottom: 100 },
-  detailTitle: { ...typography.display, color: colors.textPrimary, fontFamily: 'Inter', marginBottom: spacing.base },
-  detailDesc: { fontSize: typography.body.fontSize, lineHeight: 24, color: colors.textSecondary, fontFamily: 'Inter', marginBottom: spacing['2xl'] },
+  detailTitle: { ...typography.display, color: colors.textPrimary, fontFamily: 'Manrope', marginBottom: spacing.base },
+  detailDesc: { fontSize: typography.body.fontSize, lineHeight: 24, color: colors.textSecondary, fontFamily: 'Manrope', marginBottom: spacing['2xl'] },
   infoRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: spacing.base, borderBottomWidth: 1, borderColor: colors.border },
-  infoLabel: { fontSize: typography.caption.fontSize, fontWeight: '700', color: colors.textSecondary, fontFamily: 'Inter', letterSpacing: 1 },
-  infoValue: { fontSize: typography.label.fontSize, fontWeight: '600', color: colors.textPrimary, fontFamily: 'Inter' },
+  infoLabel: { fontSize: typography.caption.fontSize, fontWeight: '700', color: colors.textSecondary, fontFamily: 'Manrope', letterSpacing: 1 },
+  infoValue: { fontSize: typography.label.fontSize, fontWeight: '600', color: colors.textPrimary, fontFamily: 'Manrope' },
   detailFooter: { padding: spacing.xl, paddingBottom: 40, borderTopWidth: 1, borderColor: colors.border, backgroundColor: colors.surface },
   planBtn: { backgroundColor: colors.primary, padding: spacing.lg, borderRadius: radius.xl, alignItems: 'center' },
-  planBtnText: { color: colors.onPrimary, fontWeight: '700', fontSize: typography.label.fontSize, letterSpacing: 1, fontFamily: 'Inter' }
+  planBtnText: { color: colors.onPrimary, fontWeight: '700', fontSize: typography.label.fontSize, letterSpacing: 1, fontFamily: 'Manrope' }
 });
 
 export default DiscoveryFeed;

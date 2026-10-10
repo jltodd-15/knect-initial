@@ -46,7 +46,7 @@ const InitialsAvatar: React.FC<Props> = ({ name, size }) => {
 
 const styles = StyleSheet.create({
   circle: { justifyContent: 'center', alignItems: 'center', overflow: 'hidden' },
-  initials: { fontWeight: '700', fontFamily: 'Inter' },
+  initials: { fontWeight: '700', fontFamily: 'Manrope' },
 });
 
 export default InitialsAvatar;

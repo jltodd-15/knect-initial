@@ -294,19 +294,19 @@ const getStyles = ({ colors, typography, spacing, radius }: Theme) => StyleSheet
     color: colors.onColor,
     fontSize: typography.label.fontSize,
     fontWeight: '700',
-    fontFamily: 'Inter',
+    fontFamily: 'Manrope',
     marginBottom: spacing.xs
   },
   time: {
     color: colors.onColor,
     fontSize: typography.caption.fontSize,
-    fontFamily: 'Inter',
+    fontFamily: 'Manrope',
     fontWeight: '600'
   },
   participants: {
     color: colors.onColor,
     fontSize: typography.micro.fontSize,
-    fontFamily: 'Inter',
+    fontFamily: 'Manrope',
     marginTop: spacing.xs,
     fontStyle: 'italic'
   },

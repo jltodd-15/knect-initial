@@ -163,10 +163,10 @@ const SearchTab: React.FC<Props> = ({ onOpenFriends }) => {
 const getStyles = ({ colors, typography, spacing, radius }: Theme) => StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
   header: { padding: spacing.base, paddingTop: spacing.lg, paddingBottom: spacing.md },
-  headerTitle: { ...typography.display, color: colors.primary, fontFamily: 'Inter' },
+  headerTitle: { ...typography.display, color: colors.primary, fontFamily: 'Manrope' },
   searchBar: {
     ...typography.body,
-    fontFamily: 'Inter',
+    fontFamily: 'Manrope',
     color: colors.textPrimary,
     backgroundColor: colors.surfaceAlt,
     borderColor: colors.border,
@@ -178,7 +178,7 @@ const getStyles = ({ colors, typography, spacing, radius }: Theme) => StyleSheet
     paddingVertical: spacing.md,
   },
   row: { flexDirection: 'row', alignItems: 'center', padding: spacing.base, gap: spacing.md },
-  rowName: { ...typography.body, flex: 1, color: colors.textPrimary, fontFamily: 'Inter' },
+  rowName: { ...typography.body, flex: 1, color: colors.textPrimary, fontFamily: 'Manrope' },
 });
 
 export default SearchTab;

@@ -6,6 +6,7 @@ import com.facebook.react.ReactApplication
 import com.facebook.react.ReactHost
 import com.facebook.react.ReactNativeApplicationEntryPoint.loadReactNative
 import com.facebook.react.ReactPackage
+import com.facebook.react.common.assets.ReactFontManager
 import com.facebook.react.defaults.DefaultReactHost.getDefaultReactHost
 
 class MainApplication : Application(), ReactApplication {
@@ -22,6 +23,8 @@ class MainApplication : Application(), ReactApplication {
 
   override fun onCreate() {
     super.onCreate()
+    // Ticket 4.5: makes fontFamily 'Manrope' resolve to res/font/manrope.xml, weight by weight.
+    ReactFontManager.getInstance().addCustomFont(this, "Manrope", R.font.manrope)
     loadReactNative(this)
   }
 }

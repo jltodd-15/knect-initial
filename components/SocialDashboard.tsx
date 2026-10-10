@@ -1193,7 +1193,7 @@ const SocialDashboard: React.FC<Props> = ({ onChatOpen, onChatClose, onPlanActiv
         contentContainerStyle={{ paddingHorizontal: spacing.lg }}
         ListEmptyComponent={
             <View style={{alignItems:'center', marginTop: 40}}>
-                <Text style={{color: colors.textSecondary, fontFamily:'Inter'}}>No conversations found.</Text>
+                <Text style={{color: colors.textSecondary, fontFamily: 'Manrope'}}>No conversations found.</Text>
             </View>
         }
         renderItem={({ item }) => (
@@ -1227,25 +1227,25 @@ const SocialDashboard: React.FC<Props> = ({ onChatOpen, onChatClose, onPlanActiv
 const getStyles = ({ colors, typography, spacing, radius }: Theme) => StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
   header: { padding: spacing.base, paddingTop: spacing.lg, paddingBottom: spacing.md },
-  headerTitle: { fontSize: typography.display.fontSize, fontWeight: '900', color: colors.primary, fontFamily: 'Inter' },
-  headerSubtitle: { fontSize: typography.micro.fontSize, fontWeight: '700', color: colors.textSecondary, letterSpacing: 2, fontFamily: 'Inter', marginTop: spacing.xs },
+  headerTitle: { fontSize: typography.display.fontSize, fontWeight: '800', color: colors.primary, fontFamily: 'Manrope' },
+  headerSubtitle: { fontSize: typography.micro.fontSize, fontWeight: '700', color: colors.textSecondary, letterSpacing: 2, fontFamily: 'Manrope', marginTop: spacing.xs },
   
   searchContainer: { flexDirection: 'row', alignItems: 'center', backgroundColor: colors.surfaceAlt, marginHorizontal: spacing.base, padding: spacing.md, borderRadius: radius.md, marginBottom: spacing.base },
-  searchInput: { flex: 1, fontSize: typography.body.fontSize, color: colors.textPrimary, fontFamily: 'Inter' },
+  searchInput: { flex: 1, fontSize: typography.body.fontSize, color: colors.textPrimary, fontFamily: 'Manrope' },
 
   convoItem: { flexDirection: 'row', paddingVertical: spacing.md, borderBottomWidth: StyleSheet.hairlineWidth, borderColor: colors.border },
   avatar: { width: 52, height: 52, borderRadius: radius.pill },
   groupAvatarContainer: { width: 52, height: 52, borderRadius: radius.pill, overflow: 'hidden', flexDirection: 'row', flexWrap: 'wrap' },
   groupAvatarPart: { resizeMode: 'cover' },
   
-  convoName: { fontSize: typography.body.fontSize, fontWeight: '600', color: colors.textPrimary, fontFamily: 'Inter' },
-  convoMsg: { fontSize: typography.body.fontSize, color: colors.textSecondary, fontFamily: 'Inter', flex: 1, marginRight: spacing.sm },
+  convoName: { fontSize: typography.body.fontSize, fontWeight: '600', color: colors.textPrimary, fontFamily: 'Manrope' },
+  convoMsg: { fontSize: typography.body.fontSize, color: colors.textSecondary, fontFamily: 'Manrope', flex: 1, marginRight: spacing.sm },
   convoTime: { fontSize: typography.label.fontSize, color: colors.textSecondary },
   
   chatHeader: { flexDirection: 'row', alignItems: 'center', padding: spacing.md, paddingTop: spacing.md, borderBottomWidth: StyleSheet.hairlineWidth, borderColor: colors.border, backgroundColor: colors.surface },
   headerAvatar: { width: 40, height: 40, borderRadius: radius.pill },
-  chatTitle: { fontSize: typography.body.fontSize, fontWeight: '700', color: colors.textPrimary, fontFamily: 'Inter' },
-  chatSubtitle: { fontSize: typography.caption.fontSize, color: colors.textSecondary, fontFamily: 'Inter' },
+  chatTitle: { fontSize: typography.body.fontSize, fontWeight: '700', color: colors.textPrimary, fontFamily: 'Manrope' },
+  chatSubtitle: { fontSize: typography.caption.fontSize, color: colors.textSecondary, fontFamily: 'Manrope' },
   
   msgRow: { flexDirection: 'row', marginBottom: spacing.sm, alignItems: 'flex-end' },
   msgRowMe: { justifyContent: 'flex-end' },
@@ -1256,11 +1256,11 @@ const getStyles = ({ colors, typography, spacing, radius }: Theme) => StyleSheet
   msgBubble: { padding: spacing.md, paddingHorizontal: spacing.base, borderRadius: radius.xl, maxWidth: '75%' },
   msgMe: { backgroundColor: colors.primary },
   msgOther: { backgroundColor: colors.surfaceAlt },
-  msgText: { fontSize: typography.body.fontSize, color: colors.textPrimary, fontFamily: 'Inter' },
+  msgText: { fontSize: typography.body.fontSize, color: colors.textPrimary, fontFamily: 'Manrope' },
   senderName: { fontSize: typography.micro.fontSize, color: colors.textSecondary, marginBottom: spacing.xs, marginLeft: spacing.xs },
   
   inputArea: { flexDirection: 'row', alignItems: 'center', padding: spacing.md, paddingBottom: spacing['2xl'], backgroundColor: colors.surface, borderTopWidth: StyleSheet.hairlineWidth, borderColor: colors.border },
-  input: { flex: 1, height: 36, backgroundColor: colors.background, borderRadius: radius.pill, paddingHorizontal: spacing.base, color: colors.textPrimary, fontFamily: 'Inter', marginHorizontal: spacing.sm, borderWidth: 1, borderColor: colors.border },
+  input: { flex: 1, height: 36, backgroundColor: colors.background, borderRadius: radius.pill, paddingHorizontal: spacing.base, color: colors.textPrimary, fontFamily: 'Manrope', marginHorizontal: spacing.sm, borderWidth: 1, borderColor: colors.border },
   sendBtn: { width: 32, height: 32, backgroundColor: colors.primary, borderRadius: radius.pill, justifyContent: 'center', alignItems: 'center' },
   attachBtn: { width: 32, height: 32, justifyContent: 'center', alignItems: 'center' },
 
@@ -1312,7 +1312,7 @@ const getStyles = ({ colors, typography, spacing, radius }: Theme) => StyleSheet
   
   // Vote Creator Modal
   label: { fontSize: typography.label.fontSize, fontWeight: '600', color: colors.textSecondary, marginBottom: spacing.sm, textTransform: 'uppercase', letterSpacing: 0.5 },
-  voteInput: { height: 56, borderRadius: radius.lg, paddingHorizontal: spacing.base, fontSize: typography.body.fontSize, color: colors.textPrimary, fontFamily: 'Inter', marginBottom: spacing.base, shadowColor: colors.shadow, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 2 },
+  voteInput: { height: 56, borderRadius: radius.lg, paddingHorizontal: spacing.base, fontSize: typography.body.fontSize, color: colors.textPrimary, fontFamily: 'Manrope', marginBottom: spacing.base, shadowColor: colors.shadow, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 2 },
   createVoteBtn: { backgroundColor: colors.primary, padding: spacing.base, borderRadius: radius.lg, alignItems: 'center', marginTop: spacing.xl },
   createVoteText: { color: colors.onPrimary, fontWeight: '700', fontSize: typography.body.fontSize },
 

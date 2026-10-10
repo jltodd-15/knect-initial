@@ -110,8 +110,8 @@ const getStyles = ({ colors, typography, spacing, radius }: Theme) => StyleSheet
   },
   boxPressed: { backgroundColor: colors.surfaceAlt },
   text: { flex: 1 },
-  title: { ...typography.body, color: colors.textPrimary, fontFamily: 'Inter' },
-  counts: { ...typography.caption, color: colors.textSecondary, fontFamily: 'Inter' },
+  title: { ...typography.body, color: colors.textPrimary, fontFamily: 'Manrope' },
+  counts: { ...typography.caption, color: colors.textSecondary, fontFamily: 'Manrope' },
 });
 
 export default FriendsBox;

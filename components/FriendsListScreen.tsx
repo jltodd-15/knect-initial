@@ -83,8 +83,8 @@ const getStyles = ({ colors, typography, spacing }: Theme) => StyleSheet.create(
     paddingBottom: spacing.sm,
   },
   back: { width: BACK_TARGET, height: BACK_TARGET, alignItems: 'center', justifyContent: 'center' },
-  title: { ...typography.headline, color: colors.textPrimary, fontFamily: 'Inter' },
-  count: { ...typography.body, color: colors.textSecondary, fontFamily: 'Inter' },
+  title: { ...typography.headline, color: colors.textPrimary, fontFamily: 'Manrope' },
+  count: { ...typography.body, color: colors.textSecondary, fontFamily: 'Manrope' },
 });
 
 export default FriendsListScreen;

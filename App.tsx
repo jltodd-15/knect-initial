@@ -561,26 +561,26 @@ const getStyles = ({ colors, typography, spacing, radius }: Theme) => StyleSheet
   launchLogo: { marginBottom: 0 },
   // The logo and the app's name are the two sizes kept off the type scale.
   logoText: {
-    fontFamily: 'Anonymous Pro',
+    fontFamily: 'Manrope',
     fontSize: 42,
     fontWeight: '700',
     color: colors.onColor,
     letterSpacing: -2
   },
 
-  appTitle: { fontSize: 40, fontWeight: '700', color: colors.textPrimary, marginBottom: spacing.sm, fontFamily: 'Anonymous Pro' },
-  appSubtitle: { fontSize: typography.micro.fontSize, fontWeight: '700', color: colors.textSecondary, textTransform: 'uppercase', letterSpacing: 2, fontFamily: 'Inter' },
+  appTitle: { fontSize: 40, fontWeight: '700', color: colors.textPrimary, marginBottom: spacing.sm, fontFamily: 'Manrope' },
+  appSubtitle: { fontSize: typography.micro.fontSize, fontWeight: '700', color: colors.textSecondary, textTransform: 'uppercase', letterSpacing: 2, fontFamily: 'Manrope' },
 
   formCard: { backgroundColor: colors.surface, padding: spacing['2xl'], borderRadius: radius.xl, gap: spacing.base, borderWidth: 1, borderColor: colors.border },
-  input: { backgroundColor: colors.surfaceAlt, padding: spacing.lg, borderRadius: radius.xl, fontSize: typography.caption.fontSize, fontWeight: '700', color: colors.textPrimary, fontFamily: 'Inter' },
+  input: { backgroundColor: colors.surfaceAlt, padding: spacing.lg, borderRadius: radius.xl, fontSize: typography.caption.fontSize, fontWeight: '700', color: colors.textPrimary, fontFamily: 'Manrope' },
   signInBtn: { backgroundColor: colors.primary, padding: spacing.lg, borderRadius: radius.xl, alignItems: 'center' },
-  signInText: { color: colors.onPrimary, fontWeight: '700', fontSize: typography.caption.fontSize, letterSpacing: 2, fontFamily: 'Inter' },
+  signInText: { color: colors.onPrimary, fontWeight: '700', fontSize: typography.caption.fontSize, letterSpacing: 2, fontFamily: 'Manrope' },
   createAccountBtn: { backgroundColor: 'transparent', borderWidth: 1, borderColor: colors.border, marginTop: spacing.md },
   createAccountText: { color: colors.textPrimary },
 
-  forgotPasswordText: { color: colors.textSecondary, fontSize: typography.caption.fontSize, fontWeight: '700', textAlign: 'center', marginTop: spacing.md, fontFamily: 'Inter' },
+  forgotPasswordText: { color: colors.textSecondary, fontSize: typography.caption.fontSize, fontWeight: '700', textAlign: 'center', marginTop: spacing.md, fontFamily: 'Manrope' },
 
-  errorText: { color: colors.danger, textAlign: 'center', fontFamily: 'Anonymous Pro' }
+  errorText: { color: colors.danger, textAlign: 'center', fontFamily: 'Manrope' }
 });
 
 export default App;

@@ -146,7 +146,7 @@ const FriendsList: React.FC<Props> = ({ reloadToken, refreshing, onRefresh, onFi
 
 const getStyles = ({ colors, typography, spacing }: Theme) => StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center', padding: spacing.base, gap: spacing.md },
-  rowName: { ...typography.body, flex: 1, color: colors.textPrimary, fontFamily: 'Inter' },
+  rowName: { ...typography.body, flex: 1, color: colors.textPrimary, fontFamily: 'Manrope' },
 });
 
 export default FriendsList;

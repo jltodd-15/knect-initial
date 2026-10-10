@@ -623,8 +623,8 @@ const EventPlanner: React.FC<Props> = ({ initialProposal, initialParticipants })
 const getStyles = ({ colors, typography, spacing, radius }: Theme) => StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: spacing.xl, paddingVertical: spacing.md, zIndex: 10, backgroundColor: colors.background },
-  headerTitle: { fontSize: typography.display.fontSize, fontWeight: '900', color: colors.primary, fontFamily: 'Inter' },
-  headerSubtitle: { fontSize: typography.micro.fontSize, fontWeight: '700', color: colors.textSecondary, letterSpacing: 2, fontFamily: 'Inter', marginTop: spacing.xs },
+  headerTitle: { fontSize: typography.display.fontSize, fontWeight: '800', color: colors.primary, fontFamily: 'Manrope' },
+  headerSubtitle: { fontSize: typography.micro.fontSize, fontWeight: '700', color: colors.textSecondary, letterSpacing: 2, fontFamily: 'Manrope', marginTop: spacing.xs },
   
   viewSelectorBtn: { flexDirection: 'row', alignItems: 'center', backgroundColor: colors.surfaceAlt, paddingHorizontal: spacing.base, paddingVertical: spacing.md, borderRadius: radius.xl, gap: spacing.sm },
   viewSelectorText: { color: colors.textPrimary, fontSize: typography.micro.fontSize, fontWeight: '700', letterSpacing: 0.5 },
@@ -633,28 +633,28 @@ const getStyles = ({ colors, typography, spacing, radius }: Theme) => StyleSheet
 
   dropdown: { position: 'absolute', top: 70, right: 24, backgroundColor: colors.surface, borderRadius: radius.xl, padding: spacing.sm, shadowColor:colors.shadow, shadowOpacity: 0.2, shadowRadius: 10, zIndex: 100, width: 160 },
   dropdownItem: { padding: spacing.base },
-  dropdownText: { fontWeight: '700', color: colors.textPrimary, fontFamily: 'Inter', fontSize: typography.caption.fontSize },
+  dropdownText: { fontWeight: '700', color: colors.textPrimary, fontFamily: 'Manrope', fontSize: typography.caption.fontSize },
 
   weekStripContainer: { marginBottom: spacing.lg },
   weekStripContent: { flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: spacing.xl },
   dayItem: { alignItems: 'center', width: 44 },
-  dayName: { fontSize: typography.micro.fontSize, fontWeight: '700', color: colors.textSecondary, marginBottom: spacing.sm, fontFamily: 'Inter' },
+  dayName: { fontSize: typography.micro.fontSize, fontWeight: '700', color: colors.textSecondary, marginBottom: spacing.sm, fontFamily: 'Manrope' },
   dayNumberContainer: { width: 44, height: 44, borderRadius: radius.lg, backgroundColor: colors.surface, justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: colors.border },
   activeDayNumberContainer: { backgroundColor: colors.primary, borderColor: colors.primary },
-  dayNumber: { fontSize: typography.body.fontSize, fontWeight: '700', color: colors.textSecondary, fontFamily: 'Inter' },
+  dayNumber: { fontSize: typography.body.fontSize, fontWeight: '700', color: colors.textSecondary, fontFamily: 'Manrope' },
   activeDot: { width: 4, height: 4, backgroundColor: colors.onColor, borderRadius: radius.pill, marginTop: spacing.xs },
   
   allDayContainer: { paddingHorizontal: spacing.xl, marginBottom: spacing.base, flexDirection: 'column' },
-  allDayLabel: { fontSize: typography.micro.fontSize, fontWeight: '700', color: colors.textSecondary, fontFamily: 'Inter', marginBottom: spacing.sm },
+  allDayLabel: { fontSize: typography.micro.fontSize, fontWeight: '700', color: colors.textSecondary, fontFamily: 'Manrope', marginBottom: spacing.sm },
   allDayEventsList: { gap: spacing.xs },
   allDayEventRow: { width: '100%', paddingHorizontal: spacing.md, paddingVertical: spacing.md, borderRadius: radius.md },
-  allDayEventText: { color: colors.onColor, fontSize: typography.label.fontSize, fontWeight: '700', fontFamily: 'Inter' },
+  allDayEventText: { color: colors.onColor, fontSize: typography.label.fontSize, fontWeight: '700', fontFamily: 'Manrope' },
 
   agenda: { flex: 1 },
   gridContainer: { flexDirection: 'row' },
   timeColumn: { width: 60, borderRightWidth: 1, borderColor: colors.border },
   timeLabelContainer: { height: SLOT_HEIGHT, justifyContent: 'flex-start', alignItems: 'center', paddingTop: 0, transform: [{translateY: -6}] },
-  timeLabel: { fontSize: typography.micro.fontSize, fontWeight: '700', color: colors.textSecondary, fontFamily: 'Inter' },
+  timeLabel: { fontSize: typography.micro.fontSize, fontWeight: '700', color: colors.textSecondary, fontFamily: 'Manrope' },
   eventsColumn: { flex: 1, position: 'relative' },
   gridSlot: { height: SLOT_HEIGHT, borderBottomWidth: 1, borderColor: colors.surfaceAlt },
   
@@ -662,20 +662,20 @@ const getStyles = ({ colors, typography, spacing, radius }: Theme) => StyleSheet
   nowDot: { position: 'absolute', left: -4, top: -3, width: 8, height: 8, borderRadius: radius.pill, backgroundColor: colors.primary },
   
   eventCard: { position: 'absolute', left: 10, right: 10, borderRadius: radius.xl, padding: spacing.lg, borderWidth: 2, borderColor: colors.primary, borderStyle: 'dashed', backgroundColor: colors.primarySurface, height: 160 },
-  eventTitle: { color: colors.primary, fontWeight: '700', fontSize: typography.label.fontSize, fontFamily: 'Inter' },
+  eventTitle: { color: colors.primary, fontWeight: '700', fontSize: typography.label.fontSize, fontFamily: 'Manrope' },
   eventStatus: { color: colors.primary, fontSize: typography.micro.fontSize, fontWeight: '700' },
   eventTime: { color: colors.primary, fontSize: typography.micro.fontSize, fontWeight: '700', marginTop: spacing.xs },
 
   // Month View Styles
   monthContainer: { flex: 1 },
   monthBlock: { marginBottom: spacing['2xl'], paddingHorizontal: spacing.xl },
-  monthBlockTitle: { fontSize: typography.label.fontSize, fontWeight: '700', color: colors.textPrimary, marginBottom: spacing.base, fontFamily: 'Inter', letterSpacing: 1 },
+  monthBlockTitle: { fontSize: typography.label.fontSize, fontWeight: '700', color: colors.textPrimary, marginBottom: spacing.base, fontFamily: 'Manrope', letterSpacing: 1 },
   monthHeaderRow: { flexDirection: 'row', marginBottom: spacing.md },
-  monthHeaderDay: { width: '14.28%', textAlign: 'center', fontSize: typography.micro.fontSize, fontWeight: '700', color: colors.textSecondary, fontFamily: 'Inter' },
+  monthHeaderDay: { width: '14.28%', textAlign: 'center', fontSize: typography.micro.fontSize, fontWeight: '700', color: colors.textSecondary, fontFamily: 'Manrope' },
   monthGrid: { flexDirection: 'row', flexWrap: 'wrap' },
   monthCell: { width: '14.28%', aspectRatio: 1, justifyContent: 'center', alignItems: 'center', marginBottom: spacing.sm, borderRadius: radius.md },
   monthCellSelected: { backgroundColor: colors.primary },
-  monthDateText: { fontSize: typography.label.fontSize, fontWeight: '700', color: colors.textPrimary, fontFamily: 'Inter' },
+  monthDateText: { fontSize: typography.label.fontSize, fontWeight: '700', color: colors.textPrimary, fontFamily: 'Manrope' },
   monthDot: { width: 4, height: 4, borderRadius: radius.pill, backgroundColor: colors.primary, marginTop: spacing.xs },
 
   // Popup Styles
@@ -686,29 +686,29 @@ const getStyles = ({ colors, typography, spacing, radius }: Theme) => StyleSheet
   popupHeaderBtn: { padding: spacing.xs },
   
   popupContent: { padding: spacing.xl },
-  popupTitle: { fontSize: typography.title.fontSize, fontWeight: '700', fontFamily: 'Inter', marginBottom: spacing.base },
+  popupTitle: { fontSize: typography.title.fontSize, fontWeight: '700', fontFamily: 'Manrope', marginBottom: spacing.base },
   
   popupRow: { flexDirection: 'row', marginBottom: spacing.base, alignItems: 'flex-start' },
   popupIconPlaceholder: { width: 24, marginRight: spacing.md }, // For alignment if needed
   popupRowIcon: { fontSize: typography.body.fontSize, width: 24, marginRight: spacing.md, textAlign: 'center' },
   
-  popupTime: { fontSize: typography.label.fontSize, fontFamily: 'Inter', flex: 1, lineHeight: 20 },
-  popupLocation: { fontSize: typography.label.fontSize, fontFamily: 'Inter', flex: 1, lineHeight: 20 },
+  popupTime: { fontSize: typography.label.fontSize, fontFamily: 'Manrope', flex: 1, lineHeight: 20 },
+  popupLocation: { fontSize: typography.label.fontSize, fontFamily: 'Manrope', flex: 1, lineHeight: 20 },
   
-  popupSectionTitle: { fontSize: typography.caption.fontSize, fontWeight: '600', marginBottom: spacing.sm, fontFamily: 'Inter' },
+  popupSectionTitle: { fontSize: typography.caption.fontSize, fontWeight: '600', marginBottom: spacing.sm, fontFamily: 'Manrope' },
   popupAttendees: { gap: spacing.sm },
   popupAttendeeRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   popupAttendeeDot: { width: 8, height: 8, borderRadius: radius.pill, backgroundColor: colors.border },
-  popupAttendeeName: { fontSize: typography.label.fontSize, fontFamily: 'Inter' },
+  popupAttendeeName: { fontSize: typography.label.fontSize, fontFamily: 'Manrope' },
   
-  popupDescription: { fontSize: typography.label.fontSize, fontFamily: 'Inter', lineHeight: 20, flex: 1 },
+  popupDescription: { fontSize: typography.label.fontSize, fontFamily: 'Manrope', lineHeight: 20, flex: 1 },
   
   popupButton: { paddingVertical: spacing.md, borderRadius: radius.sm, alignItems: 'center', marginTop: spacing.xl },
-  popupButtonText: { color: colors.onPrimary, fontWeight: '700', fontSize: typography.label.fontSize, fontFamily: 'Inter' },
+  popupButtonText: { color: colors.onPrimary, fontWeight: '700', fontSize: typography.label.fontSize, fontFamily: 'Manrope' },
 
   // Toast
   toastContainer: { position: 'absolute', bottom: 100, left: '20%', right: '20%', backgroundColor: colors.scrim, padding: spacing.md, borderRadius: radius.xl, alignItems: 'center', zIndex: 300 },
-  toastText: { color: colors.onColor, fontSize: typography.caption.fontSize, fontWeight: '600', fontFamily: 'Inter', textAlign: 'center' },
+  toastText: { color: colors.onColor, fontSize: typography.caption.fontSize, fontWeight: '600', fontFamily: 'Manrope', textAlign: 'center' },
 });
 
 export default EventPlanner;

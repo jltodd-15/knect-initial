@@ -550,27 +550,27 @@ const getStyles = ({ colors, typography, spacing, radius }: Theme) => StyleSheet
   container: { flex: 1, backgroundColor: colors.background },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: spacing.xl, paddingVertical: spacing.lg },
   closeBtn: { padding: spacing.xs },
-  headerTitle: { fontSize: typography.caption.fontSize, fontWeight: '700', color: colors.textPrimary, letterSpacing: 1, fontFamily: 'Inter' },
+  headerTitle: { fontSize: typography.caption.fontSize, fontWeight: '700', color: colors.textPrimary, letterSpacing: 1, fontFamily: 'Manrope' },
   
   content: { flex: 1 },
   scrollContent: { padding: spacing.xl },
   
-  titleInput: { fontSize: typography.display.fontSize, fontWeight: '700', color: colors.textPrimary, fontFamily: 'Inter', marginBottom: spacing['2xl'], padding: 0 },
+  titleInput: { fontSize: typography.display.fontSize, fontWeight: '700', color: colors.textPrimary, fontFamily: 'Manrope', marginBottom: spacing['2xl'], padding: 0 },
   
   card: { backgroundColor: colors.surface, borderRadius: radius.xl, padding: spacing.lg, borderWidth: 1, borderColor: colors.border },
   cardRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  cardLabel: { fontSize: typography.micro.fontSize, fontWeight: '700', color: colors.textSecondary, letterSpacing: 1, fontFamily: 'Inter', marginBottom: spacing.xs },
-  cardValue: { fontSize: typography.body.fontSize, fontWeight: '600', color: colors.textPrimary, fontFamily: 'Inter' },
+  cardLabel: { fontSize: typography.micro.fontSize, fontWeight: '700', color: colors.textSecondary, letterSpacing: 1, fontFamily: 'Manrope', marginBottom: spacing.xs },
+  cardValue: { fontSize: typography.body.fontSize, fontWeight: '600', color: colors.textPrimary, fontFamily: 'Manrope' },
   
   avatarRow: { flexDirection: 'row', marginTop: spacing.xs },
   avatar: { width: 32, height: 32, borderRadius: radius.pill, borderWidth: 2, borderColor: colors.surface },
 
   timeRow: { flexDirection: 'row', marginTop: spacing.base },
   timeCard: { flex: 1, backgroundColor: colors.surface, borderRadius: radius.xl, padding: spacing.lg, borderWidth: 1, borderColor: colors.border },
-  timeValue: { fontSize: typography.body.fontSize, fontWeight: '600', color: colors.textPrimary, fontFamily: 'Inter', marginTop: spacing.xs },
-  timeSubValue: { fontSize: typography.label.fontSize, color: colors.textSecondary, fontFamily: 'Inter', marginTop: spacing.xs },
+  timeValue: { fontSize: typography.body.fontSize, fontWeight: '600', color: colors.textPrimary, fontFamily: 'Manrope', marginTop: spacing.xs },
+  timeSubValue: { fontSize: typography.label.fontSize, color: colors.textSecondary, fontFamily: 'Manrope', marginTop: spacing.xs },
   
-  plainInput: { fontSize: typography.body.fontSize, fontWeight: '600', color: colors.textPrimary, fontFamily: 'Inter', padding: 0, marginTop: spacing.xs },
+  plainInput: { fontSize: typography.body.fontSize, fontWeight: '600', color: colors.textPrimary, fontFamily: 'Manrope', padding: 0, marginTop: spacing.xs },
   
   colorRow: { flexDirection: 'row', gap: spacing.md },
   colorCircle: { width: 32, height: 32, borderRadius: radius.pill, justifyContent: 'center', alignItems: 'center' },
@@ -578,41 +578,41 @@ const getStyles = ({ colors, typography, spacing, radius }: Theme) => StyleSheet
   
   footer: { padding: spacing.xl, paddingTop: spacing.md, backgroundColor: colors.background, borderTopWidth: 1, borderColor: colors.border },
   saveBtn: { height: 56, borderRadius: radius.pill, justifyContent: 'center', alignItems: 'center' },
-  saveText: { fontSize: typography.caption.fontSize, fontWeight: '700', letterSpacing: 1, fontFamily: 'Inter' },
+  saveText: { fontSize: typography.caption.fontSize, fontWeight: '700', letterSpacing: 1, fontFamily: 'Manrope' },
 
   // Friends Step Styles
   searchContainer: { flexDirection: 'row', alignItems: 'center', backgroundColor: colors.surfaceAlt, padding: spacing.md, borderRadius: radius.lg, marginBottom: spacing.base, borderWidth: 1, borderColor: colors.border },
-  searchInput: { flex: 1, fontSize: typography.label.fontSize, color: colors.textPrimary, fontFamily: 'Inter', fontWeight: '600' },
+  searchInput: { flex: 1, fontSize: typography.label.fontSize, color: colors.textPrimary, fontFamily: 'Manrope', fontWeight: '600' },
   friendRow: { flexDirection: 'row', alignItems: 'center', padding: spacing.base, borderRadius: radius.xl, marginBottom: spacing.md, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
   friendRowSelected: { backgroundColor: colors.primary, borderColor: colors.primary },
   friendRowBusy: { backgroundColor: colors.dangerSurface, borderColor: colors.dangerSurface },
   friendAvatar: { width: 48, height: 48, borderRadius: radius.pill, marginRight: spacing.base },
-  friendName: { fontSize: typography.label.fontSize, fontWeight: '700', color: colors.textPrimary, fontFamily: 'Inter' },
+  friendName: { fontSize: typography.label.fontSize, fontWeight: '700', color: colors.textPrimary, fontFamily: 'Manrope' },
   busyLabel: { fontSize: typography.micro.fontSize, fontWeight: '700', color: colors.danger, marginTop: spacing.xs, letterSpacing: 0.5 },
   checkCircle: { width: 24, height: 24, borderRadius: radius.pill, backgroundColor: colors.onColor, justifyContent: 'center', alignItems: 'center' },
 
   // Calendar Styles
   calendarHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing.xl },
-  calMonthTitle: { fontSize: typography.body.fontSize, fontWeight: '700', color: colors.textPrimary, fontFamily: 'Inter', letterSpacing: 1 },
+  calMonthTitle: { fontSize: typography.body.fontSize, fontWeight: '700', color: colors.textPrimary, fontFamily: 'Manrope', letterSpacing: 1 },
   calNavBtn: { padding: spacing.sm },
   weekRow: { flexDirection: 'row', marginBottom: spacing.md },
-  weekDayText: { width: '14.28%', textAlign: 'center', fontSize: typography.micro.fontSize, fontWeight: '700', color: colors.textSecondary, fontFamily: 'Inter' },
+  weekDayText: { width: '14.28%', textAlign: 'center', fontSize: typography.micro.fontSize, fontWeight: '700', color: colors.textSecondary, fontFamily: 'Manrope' },
   calGrid: { flexDirection: 'row', flexWrap: 'wrap' },
   calCell: { width: '14.28%', aspectRatio: 1, justifyContent: 'center', alignItems: 'center', marginBottom: spacing.sm, borderRadius: radius.md },
   calCellSelected: { backgroundColor: colors.primary },
-  calDateText: { fontSize: typography.body.fontSize, fontWeight: '700', color: colors.textPrimary, fontFamily: 'Inter' },
+  calDateText: { fontSize: typography.body.fontSize, fontWeight: '700', color: colors.textPrimary, fontFamily: 'Manrope' },
 
   // Hours Styles
   hourRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: spacing.lg, borderRadius: radius.lg, marginBottom: spacing.sm, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
   hourRowExpanded: { backgroundColor: colors.primary, borderColor: colors.primary },
   hourRowConflict: { backgroundColor: colors.dangerSurface, borderColor: colors.dangerSurface, opacity: 0.8 },
-  hourText: { fontSize: typography.body.fontSize, fontWeight: '700', color: colors.textPrimary, fontFamily: 'Inter' },
+  hourText: { fontSize: typography.body.fontSize, fontWeight: '700', color: colors.textPrimary, fontFamily: 'Manrope' },
   hourTextConflict: { color: colors.danger },
   conflictBadge: { backgroundColor: colors.dangerSurface, paddingHorizontal: spacing.sm, paddingVertical: spacing.xs, borderRadius: radius.sm },
   conflictText: { fontSize: typography.micro.fontSize, fontWeight: '700', color: colors.danger },
   minuteContainer: { flexDirection: 'row', gap: spacing.sm, marginBottom: spacing.base, paddingHorizontal: spacing.xs },
   minuteBtn: { flex: 1, backgroundColor: colors.surfaceAlt, padding: spacing.md, borderRadius: radius.md, alignItems: 'center' },
-  minuteText: { fontSize: typography.label.fontSize, fontWeight: '700', color: colors.textPrimary, fontFamily: 'Inter' }
+  minuteText: { fontSize: typography.label.fontSize, fontWeight: '700', color: colors.textPrimary, fontFamily: 'Manrope' }
 });
 
 export default CreateEventModal;

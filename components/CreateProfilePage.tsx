@@ -313,22 +313,22 @@ const CreateProfilePage: React.FC<Props> = ({ onComplete, submitting, identity, 
 const getStyles = ({ colors, typography, spacing, radius }: Theme) => StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
   header: { alignItems: 'center', marginTop: 40, marginBottom: spacing['2xl'] },
-  title: { ...typography.display, color: colors.primary, fontFamily: 'Inter', marginBottom: spacing.sm },
-  subtitle: { fontSize: typography.label.fontSize, color: colors.textSecondary, fontFamily: 'Inter' },
+  title: { ...typography.display, color: colors.primary, fontFamily: 'Manrope', marginBottom: spacing.sm },
+  subtitle: { fontSize: typography.label.fontSize, color: colors.textSecondary, fontFamily: 'Manrope' },
   
   avatarSection: { alignItems: 'center', marginBottom: spacing['2xl'] },
 
   form: { gap: spacing.xl },
   inputGroup: { gap: spacing.sm },
-  label: { fontSize: typography.caption.fontSize, fontWeight: '700', color: colors.textSecondary, letterSpacing: 1, fontFamily: 'Inter' },
-  input: { backgroundColor: colors.surfaceAlt, padding: spacing.base, borderRadius: radius.lg, fontSize: typography.body.fontSize, color: colors.textPrimary, fontFamily: 'Inter' },
+  label: { fontSize: typography.caption.fontSize, fontWeight: '700', color: colors.textSecondary, letterSpacing: 1, fontFamily: 'Manrope' },
+  input: { backgroundColor: colors.surfaceAlt, padding: spacing.base, borderRadius: radius.lg, fontSize: typography.body.fontSize, color: colors.textPrimary, fontFamily: 'Manrope' },
   
   prefilledRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: colors.surfaceAlt, padding: spacing.base, borderRadius: radius.lg },
-  prefilledName: { fontSize: typography.body.fontSize, color: colors.textPrimary, fontFamily: 'Inter' },
-  changeText: { fontSize: typography.caption.fontSize, fontWeight: '700', color: colors.primary, letterSpacing: 1, fontFamily: 'Inter' },
+  prefilledName: { fontSize: typography.body.fontSize, color: colors.textPrimary, fontFamily: 'Manrope' },
+  changeText: { fontSize: typography.caption.fontSize, fontWeight: '700', color: colors.primary, letterSpacing: 1, fontFamily: 'Manrope' },
 
   ruleList: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.md },
-  ruleText: { fontSize: typography.caption.fontSize, color: colors.textSecondary, fontFamily: 'Inter' },
+  ruleText: { fontSize: typography.caption.fontSize, color: colors.textSecondary, fontFamily: 'Manrope' },
   ruleMet: { color: colors.primary, fontWeight: '700' },
 
   tagCloud: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, marginTop: spacing.sm },
@@ -350,7 +350,7 @@ const getStyles = ({ colors, typography, spacing, radius }: Theme) => StyleSheet
   passwordRow: { justifyContent: 'center' },
   passwordInput: { paddingRight: 52 },
   eyeBtn: { position: 'absolute', right: spacing.md, padding: spacing.xs },
-  errorText: { color: colors.danger, textAlign: 'center', fontFamily: 'Anonymous Pro' }
+  errorText: { color: colors.danger, textAlign: 'center', fontFamily: 'Manrope' }
 });
 
 export default CreateProfilePage;
