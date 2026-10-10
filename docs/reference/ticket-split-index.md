@@ -246,3 +246,44 @@ All three from the first pass now have owners. What remains:
 | 🔴 **`Friends` is readable by every signed-in user** | Pending requests reveal who is trying to friend whom. 4.4 is the first screen built on that read rule | ⚠️ **Unruled.** Belongs to a rules ticket before launch, not to Project 4 |
 | **Seeing the app on a device** | 4.2's sweep is verified by looking at the phone; Kyson has an 8 GB M2 and an iPhone 15 with Developer Mode on | ⚠️ **Kyson is setting this up in a separate chat** — a release build runs without Metro |
 | **The repo is public** | Verified again 2026-10-07: it clones anonymously. J6 ruled `google-services.json` isn't a secret, but the roadmap and rules file are readable by anyone | ⚠️ **Known, not re-decided here** |
+
+---
+
+## Project 5 — appended 2026-10-10
+
+Edit pass run in Claude Code with Kyson. The parent page is `docs/tickets/5.md`; the original Google Doc text is kept at its bottom.
+
+| # | Title | Was | What it does | Verified by | `*` | Depends on | Flags and rulings |
+|---|---|---|---|---|---|---|---|
+| **5.1** | Cloud Functions Setup & Test Harness | D2, and the setup half of 5 | `functions/` project, emulator entry, callable auth helper, `npm run test:functions`, deploy script | `npm run test:functions` | — | `*3.1` | ✅ **Absorbs D2** (Kyson, 2026-10-07). Needs the Blaze plan. Three open brackets: Node version, region, what proves the harness |
+| **`*5.2`** | `acceptFriendRequest` & the 1-on-1 Chat | 5 Action B, plus 15.1's friend-accept entry point | One transaction: block check, both `Friends` writes, chat find-or-create | `npm run test:functions` | ⭐ | 5.1, `*3.2`, `*3.3` | ⭐ **Starred: Admin SDK write, fails quietly** (criteria 2 and 3). ✅ **RULED 2026-10-10: accept and chat land together.** Writes the find-or-create recipe 15.1 reuses. One open bracket: `chat_name` for a direct chat |
+| **`*5.3`** | Friend Actions — the App's Data Layer | 5 Actions A, C, D, E, F, plus the new Unblock | Seven actions and a relationship read in `services/FriendsService.ts`; pure rules in `services/friendsList.ts` | `npm test` (+ `npm run test:rules` for the block batch) | ⭐ | 4.4, 4.6, `*3.2`, `*5.2` | ⭐ **Starred: writes `blocked_users`; blocking gates App Review** (criterion 4). New app dependency `@react-native-firebase/functions`. No rules change: every write is already allowed and tested |
+| **5.4** | Friend Buttons — Accept, Decline, Star & the Shared Action Button | 5 §5, Appendix B.1 | `<FriendActionButton />`; Accept/Decline on pending rows; star toggle | `npm test` + a device with two accounts | — | `*5.3`, 4.4, 4.6, 4.5 | Four open brackets: where the button is mounted before 7, whether a starred row moves at once, what happens after Accept, the failure wording |
+
+### Rulings made in this session
+
+- **2026-10-10 — accepting a request and creating the 1-on-1 chat land together** (closes section 3.1's first Project 5 item; Decision Log F1, F7, S4).
+- **2026-10-10 — `Friends` being readable by every signed-in user is accepted for MVP.** `*3.4` should carry it as a known, accepted exposure.
+- **Sending a request is a client batch, not a Function.** Not a new ruling: `*3.2` (2026-09-09) put the block check in the `Friends` create rule, which is newer than Decision Log O4's "a Function mediates friend requests" (2026-08-25). O4 still holds for accepting.
+
+### Change List reconciliation — Project 5 (7 items)
+
+| Item | Result | Reason |
+|---|---|---|
+| 🔴 B9, acceptance rejected by the rules | **Answered by a ruling** | `Friends` update stays owner-only; acceptance is `acceptFriendRequest` (`*5.2`) |
+| 🔴 B10, block check unenforceable | **Applied, differently** | On send: the create rule checks `blocked_users` (`firestore.rules:56-59`, `:117`). On accept: the Function checks both directions |
+| 🔴 B11, canonical status strings | **Already applied** | In `MASTER_SCHEMA.md` and `CLAUDE.md` |
+| 🟡 Action F nested under Action E | **Applied** | Block is its own row in `*5.3` |
+| 🟡 No failure states | **Applied** | Optimistic with revert, per Appendix B.1 (5.4) |
+| 🟡 No unblock action | **Applied** | `*5.3` adds it. Its only control is ticket 7's |
+| 🟡 A blocked user's existing chats and events | **Carried as out of scope** | Stated in `*5.3`. Messages are hidden by 15.2's receive-side filter |
+
+### New or newly visible open items
+
+| Item | Why it matters | Status |
+|---|---|---|
+| 🔴 **Nothing in the app can block after Project 5** | The write exists (`*5.3`); the controls are 7's and 15.2's. Blocking gates App Review | ⚠️ Flagged for 7 and 15.2 |
+| **No "people I've blocked" list** | Unblock is reachable only from that person's profile | ⚠️ Unowned |
+| **Crossed friend requests** | The second sender's batch is denied; no handling is specified | ⚠️ Unspecified |
+| **Decision Log O4 wording** | Still says a Function mediates requests; for sending, `*3.2` superseded it | Stale reference, for the sweep |
+

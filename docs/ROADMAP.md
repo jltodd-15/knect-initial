@@ -30,7 +30,11 @@ Status key: **reviewed** · **written-unreviewed** · **needs split** (the Restr
 | 4.4 | Friends List & Pending Requests | written-unreviewed [PR open, **not merged** — tickets after it are written as if it were done] | | 4.3, `*3.2` | Read-only friends + pending |
 | 4.5 | Token, Font & Icon Update | written-unreviewed [built, `ticket/4.5`] | | 4.2, 4.6 | `theme/tokens.ts` up to Appendix A; Manrope; Lucide; `on-danger` |
 | 4.6 | Friends Box & Friends List Screen | written-unreviewed [built, `ticket/4.6`] | | 4.4, 4.1 | Counts on Search; list on its own screen |
-| 5 | Friend Request Logic | needs edit pass | `*` | 4.4; own Functions setup + chat creation (§3.3) | Send/accept/decline/star/remove/block |
+| 5 | Friend Requests (parent) | edit pass done 2026-10-10; split into 5.1–5.4 | | 4.4, 4.6 | Parent page; build from the sub-tickets |
+| 5.1 | Cloud Functions Setup & Test Harness | written-unreviewed, open brackets | | `*3.1` | `functions/` project and its test command. Absorbs D2 |
+| 5.2 | `acceptFriendRequest` & the 1-on-1 Chat | written-unreviewed, open brackets | `*` | 5.1, `*3.2`, `*3.3` | Block check, both friendship writes, chat find-or-create |
+| 5.3 | Friend Actions — Data Layer | written-unreviewed | `*` | 4.4, 4.6, `*5.2` | Send, accept, decline, star, remove, block, unblock |
+| 5.4 | Friend Buttons | written-unreviewed, open brackets | | `*5.3`, 4.5 | Accept/Decline, star toggle, shared action button |
 | 6 | Profile Picture Uploads | needs edit pass | | `*2.2`, D9 | Pick, compress, upload |
 | 7 | Public Profile Routing | needs edit pass | | 4.1, 5 | Tap a person → their profile |
 | 8 | Define Activity Schema | needs edit pass | | `*3.2` | Activity document in code |
@@ -52,7 +56,7 @@ Status key: **reviewed** · **written-unreviewed** · **needs split** (the Restr
 | 19 | External Calendar Sync | deferred | | 18 | Google/Apple Calendar |
 | 20 | Push Notifications | deferred | | Functions, 15.2, 16.x, 17.x | FCM + notification paths |
 | 21 | Deep Linking & SMS Sharing | deferred | | 4.1 | Growth loop |
-| D2 | Cloud Functions setup | unwritten (may fold into 5) | | 1.1 | Runtime, deploy, emulator, scheduler |
+| D2 | Cloud Functions setup | absorbed into 5.1 (2026-10-10) | | — | See 5.1 |
 | D4 | Location capture & geohash | unwritten | | `*2.2`, `*3.2` | Writes `Private_info.location`/`geohash` |
 | D5 | User status | unwritten | | `*2.2` | Available/unavailable |
 | D6 | Own-profile tab | unwritten | | 4.2 | Edit own profile; 3-state theme |
@@ -115,14 +119,17 @@ Tick as resolved. **blocks build** = the ticket can't go to Claude Code until th
 
 With 4.4 in PR, the next tickets by number are 5, 6 and 7. **None of them is ready for Claude Code** — all three are the original Google Doc text and have never been through the edit pass. The next step for each is an edit-pass session (Kyson + Claude chat, `edit-pass-brief.md`), not a build. The decisions that session needs:
 
-- [ ] **Project 5 — does accepting a request ship before the 1-on-1 chat step exists?** Kyson ruled (2026-10-07) that Project 5 scopes its own Functions setup and chat creation rather than waiting on D2 and 15.1; whether acceptance lands first without the chat is "that session's call." — **blocks build (5)**
-- [ ] **Project 5 — confirm no client-side acceptance path.** The Doc's Action B is a client batched write; `*3.2`'s owner-only `Friends` update denies it by ruling. Acceptance must be `acceptFriendRequest` (O4, F7). `*3.4` re-checks this. — **blocks build (5)**
-- [ ] **`Friends` is readable by every signed-in user, pending requests included.** 4.4 reads it and 5 writes it. Rule it before 5 widens the exposure, or explicitly accept it for MVP. — owner: rules ticket
+- [x] **Project 5 — does accepting a request ship before the 1-on-1 chat step exists?** Kyson ruled (2026-10-07) that Project 5 scopes its own Functions setup and chat creation rather than waiting on D2 and 15.1; whether acceptance lands first without the chat is "that session's call." — **blocks build (5)** **Ruled 2026-10-10: they land together** (`*5.2`).
+- [x] **Project 5 — confirm no client-side acceptance path.** The Doc's Action B is a client batched write; `*3.2`'s owner-only `Friends` update denies it by ruling. Acceptance must be `acceptFriendRequest` (O4, F7). `*3.4` re-checks this. — **blocks build (5)** **Confirmed in the edit pass:** `*5.3`'s Accept only calls the Function.
+- [x] **`Friends` is readable by every signed-in user, pending requests included.** 4.4 reads it and 5 writes it. Rule it before 5 widens the exposure, or explicitly accept it for MVP. — owner: rules ticket **Accepted for MVP (Kyson, 2026-10-10).**
 - [ ] **Project 6 — Storage path convention and `storage.rules` (D9).** Neither exists; 6 can't upload without both. Decide whether D9 folds into 6. — **blocks build (6)**
 - [ ] **Project 7 — designs.** It renders "your own profile page" minus controls, but D6 (own-profile tab) is unwritten, so there's no layout to mirror. Under the design-input gate, 7 needs a public-profile design or written spec. — **blocks build (7)**
 
 ### 3.2 Open brackets, by ticket
 
+- [ ] **5.1** — Node version for Functions; the Functions region (look up the Firestore database's region first); whether the harness is proved with an `acceptFriendRequest` shell. — **blocks build (5.1)**
+- [ ] **5.2** — `chat_name` for a direct chat. — **blocks build (5.2)**
+- [ ] **5.4** — where the action button is mounted before ticket 7; whether a starred row moves at once; stay on Search or open the chat after Accept; the failure message wording. — **blocks build (5.4)**
 - [ ] **0.2** — iOS bundle ID (`com.knect`?). Only open if 0.2 isn't built.
 - [ ] **D11** — what analytics events get logged.
 - [ ] **16.1** — Events listener date bound. — **blocks build (16.x)**
@@ -192,7 +199,7 @@ From earlier rulings, not yet in the ticket text:
 - [ ] **16.1 / 17.1** — still list `firestore.rules` as theirs to write and say "Rules Playground"; now verify-and-extend + emulator. 16.1 "Depends on: 3" → `*3.3`.
 - [ ] **17.1** — must write `Votes.created_by`; candidate Events need `linked_chat_id`.
 - [ ] **15.2** — 2.1 owns the Firestore config module, not 15.2; Messages create rule and blocking are now `*3.3`'s; reuse 4.4's `services/userProfileCache.ts` for sender names.
-- [ ] **5** — drop `friend_name` / `friend_profile_picture_url` (Q3); Appendix B.1 button copy; block check inside `acceptFriendRequest` (O4); add an unblock action (Change List, Project 5); promote Action F out from under Action E.
+- [x] **5** — applied in the 2026-10-10 edit pass (5.1–5.4): no denormalized fields, Appendix B.1 copy, block check in `acceptFriendRequest`, an unblock action, Block promoted to its own action.
 - [ ] **6** — no friend picture copies (Q3); `@d11/react-native-fast-image` is installed, delete the `react-native-fast-image` install steps; initials avatar is the floor (1.4); needs D9.
 - [ ] **7** — "Relationship Check" can't read another user's `blocked_users` (O4); "project 4 under 3.2" is gone (Appendix B.1); one-time `get()`, not a listener; push it on 4.1's root stack.
 - [ ] **8** — counters client-side `FieldValue.increment()` (O6); add `source` (required), `category` (required), `creator_id` (UGC only); no radius in the schema ticket (R18); UI section moves to 11/12.
@@ -212,7 +219,7 @@ From earlier rulings, not yet in the ticket text:
 - [ ] **Q4** — final `category` list (6 vs 15–20 illustrations). Project 8.
 - [ ] **Q11** — `status_visibility` values. D5.
 - [ ] **`@d11/react-native-fast-image`** — installed, owned by no ticket (likely 6 or 11).
-- [ ] **D2's fate** — Project 5 now scopes its own Functions setup; 15.x, 16.x, 17.x and 20 also need Functions. One setup, owned once.
+- [x] **D2's fate** — absorbed into 5.1 (2026-10-10). One Functions setup, owned once; 15.x, 16.x, 17.x and 20 build on it.
 - [ ] **Public repo** — `docs/reference/` puts the decision logs and rules reasoning in a public repo. Not a credential leak (J6), but a choice to make deliberately.
 
 ### 3.6 Still ambiguous — newest can't be determined
