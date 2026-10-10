@@ -100,7 +100,7 @@ Project 18 §0, applied to **every** ticket that writes UI.
 3. No guesses — no approximated layouts, placeholder colors, or stock icons.
 4. **Boards labeled "Potential" count as missing** until Kyson approves them.
 5. Data-layer work may proceed while waiting. Screens may not.
-6. Design source of truth: the **Knect Visual Directions** canvas (Direction A, "Refined Emerald"), plus what Kyson attaches in-session. Where it disagrees with Appendix A, the canvas/Project 18 is newer and wins (section 3.3).
+6. Design source of truth: the **Knect Visual Directions** canvas (Direction A, "Refined Emerald"), plus what Kyson attaches in-session. The export of that canvas is in `docs/design/`; its `README.md` lists every board and its status. Where it disagrees with Appendix A, the canvas/Project 18 is newer and wins (section 3.3).
 
 ---
 
