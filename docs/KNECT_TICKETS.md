@@ -15,7 +15,7 @@ The assembled file was 9,931 lines. It now lives as separate files, with the tex
 
 Nothing was dropped: every line of the assembled file is in one of these files or on this page. Edit tickets in place from here on; there is no second copy to keep in sync.
 
-**Two files in the repo root predate this folder and still stand.** The root [`ROADMAP.md`](../ROADMAP.md) holds the build notes for what has landed; `docs/ROADMAP.md` is the ticket index and the open decisions. The root [`MASTER_SCHEMA.md`](../MASTER_SCHEMA.md) is the copy `CLAUDE.md` names as the authority; `reference/master-schema.md` is the fuller working copy. Until the two schema files are reconciled in their own session, a field that differs between them is a stop-and-ask.
+**Two files in the repo root predate this folder and still stand.** The root [`ROADMAP.md`](../ROADMAP.md) holds the build notes for what has landed; `docs/ROADMAP.md` is the ticket index and the open decisions. The root [`MASTER_SCHEMA.md`](../MASTER_SCHEMA.md) is the schema authority (Kyson, 2026-10-09): new fields are added there, by the ticket that introduces them. `reference/master-schema.md` is the older working copy, kept for its change log and its open questions (the Q-codes); where a ticket says "the Master Schema" for a field name, read the root file. A field that differs between the two is a stop-and-ask.
 
 ## How to use it
 

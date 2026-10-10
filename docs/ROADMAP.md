@@ -136,7 +136,7 @@ With 4.4 in PR, the next tickets by number are 5, 6 and 7. **None of them is rea
 - [ ] **17.2** — on vote close, the event's clock restarts fresh or with the remainder.
 - [ ] **17.2** — rewrite `Free_Busy` when a winning option moves a confirmed event. Now reachable — 18.5 opened confirmed-event votes.
 - [ ] **17.2 / Q9** — build the vote-cancel button for MVP; if yes, `close_reason` gets a fourth value or none.
-- [ ] **Appendix B.1** — text color on `danger` fills now that `on-primary` is dark: add `on-danger: #ffffff`, or reuse another token.
+- [x] **Appendix B.1** — text on `danger` fills is **white** (Kyson, 2026-10-09). No existing token is white in both themes once `on-primary` goes dark, so the token follow-up ticket adds `on-danger: #ffffff` to Appendix A, `tokens.json` and `theme/tokens.ts`.
 - [ ] **18.2** — all-day `end_time`: inclusive end-of-day or exclusive next midnight. Pin it in the Master Schema. — **blocks build (18.2)**
 - [ ] **18.2** — multi-day: separate toggle or tap the end date.
 - [ ] **18.2** — confirm itineraries are deferred out of 18.
@@ -177,11 +177,13 @@ From Project 18 (Kyson, 2026-10-09):
 - [ ] **Free_Busy writer (plan's 16.8)** — also write on personal-event create/update/delete, respect the busy switch, move the block when a confirmed event's time changes.
 - [ ] **Project 17 — confirmed-event votes.** Widen vote scope past `proposed`; "Keep current time" mandatory in every alternative vote; no votes or tie keeps current time; deadline before the event; winner write-back updates `event_time`/`end_time` on a confirmed event; re-check against 16.7's sweep.
 - [ ] **16.1 text** — "do not rewrite the planner UI" points to 18; drag stays locked, time changes go through 18.5.
-- [ ] **Master Schema** — pin the all-day `end_time` convention; record `counts_as_busy`; record confirmed-event votes.
+- [ ] **Master Schema** — pin the all-day `end_time` convention; record `counts_as_busy`; record confirmed-event votes. These go into the root `MASTER_SCHEMA.md`, in the ticket that makes each change.
 - [ ] **Split Index** — add 18.1–18.5; mark D3 absorbed.
 - [ ] **Free_Busy now holds personal events.** Q2 accepted open reads because a block reveals only *that* you're busy, and named "adding content" as the trigger to revisit. Personal events add exposure without adding fields — re-confirm Q2.
 
 From earlier rulings, not yet in the ticket text:
+
+- [ ] **4.4 / Search tab — Friends becomes a tap-in box (Kyson, 2026-10-09).** Under the search bar the Search tab shows Pending requests and one Friends box with counts; tapping it opens the friends list on its own screen (`docs/design/app-screens/Search`, `FriendsList`). Reason: opening Search must not read every friend, and it is cleaner. The open 4.4 PR shows the list itself under the search bar, so this is a follow-up to 4.4, not part of it. **Open:** how the counts are read without reading every `Friends` document.
 
 - [ ] **15.1** — add/remove member writes `Events.shared_with` + `rsvps` for every open proposal; use `recent_message_sender_id` for the subtitle; its "blocking restricts new sends only" line predates the receive-side ruling; its `Chats` update rule is now `*3.3`'s.
 - [ ] **12** — "Make This An Event" → chooser (Planner or chat). **11** — share affordance on the Discover card.
